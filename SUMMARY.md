@@ -1,9 +1,15 @@
 # Table of contents
 
-* [📚 To Sort](README.md)
-* [🐧 Linux](linux/README.md)
+* [🐧 Linux](README.md)
   * [Useful commands](linux/useful-commands.md)
   * [Tips & Tricks](linux/tips-and-tricks.md)
 * [🐳 Docker](docker.md)
-* [Hacking Wiki](https://book.hacktricks.xyz)
+
+## 😎 Awesome Sites
+
 * [QuickRef](https://quickref.me/)
+* [Hacking Wiki](https://book.hacktricks.xyz)
+
+## ✍️ TODO
+
+* [R\&T](todo/r-and-t.md)
