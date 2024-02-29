@@ -1,6 +1,7 @@
 # Table of contents
 
-* [🐧 Linux](README.md)
+* [👋 Welcome](README.md)
+* [🐧 Linux](<README (1).md>)
   * [Useful commands](linux/useful-commands.md)
   * [Tips & Tricks](linux/tips-and-tricks.md)
 * [🐳 Docker](docker.md)
