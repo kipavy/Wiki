@@ -7,6 +7,8 @@
 * [Useful Commands](linux/useful-commands.md)
 * [🐳 Docker](linux/docker/README.md)
   * [Basics](linux/docker/basics.md)
+* [VS Code](linux/vs-code/README.md)
+  * [GUI on Codespace](linux/vs-code/gui-on-codespace.md)
 
 ## 😎 Awesome Sites
 
