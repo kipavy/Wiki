@@ -19,3 +19,5 @@
 ## ✍️ TODO
 
 * [R\&T](todo/r-and-t.md)
+* [Linux on Portable SSD](todo/linux-on-portable-ssd.md)
+* [Linux QuickStart Script](todo/linux-quickstart-script.md)
