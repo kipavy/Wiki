@@ -4,6 +4,7 @@
 
 ## 🐧 Linux
 
+* [Basics](linux/basics.md)
 * [Useful Commands](linux/useful-commands.md)
 * [Linux on Portable SSD](linux/linux-on-portable-ssd.md)
 * [🐳 Docker](linux/docker/README.md)
