@@ -22,10 +22,12 @@ At the time of writing this tutorial, the Ubuntu installer has a problem: the di
 1. Prepare a bootable Ubuntu USB or any linux . If you have a fast USB Drive >64 GB, I recommend to install [Medicat](../todo/medicat.md).
 2. Boot on USB (use safe graphics if it crashes)
 3. Enter in mode "try ubuntu" to create EFI partition (this step is crucial, it enable the portability of the drive, it allows the drive to have its own boot option so that any PC can detect it)
-4. open gparted, select your external drive (NOT LINUX USB), créér partition FAT32 500 MO, puis clic droit, manage flags, boot + esp.
-5. enlever les flags boot et esp du disque de l’OS principal pour être certain que grub sera sur le ssd externe
-6. Lancer l’installation et au moment des partition choisir personnalisé
-7. Créer 1 partition ‘/’ ext4 de la taille souhaitée ex: 80 GO Créer 1 partition ‘swap’ de 1g GO (même si il en faudrait une de 16 si vous avez 16GO RAM)
+4. open gparted, select your external drive (NOT LINUX USB), create FAT32 500 MB partition , then right click on it, manage flags, boot + esp.
+5. remove boot+esp flags from your PC main OS to ensure grub will install on the external drive and not on your PC (currently ubuntu install has this bug where it always selects the first EFI partition detected to install grub on it).
+6. Start linux install, when asked, select custom partitioning
+7. Here are the partitions you need to create:
+   1. root: ‘/’; ext4; the size you want for the OS eg: 80 GB
+   2. ‘swap’; linux-swap; 1GB (ideally use at least 16GB if you have 16GB RAM)
 8. Une fois que vous avez sur le SSD externe: 1 partition EFI, 1 Partition ‘/’ et 1 partition ‘swap’
 
 <figure><img src="../.gitbook/assets/image.png" alt=""><figcaption><p>Ici J’ai formaté le reste de l’espace libre en NTFS pour pouvoir l’utiliser dans windows</p></figcaption></figure>
