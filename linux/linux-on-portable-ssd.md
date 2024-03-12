@@ -25,18 +25,25 @@ At the time of writing this tutorial, the Ubuntu installer has a problem: the di
 4. open gparted, select your external drive (NOT LINUX USB), create FAT32 500 MB partition , then right click on it, manage flags, boot + esp.
 5. remove boot+esp flags from your PC main OS to ensure grub will install on the external drive and not on your PC (currently ubuntu install has this bug where it always selects the first EFI partition detected to install grub on it).
 6. Start linux install, when asked, select custom partitioning
-7. Here are the partitions you need to create:
+7. Here are the partitions you need to create on your external Drive:
    1. root: ‘/’; ext4; the size you want for the OS eg: 80 GB
    2. ‘swap’; linux-swap; 1GB (ideally use at least 16GB if you have 16GB RAM)
-8. Une fois que vous avez sur le SSD externe: 1 partition EFI, 1 Partition ‘/’ et 1 partition ‘swap’
 
-<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption><p>Ici J’ai formaté le reste de l’espace libre en NTFS pour pouvoir l’utiliser dans windows</p></figcaption></figure>
+Here is how it should look like:
 
-9. Lancer l’installation normalement
-10. Une fois dans Ubuntu, faire `sudo update-grub` et dans gparted (`sudo apt install gparted`) Remettre les flags boot, esp pour les disques qui l’avaient avant opération (en gros les disque de démarrage)
-11. SI CA MARCHE PLUS APRES REINSTALLATION WINDOWS:
-    1. Boot manuellement sur ubuntu depuis le bios
-    2.
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption><p>Here I formatted the free space to NTFS to use the free space as an external Drive in any OS</p></figcaption></figure>
 
-        <figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
-    3. remettre USB après windows dans le BIOS
+9. Continue install normally
+10. Once you are in ubuntu, do <mark style="color:red;">`sudo update-grub`</mark> and install gparted to re-enable the EFI flags on your PC's main OS: <mark style="color:red;">`sudo apt install gparted`</mark> re-enable boot + esp flags for the drives that had it before step 5. (basically your boot drives, C: drive on windows)
+
+***
+
+{% hint style="info" %}
+if you reinstalled your main OS and your PC won't automatically boot on the SSD when it's 1st in the boot order, follow these quick steps:
+{% endhint %}
+
+1. Go in BIOS and manually boot on your external drive (select the OS manager EFI partition, not the USB Drive entry itself)
+2.  Follow this screenshot to reorder your boot option to ensure ubuntu is first.
+
+    <figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+3. If it still doesn't work, go in BIOS and set low boot priority to USB so it will first boot on grub and not on the default USB boot option that will lead to a boot loop.
