@@ -7,6 +7,7 @@
 * [Basics](linux/basics.md)
 * [Useful Commands](linux/useful-commands.md)
 * [Linux on Portable SSD](linux/linux-on-portable-ssd.md)
+* [QuickStartup Script](linux/quickstartup-script.md)
 * [🐳 Docker](linux/docker/README.md)
   * [Introduction](linux/docker/introduction.md)
   * [Easy Monitoring](linux/docker/easy-monitoring.md)
@@ -26,4 +27,3 @@
 ## ✍️ TODO
 
 * [R\&T](todo/r-and-t.md)
-* [Linux QuickStart Script](todo/linux-quickstart-script.md)
