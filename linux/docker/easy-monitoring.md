@@ -2,7 +2,9 @@
 
 ## (Choice 1) VS Code's docker extension
 
-## (Choice 2) Portainer:
+[https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
+
+## (Choice 2) Portainer
 
 1. Copy paste this in terminal
 
