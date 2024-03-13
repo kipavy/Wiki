@@ -27,4 +27,3 @@
 
 * [R\&T](todo/r-and-t.md)
 * [Linux QuickStart Script](todo/linux-quickstart-script.md)
-* [Medicat](todo/medicat.md)

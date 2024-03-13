@@ -19,7 +19,7 @@ For any PC to be able to detect the SSD as bootable, the SSD must include an esp
 
 At the time of writing this tutorial, the Ubuntu installer has a problem: the disk selected for installing the bootloader (GRUB) is not currently the one on which GRUB will be installed, GRUB will be installed on the first efi partition detected, in other words, in the case of a Windows PC, GRUB will be installed on the Windows PC and therefore the SSD will not be bootable on another PC, and the Windows PC will no longer boot when the external SSD is unplugged. To remedy this, in a live Ubuntu for example and using gparted, remove the boot and esp flags from any disk, create the efi partition on the external SSD with the boot and esp flags. Install, then reset the flags. This way, the only disk to have the flags will be the external SSD.
 
-1. Prepare a bootable Ubuntu USB or any linux . If you have a fast USB Drive >64 GB, I recommend to install [Medicat](../todo/medicat.md).
+1. Prepare a bootable Ubuntu USB or any linux . If you have a fast USB Drive >64 GB, I recommend to install [Medicat](../awesome-tools/medicat.md).
 2. Boot on USB (use safe graphics if it crashes)
 3. Enter in mode "try ubuntu" to create EFI partition (this step is crucial, it enable the portability of the drive, it allows the drive to have its own boot option so that any PC can detect it)
 4. open gparted, select your external drive (NOT LINUX USB), create FAT32 500 MB partition , then right click on it, manage flags, boot + esp.
