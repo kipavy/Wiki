@@ -41,7 +41,60 @@ docker push your_username/your_image:latest
 
 ## [Docker Compose](https://docs.docker.com/compose/)
 
-The docker compose command makes the creation of containers easy. You first need to create a docker-compose.yml file
+The docker compose command makes the creation of containers easy. You first need to create a docker-compose.yml file, here is an example :
+
+```yaml
+---
+services:
+  # MARIADB
+  db:
+    image: mariadb:latest
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
+      MYSQL_DATABASE: blog
+      MYSQL_USER: bloguser
+      MYSQL_PASSWORD: pass123
+    volumes:
+      - dbvol:/var/lib/mysql
+    networks:
+      - blognet
+    restart: always
+
+  # PHPMYADMIN
+  dbadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      PMA_HOST: db
+    ports:
+      - 9090:80
+    networks:
+      - blognet
+    restart: always
+
+  # WORDPRESSs
+  web:
+    image: wordpress:latest
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: bloguser
+      WORDPRESS_DB_PASSWORD: pass123
+      WORDPRESS_DB_NAME: blog
+    ports:
+      - 9000:80
+    networks:
+      - blognet
+    volumes:
+      - webvol:/var/www/html/wp-content
+    restart: always
+
+volumes:
+  dbvol:
+  webvol:
+
+networks:
+  blognet:
+...
+```
 
 [^1]: Src folder path or docker volume name
 
