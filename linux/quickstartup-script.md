@@ -9,6 +9,7 @@ print_recommendations() {
     echo "Recommended GNOME Shell Extensions:"
     echo "- Clipboard indicator"
     echo "- Tiling Assistant"
+    echo "- Add to Desktop"
     echo "- Burn My Window"
     echo "- Compiz alike magic lamp effect"
     echo "- Compiz window effect"
