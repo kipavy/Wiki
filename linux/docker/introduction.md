@@ -2,6 +2,12 @@
 
 ## Basics
 
+Here we launch a container named "test" in "detached interactive terminal" so that it runs in the background, and we mount the local pagesweb folder in the /usr/usr/share/nginx container folder in read-only mode, finally using the official nginx image:
+
+```bash
+docker run —name test -dit -p 8080:80 -v ~/pagesweb:/usr/usr/share/nginx/html:ro nginx
+```
+
 ### [Mounting](https://docs.docker.com/storage/bind-mounts/)
 
 \-v src[^1]:dest[^2]:ro[^3]  OR  --mount type=tmpfs[^4],src=folder1,dst=folder2
@@ -34,6 +40,8 @@ docker push your_username/your_image:latest
 ```
 
 ## [Docker Compose](https://docs.docker.com/compose/)
+
+The docker compose command makes the creation of containers easy. You first need to create a docker-compose.yml file
 
 [^1]: Src folder path or docker volume name
 
