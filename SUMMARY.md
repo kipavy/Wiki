@@ -13,9 +13,14 @@
 * [VS Code](linux/vs-code/README.md)
   * [GUI on Codespace](linux/vs-code/gui-on-codespace.md)
 
+## 💻 Awesome Tools
+
+* [Medicat](awesome-tools/medicat.md)
+
 ## 😎 Awesome Sites
 
 * [Hacking Wiki](https://book.hacktricks.xyz)
+* [Github Awesome](https://github.com/sindresorhus/awesome)
 * [QuickRef](https://quickref.me/)
 
 ## ✍️ TODO
