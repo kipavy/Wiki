@@ -41,13 +41,25 @@ docker push your_username/your_image:latest
 
 ## [Docker Compose](https://docs.docker.com/compose/)
 
+### [Install](https://docs.docker.com/compose/install/)
+
+```bash
+sudo apt update
+sudo apt install docker-compose-plugin
+```
+
+### Usage
+
 The docker compose command makes the creation of containers easy. You first need to create a docker-compose.yml file, here is an example :
 
-```yaml
----
+{% hint style="warning" %}
+Be Careful: Each Docker Volume/Network used need to be created in the compose file outside of services (level 0 of yaml), see the end of the example.
+{% endhint %}
+
+<pre class="language-yaml"><code class="lang-yaml">---
 services:
   # MARIADB
-  db:
+  <a data-footnote-ref href="#user-content-fn-5">db</a>:
     image: mariadb:latest
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 1
@@ -71,7 +83,7 @@ services:
       - blognet
     restart: always
 
-  # WORDPRESSs
+  # WORDPRESS
   web:
     image: wordpress:latest
     environment:
@@ -94,7 +106,20 @@ volumes:
 networks:
   blognet:
 ...
-```
+</code></pre>
+
+and run:
+
+<pre class="language-bash" data-full-width="false"><code class="lang-bash">docker compose up <a data-footnote-ref href="#user-content-fn-6">-d</a>
+</code></pre>
+
+### [Basic commands](https://docs.docker.com/reference/cli/docker/compose/)
+
+* Run Docker Compose file: <mark style="color:red;">`docker compose up -d`</mark>
+* Start all services: <mark style="color:red;">`docker compose up`</mark>
+* Stop all services: <mark style="color:red;">`docker compose down`</mark>
+
+
 
 [^1]: Src folder path or docker volume name
 
@@ -103,3 +128,7 @@ networks:
 [^3]: Read-Only
 
 [^4]: optional
+
+[^5]: hostname of container, can be used thanks to docker dns service
+
+[^6]: Detached mode: Run containers in the background
