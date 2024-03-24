@@ -44,7 +44,7 @@ EOF
 
 #### (Option 1) Create a service with auto execution at startup:
 
-<pre class="language-bash"><code class="lang-bash">cat &#x3C;&#x3C;EOF >/tmp/my_service.service
+<pre class="language-bash"><code class="lang-bash">cat &#x3C;&#x3C;EOF >/etc/systemd/system/my_service.service
 [Unit]
 Description=My Script
 
