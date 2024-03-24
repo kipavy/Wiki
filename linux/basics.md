@@ -23,6 +23,8 @@ EOF
 
 ### Create Desktop shortcut
 
+#### For Scripts/Programs:
+
 ```bash
 cat <<EOF >~/Desktop/my_shortcut.desktop
 [Desktop Entry]
@@ -38,7 +40,10 @@ Categories=catégories du programme  #Exemple: Categories=Application;Game;Arcad
 EOF
 ```
 
+#### For file/folder shortcut:
 
+<pre class="language-bash"><code class="lang-bash">ln -s original.txt ~/<a data-footnote-ref href="#user-content-fn-1">Desktop</a>/shortcut.txt
+</code></pre>
 
 ### Scheduling tasks
 
@@ -55,7 +60,7 @@ ExecStart=/home/test/my_script.sh
 WantedBy=multi-user.target
 EOF
 
-<a data-footnote-ref href="#user-content-fn-1">sudo systemctl enable --now my_service</a> # Enables the service at startup and start it now
+<a data-footnote-ref href="#user-content-fn-2">sudo systemctl enable --now my_service</a> # Enables the service at startup and start it now
 </code></pre>
 
 #### (Option 2): Schedule tasks with crontab:
@@ -76,7 +81,9 @@ Here is 2 ways of scheduling tasks at reboot, if your task is complex, prefer sh
 @reboot [part to shell script]
 ```
 
-[^1]: Same as:
+[^1]: can change depending on OS language
+
+[^2]: Same as:
 
     <mark style="color:red;">`systemctl enable my_service`</mark>
 
