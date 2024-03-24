@@ -38,3 +38,46 @@ Categories=catégories du programme  #Exemple: Categories=Application;Game;Arcad
 EOF
 ```
 
+
+
+### Scheduling tasks
+
+#### (Option 1) Create a service with auto execution at startup:
+
+<pre class="language-bash"><code class="lang-bash">cat &#x3C;&#x3C;EOF >/tmp/my_service.service
+[Unit]
+Description=My Script
+
+[Service]
+ExecStart=/home/test/my_script.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+<a data-footnote-ref href="#user-content-fn-1">sudo systemctl enable --now my_service</a> # Enables the service at startup and start it now
+</code></pre>
+
+#### (Option 2): Schedule tasks with crontab:
+
+Crontab is more versatile, you can schedule very minute, hour, at reboot, whatever you want, see [https://crontab.guru/](https://crontab.guru/) for help.
+
+Here are the 2 most usedul crontab commands:
+
+```bash
+crontab -l  # List Current cron jobs
+crontab -e  # Edit jobs
+```
+
+Here is 2 ways of scheduling tasks at reboot, if your task is complex, prefer shell script:
+
+```antlr4
+@reboot [path to command] [argument1] [argument2] … [argument n]
+@reboot [part to shell script]
+```
+
+[^1]: Same as:
+
+    <mark style="color:red;">`systemctl enable my_service`</mark>
+
+    <mark style="color:red;">`systemctl start my_service`</mark>
