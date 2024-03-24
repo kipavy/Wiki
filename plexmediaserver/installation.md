@@ -14,7 +14,7 @@ You can follow this tutorial if you prefer: [https://github.com/itsToggle/plex\_
 ## Requirements
 
 * A server running linux (e.g Debian) w/ Ethernet (min 1Gbits/s recommended)
-* (Optionnal) Smart Plug (If you want to turn on/off your server from anywere + monitor power consumption...)
+* [(Optionnal) Smart Plug (If you want to turn on/off your server from anywere + monitor power consumption...)](#user-content-fn-1)[^1]
 * 2.99€/month to spend for [https://alldebrid.fr/?uid=3dpui\&lang=fr](https://alldebrid.fr/?uid=3dpui\&lang=fr) (this allows you to have unlimited storage so you can have a poor 120GB SSD on for your server + eliminate need of VPN + Instant availability thanks to caching)
 
 ## Mount your debrid services
@@ -34,7 +34,7 @@ You need to install docker on your server: [https://docs.docker.com/engine/insta
 You also need to install docker compose if you don't have it, see [docker](../linux/docker/ "mention")
 {% endhint %}
 
-Download this file and edit the path to what you want, if you leave it unchanged, it will create a folder /home/plex and will put everything in it. Note that overseerr[^1], tautulli[^2] and flaresolverr[^3] are optional and can be removed from the compose.
+Download this file and edit the path to what you want, if you leave it unchanged, it will create a folder /home/plex and will put everything in it. Note that overseerr[^2], tautulli[^3] and flaresolverr[^4] are optional and can be removed from the compose.
 
 {% file src="../.gitbook/assets/docker-compose.yml" %}
 
@@ -50,6 +50,10 @@ You should see something like this:
 
 Open Plex Web UI to start configuration by opening [http://ipaddress:32400/web](http://ipaddress:32400/web) or [localhost:32400/web](https://localhost:32400/web)
 
+{% hint style="danger" %}
+You'll need to setup port forwarding on your server to access Plex anywere
+{% endhint %}
+
 ## Setup plex\_debrid
 
 See [https://github.com/itsToggle/plex\_debrid?tab=readme-ov-file#3-page\_facing\_up-setup-plex\_debrid](https://github.com/itsToggle/plex\_debrid?tab=readme-ov-file#3-page\_facing\_up-setup-plex\_debrid)
@@ -57,6 +61,10 @@ See [https://github.com/itsToggle/plex\_debrid?tab=readme-ov-file#3-page\_facing
 ```bash
 docker attach plex_debrid  # Then follow instructions
 ```
+
+{% hint style="warning" %}
+I don't provide tutorial for setting up jackett with flaresolverr, overseerr and tautulli as it is really simple and optionnal (actually jackett is optionnal but it is very hard to do without it).
+{% endhint %}
 
 ## Troobleshooting
 
@@ -125,8 +133,10 @@ docker run -d \
   lscr.io/linuxserver/overseerr:latest
 ```
 
-[^1]: Provides a clean & modern website for user requests management
+[^1]: Enable Restore on AC/Power Loss in BIOS Power Management to have the server to boot automatically when plug is turned on. Useful if there is a power outage.
 
-[^2]: Provides a monitoring app for your plex
+[^2]: Provides a clean & modern website for user requests management
 
-[^3]: Used to bypass some verifications on some sites like ygg
+[^3]: Provides a monitoring app for your plex
+
+[^4]: Used to bypass some verifications on some sites like ygg
