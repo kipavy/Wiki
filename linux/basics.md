@@ -49,7 +49,7 @@ EOF
 
 #### (Option 1) Create a service with auto execution at startup:
 
-<pre class="language-bash"><code class="lang-bash">sudo cat &#x3C;&#x3C;EOF >/etc/systemd/system/my_service.service
+<pre class="language-bash"><code class="lang-bash">sudo sh -c 'cat &#x3C;&#x3C;EOF >/etc/systemd/system/my_service.service
 [Unit]
 Description=My Script
 
@@ -58,7 +58,7 @@ ExecStart=/home/test/my_script.sh
 
 [Install]
 WantedBy=multi-user.target
-EOF
+EOF'
 
 <a data-footnote-ref href="#user-content-fn-2">sudo systemctl enable --now my_service</a> # Enables the service at startup and start it now
 </code></pre>
