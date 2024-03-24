@@ -1,5 +1,9 @@
 # Introduction
 
+## Installation
+
+[https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
+
 ## Basics
 
 Here we launch a container named "test" in "detached interactive terminal" so that it runs in the background, and we mount the local pagesweb folder in the /usr/usr/share/nginx container folder in read-only mode, finally using the official nginx image:

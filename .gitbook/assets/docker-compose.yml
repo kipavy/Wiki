@@ -1,0 +1,80 @@
+---
+name: plexmediaserver
+services:
+    plex_debrid:
+        container_name: plex_debrid
+        volumes:
+            - /home/plex/plex_debrid/config/:/config
+        network_mode: host
+        tty: true
+        stdin_open: true
+        restart: unless-stopped
+        pull_policy: always
+        image: itstoggle/plex_debrid
+
+    jackett:
+        container_name: jackett
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Europe/London
+            - AUTO_UPDATE=true
+        ports:
+            - 9117:9117
+        volumes:
+            - /home/plex/jackett/config/:/config
+            - /home/plex/jackett/downloads/:/downloads
+        dns:
+            - 1.1.1.1
+        restart: unless-stopped
+        image: lscr.io/linuxserver/jackett:latest
+
+    plex:
+        container_name: plex
+        network_mode: host
+        environment:
+            - TZ=Europe/London
+        volumes:
+            - /home/plex/plexmediaserver/config/:/config
+            - /home/plex/plexmediaserver/transcode/:/transcode
+            - /home/plex/plexmediaserver/data/:/data
+        restart: unless-stopped
+        pull_policy: always
+        image: lscr.io/linuxserver/plex:latest
+
+    flaresolverr:
+        container_name: flaresolverr
+        ports:
+            - 8191:8191
+        environment:
+            - LOG_LEVEL=info
+        restart: unless-stopped
+        pull_policy: always
+        image: ghcr.io/flaresolverr/flaresolverr:latest
+
+    overseerr:
+        container_name: overseerr
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Europe/London
+        ports:
+            - 5055:5055
+        volumes:
+            - /home/plex/overseerr/config/:/config
+        restart: unless-stopped
+        image: lscr.io/linuxserver/overseerr:latest
+
+    tautulli:
+        container_name: tautulli
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Europe/London
+        ports:
+            - 8181:8181
+        volumes:
+            - /home/plex/tautulli/config/:/config
+        restart: unless-stopped
+        image: lscr.io/linuxserver/tautulli:latest
+...

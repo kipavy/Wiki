@@ -14,6 +14,10 @@
 * [VS Code](linux/vs-code/README.md)
   * [GUI on Codespace](linux/vs-code/gui-on-codespace.md)
 
+## 🎬 PlexMediaServer
+
+* [Installation](plexmediaserver/installation.md)
+
 ## 💻 Awesome Tools
 
 * [Medicat](awesome-tools/medicat.md)
