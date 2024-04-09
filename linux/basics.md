@@ -40,6 +40,10 @@ Categories=catégories du programme  #Exemple: Categories=Application;Game;Arcad
 EOF
 ```
 
+You can also look at existing shortcuts by doing: <mark style="color:red;">`ls -l /usr/share/applications/`</mark>
+
+User specific shortcuts for app menu are in <mark style="color:red;">`~/.local/share/applications`</mark>
+
 #### For file/folder shortcut:
 
 <pre class="language-bash"><code class="lang-bash">ln -s original.txt ~/<a data-footnote-ref href="#user-content-fn-1">Desktop</a>/shortcut.txt
