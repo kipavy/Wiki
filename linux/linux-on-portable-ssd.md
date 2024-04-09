@@ -47,3 +47,15 @@ if you reinstalled your main OS and your PC won't automatically boot on the SSD 
 
     <figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 3. If it still doesn't work, go in BIOS and set low boot priority to USB so it will first boot on grub and not on the default USB boot option that will lead to a boot loop.
+
+***
+
+If you have new chipset error or long boot try these:
+
+1. sudo gedit /etc/default/grub
+2. Replace GRUB\_CMDLINE\_LINUX\_DEFAULT="quiet splash" with GRUB\_CMDLINE\_LINUX\_DEFAULT="quiet splash nomodeset nouveau.modeset=0"
+3. save & exit
+4. sudo update-grub
+
+If you just have a long boot try to disable secure boot in bios.
+
