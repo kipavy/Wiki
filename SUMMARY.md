@@ -13,7 +13,7 @@
   * [Introduction](linux/docker/introduction.md)
   * [Easy Monitoring](linux/docker/easy-monitoring.md)
 * [VS Code](linux/vs-code/README.md)
-  * [SSH Codespace](linux/vs-code/ssh-codespace.md)
+  * [Codespace as SSH Proxy](linux/vs-code/codespace-as-ssh-proxy.md)
   * [GUI on Codespace](linux/vs-code/gui-on-codespace.md)
 
 ## 🎬 PlexMediaServer
