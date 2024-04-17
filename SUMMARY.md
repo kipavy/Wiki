@@ -13,6 +13,7 @@
   * [Introduction](linux/docker/introduction.md)
   * [Easy Monitoring](linux/docker/easy-monitoring.md)
 * [VS Code](linux/vs-code/README.md)
+  * [SSH Codespace](linux/vs-code/ssh-codespace.md)
   * [GUI on Codespace](linux/vs-code/gui-on-codespace.md)
 
 ## 🎬 PlexMediaServer
@@ -31,6 +32,5 @@
 
 ## ✍️ TODO
 
-* [SSH Codespace](todo/ssh-codespace.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
 * [R\&T](todo/r-and-t.md)

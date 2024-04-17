@@ -60,11 +60,10 @@ sudo apt install docker-compose-plugin
 The docker compose command makes the creation of containers easy. You first need to create a docker-compose.yml file, here is an example :
 
 {% hint style="warning" %}
-Be Careful: Each Docker Volume/Network used need to be created in the compose file outside of services (level 0 of yaml), see the end of the example.
+Be Careful: Each Docker Volume/Network used need to be created in the compose file outside of services (level 0 of yaml), see the end of the example. By default all of the containers will be created in the same docker network.
 {% endhint %}
 
-<pre class="language-yaml"><code class="lang-yaml">---
-services:
+<pre class="language-yaml"><code class="lang-yaml">services:
   # MARIADB
   <a data-footnote-ref href="#user-content-fn-6">db</a>:
     image: mariadb:latest
@@ -112,7 +111,6 @@ volumes:
 
 networks:
   blognet:
-...
 </code></pre>
 
 and run:
