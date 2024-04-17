@@ -2,6 +2,9 @@
 
 ## Installation
 
+<pre class="language-bash" data-full-width="false"><code class="lang-bash"><a data-footnote-ref href="#user-content-fn-1">sudo groupadd docker ; sudo usermod -aG docker $USER</a>
+</code></pre>
+
 [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 
 ## Basics
@@ -14,7 +17,7 @@ docker run —name test -dit -p 8080:80 -v ~/pagesweb:/usr/usr/share/nginx/html:
 
 ### [Mounting](https://docs.docker.com/storage/bind-mounts/)
 
-\-v src[^1]:dest[^2]:ro[^3]  OR  --mount type=tmpfs[^4],src=folder1,dst=folder2
+\-v src[^2]:dest[^3]:ro[^4]  OR  --mount type=tmpfs[^5],src=folder1,dst=folder2
 
 ## [Dockerfile](https://docs.docker.com/reference/dockerfile/)
 
@@ -63,7 +66,7 @@ Be Careful: Each Docker Volume/Network used need to be created in the compose fi
 <pre class="language-yaml"><code class="lang-yaml">---
 services:
   # MARIADB
-  <a data-footnote-ref href="#user-content-fn-5">db</a>:
+  <a data-footnote-ref href="#user-content-fn-6">db</a>:
     image: mariadb:latest
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 1
@@ -114,7 +117,7 @@ networks:
 
 and run:
 
-<pre class="language-bash" data-full-width="false"><code class="lang-bash">docker compose up <a data-footnote-ref href="#user-content-fn-6">-d</a>
+<pre class="language-bash" data-full-width="false"><code class="lang-bash">docker compose up <a data-footnote-ref href="#user-content-fn-7">-d</a>
 </code></pre>
 
 ### [Basic commands](https://docs.docker.com/reference/cli/docker/compose/)
@@ -125,14 +128,16 @@ and run:
 
 
 
-[^1]: Src folder path or docker volume name
+[^1]: If you don't do this before install you may have permissions issues with docker
 
-[^2]: Destination folder, inside container
+[^2]: Src folder path or docker volume name
 
-[^3]: Read-Only
+[^3]: Destination folder, inside container
 
-[^4]: optional
+[^4]: Read-Only
 
-[^5]: hostname of container, can be used thanks to docker dns service
+[^5]: optional
 
-[^6]: Detached mode: Run containers in the background
+[^6]: hostname of container, can be used thanks to docker dns service
+
+[^7]: Detached mode: Run containers in the background
