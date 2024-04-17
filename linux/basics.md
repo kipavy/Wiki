@@ -85,6 +85,20 @@ Here is 2 ways of scheduling tasks at reboot, if your task is complex, prefer sh
 @reboot [part to shell script]
 ```
 
+### Zip & Unzip Using tar
+
+#### Zip
+
+```bash
+tar -czvf path/to/target.tar.gz path/to/dir
+```
+
+#### Unzip
+
+```bash
+tar -xvf path/to/archive.tar.gz
+```
+
 [^1]: can change depending on OS language
 
 [^2]: Same as:
