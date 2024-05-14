@@ -32,6 +32,7 @@
 
 ## ✍️ TODO
 
+* [Kubuntu 24.04](todo/kubuntu-24.04.md)
 * [Github](todo/github.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
 * [R\&T](todo/r-and-t.md)
