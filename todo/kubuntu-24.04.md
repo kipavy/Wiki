@@ -5,7 +5,7 @@ description: Update, remove & block snap completely + install flatpak for Discov
 # Kubuntu 24.04
 
 {% hint style="warning" %}
-Make sure you have internet access
+This will delete all of your snap apps
 {% endhint %}
 
 1. <mark style="color:red;">`sudo apt update && sudo apt full-upgrade`</mark>
