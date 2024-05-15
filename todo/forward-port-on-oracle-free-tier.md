@@ -10,7 +10,7 @@ sudo apt-get install firewalld
 sudo systemctl enable firewalld
 sudo systemctl start firewalld
 
-sudo firewall-cmd --zone=public --add-port=32400/tcp --permanent`
+sudo firewall-cmd --zone=public --add-port=32400/tcp --permanent
 sudo firewall-cmd --reload
 
 sudo iptables -A INPUT -m state --state NEW -p tcp --dport 32400 -j ACCEPT
