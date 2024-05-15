@@ -32,6 +32,7 @@
 
 ## ✍️ TODO
 
+* [Forward Port on Oracle Free Tier](todo/forward-port-on-oracle-free-tier.md)
 * [Kubuntu 24.04](todo/kubuntu-24.04.md)
 * [Github](todo/github.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
