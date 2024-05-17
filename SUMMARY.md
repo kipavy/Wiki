@@ -9,6 +9,7 @@
 * [Linux on Portable SSD](linux/linux-on-portable-ssd.md)
 * [QuickStartup Script](linux/quickstartup-script.md)
 * [Change Bash Colors](linux/change-bash-colors.md)
+* [Add flatpak for Kubuntu 24.04](linux/add-flatpak-for-kubuntu-24.04.md)
 * [🐳 Docker](linux/docker/README.md)
   * [Introduction](linux/docker/introduction.md)
   * [Easy Monitoring](linux/docker/easy-monitoring.md)
@@ -16,9 +17,15 @@
   * [Codespace as SSH Proxy](linux/vs-code/codespace-as-ssh-proxy.md)
   * [GUI on Codespace](linux/vs-code/gui-on-codespace.md)
 
+***
+
+* [Git](git/README.md)
+  * [Github SSH Access for private repo](git/github-ssh-access-for-private-repo.md)
+
 ## 🎬 PlexMediaServer
 
 * [Installation](plexmediaserver/installation.md)
+* [Forward Port on Oracle Free Tier](plexmediaserver/forward-port-on-oracle-free-tier.md)
 
 ## 💻 Awesome Tools
 
@@ -32,8 +39,5 @@
 
 ## ✍️ TODO
 
-* [Forward Port on Oracle Free Tier](todo/forward-port-on-oracle-free-tier.md)
-* [Kubuntu 24.04](todo/kubuntu-24.04.md)
-* [Github](todo/github.md)
-* [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
 * [R\&T](todo/r-and-t.md)
+* [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
