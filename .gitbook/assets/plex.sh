@@ -5,6 +5,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # TODO : Use systemd to manage auto start of the rclone mount (no more need service for udpate as watchtower is used)
+# TODO : plex_debrid init config needs interactivity, no compose up -d possible
 
 update_and_install_dependencies() {
     echo -e "${GREEN}\nUpdating system and installing dependencies (rclone, curl, whiptail)...\n${NC}"
