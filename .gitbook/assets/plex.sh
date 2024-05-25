@@ -4,6 +4,10 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# TODO : Add a check for the user to confirm the installation of the dependencies
+# TODO : Use systemd to manage auto start of the rclone mount
+# TODO : Add watchtower to compose to update the containers
+
 update_and_install_dependencies() {
     echo -e "${GREEN}\nUpdating system and installing dependencies (rclone, curl, whiptail)...\n${NC}"
     sudo apt update
@@ -26,10 +30,12 @@ check_docker_installation() {
 }
 
 configure_and_mount_rclone() {
-    echo -e "${BLUE}\nPlease set up your remote for source files, when done just quit config with q\n${NC}"
+    echo -e "${BLUE}\nPlease set up your "plex" remote for source files, when done just quit config with q\n${NC}"
+    echo -e "${RED}Name your remote: plex otherwise the script will fail${NC}"
     rclone config
+    echo -e "${GREEN}\nMounting rclone remote to /home/plex/data/rclone ...\n${NC}"
     if rclone listremotes > /dev/null 2>&1; then
-        rclone mount my-remote:links /home/plex/data/rclone --dir-cache-time 10s --allow-other
+        rclone mount plex:links /home/plex/data/rclone --dir-cache-time 10s --allow-other
     else
         echo "rclone configuration failed or no remotes configured. Exiting."
         exit 1
