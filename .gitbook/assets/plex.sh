@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
@@ -32,8 +32,7 @@ configure_and_mount_rclone() {
     echo -e "${RED}Name your remote: plex, otherwise the script will fail.${NC}"
 
     while true; do
-        # Use 'script' to open an interactive shell for rclone config
-        script -q -c 'rclone config' /dev/null
+        rclone config
         echo -e "${GREEN}\nChecking if \"plex\" remote is configured...\n${NC}"
         if rclone listremotes | grep -q "^plex:"; then
             echo -e "${GREEN}\n\"plex\" remote is configured successfully.\n${NC}"
