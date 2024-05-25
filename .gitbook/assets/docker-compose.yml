@@ -76,3 +76,11 @@ services:
             - /home/plex/tautulli/config/:/config
         restart: unless-stopped
         image: lscr.io/linuxserver/tautulli:latest
+
+    watchtower:
+        container_name: watchtower
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        restart: unless-stopped
+        pull_policy: always
+        image: containrrr/watchtower:latest

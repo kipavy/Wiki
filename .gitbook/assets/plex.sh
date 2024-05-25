@@ -25,7 +25,7 @@ check_docker_installation() {
         echo "Docker is not installed. Please install Docker and run the script again."
     fi
     if ! command -v docker compose > /dev/null; then
-        echo "Docker Compose is not installed. Please install Docker Compose and run the script again."
+        echo "Docker Compose is not installed. Please install Docker Compose and run the script again. See https://docs.docker.com/engine/install/"
     fi
 }
 
@@ -45,6 +45,7 @@ configure_and_mount_rclone() {
 display_and_process_checklist() {
     # Define the checkable options
     CHECKABLE_OPTIONS=(
+        "Watchtower" "Auto update containers" ON
         "Plex Debrid" "Used to treat users requests" ON
         "Jackett" "Scrapper" ON
         "Flaresolverr" "May be used by Jackett to Bypass Captcha" ON
@@ -69,24 +70,28 @@ display_and_process_checklist() {
     # Process the selected checkable options
     for CHOICE in $CHOICES; do
         case $CHOICE in
+            "\"Watchtower\"")
+                echo "Option 1 selected: Watchtower"
+                SELECTED_OPTIONS+=( "watchtower" )
+                ;;
             "\"Plex Debrid\"")
-                echo "Option 1 selected: Plex Debrid"
+                echo "Option 2 selected: Plex Debrid"
                 SELECTED_OPTIONS+=( "plex_debrid" )
                 ;;
             "\"Jackett\"")
-                echo "Option 2 selected: Jackett"
+                echo "Option 3 selected: Jackett"
                 SELECTED_OPTIONS+=( "jackett" )
                 ;;
             "\"Flaresolverr\"")
-                echo "Option 3 selected: Flaresolverr"
+                echo "Option 4 selected: Flaresolverr"
                 SELECTED_OPTIONS+=( "flaresolverr" )
                 ;;
             "\"Overseerr\"")
-                echo "Option 4 selected: Overseerr"
+                echo "Option 5 selected: Overseerr"
                 SELECTED_OPTIONS+=( "overseerr" )
                 ;;
             "\"Tautulli\"")
-                echo "Option 5 selected: Tautulli"
+                echo "Option 6 selected: Tautulli"
                 SELECTED_OPTIONS+=( "tautulli" )
                 ;;
         esac
