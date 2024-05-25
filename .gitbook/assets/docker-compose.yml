@@ -39,6 +39,8 @@ services:
             - /home/plex/plexmediaserver/data/:/data
         restart: unless-stopped
         pull_policy: always
+        labels:
+            - "com.centurylinklabs.watchtower.enable=false"
         image: lscr.io/linuxserver/plex:latest
 
     flaresolverr:
@@ -62,6 +64,7 @@ services:
         volumes:
             - /home/plex/overseerr/config/:/config
         restart: unless-stopped
+        pull_policy: always
         image: lscr.io/linuxserver/overseerr:latest
 
     tautulli:
@@ -75,6 +78,7 @@ services:
         volumes:
             - /home/plex/tautulli/config/:/config
         restart: unless-stopped
+        pull_policy: always
         image: lscr.io/linuxserver/tautulli:latest
 
     watchtower:
