@@ -32,12 +32,12 @@ configure_and_mount_rclone() {
     echo -e "${RED}Name your remote: plex otherwise the script will fail${NC}"
     rclone config
     echo -e "${GREEN}\nMounting rclone remote to /home/plex/data/rclone ...\n${NC}"
-    if rclone listremotes > /dev/null 2>&1; then
-        rclone mount plex:links /home/plex/data/rclone --dir-cache-time 10s --allow-other
-    else
-        echo "rclone configuration failed or no remotes configured. Exiting."
-        exit 1
-    fi
+    # if rclone listremotes > /dev/null 2>&1; then
+    #     rclone mount plex:links /home/plex/data/rclone --dir-cache-time 10s --allow-other
+    # else
+    #     echo "rclone configuration failed or no remotes configured. Exiting."
+    #     exit 1
+    # fi
 }
 
 display_and_process_checklist() {
