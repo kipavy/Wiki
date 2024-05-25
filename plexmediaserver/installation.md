@@ -12,7 +12,7 @@ I made a script that set up a full Plex stack with auto start & updates... Just 
 {% endhint %}
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Crackvignoule/Wiki/main/.gitbook/assets/plex.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Crackvignoule/Wiki/main/.gitbook/assets/plex.sh | bash
 ```
 
 ***
