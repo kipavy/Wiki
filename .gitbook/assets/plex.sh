@@ -1,5 +1,29 @@
 #!/usr/bin/env bash
 
+echo "Welcome to the Plex setup script !"
+echo "This script will install the latest version of Plex Media Server and other services."
+
+# Verify if docker and docker compose (not docker-compose) are installed, if not install them
+if ! command -v docker > /dev/null; then
+    # echo "Docker is not installed. Installing Docker ..."
+    # sudo usermod -aG docker $USER
+    # curl -fsSL https://get.docker.com | sh
+    echo "Docker is not installed. Please install Docker and run the script again."
+fi
+if ! command -v docker-compose > /dev/null; then
+    echo "Docker Compose is not installed. Installing Docker Compose ..."
+    echo "Please install Docker Compose and run the script again."
+fi
+
+
+
+echo "Updating the system ..."
+sudo apt update
+sudo apt full-upgrade -y
+
+echo "Installing dependencies (rclone, curl, whiptail)..."
+sudo apt install -y curl rclone whiptail
+
 echo "Welcome ! Set up your remote for source files (WebDav ...)"
 rclone config
 
