@@ -4,7 +4,6 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# TODO : Use systemd to manage auto start of the rclone mount (no more need service for udpate as watchtower is used)
 # TODO : plex_debrid init config needs interactivity, no compose up -d possible
 
 update_and_install_dependencies() {
@@ -43,9 +42,29 @@ configure_and_mount_rclone() {
         fi
     done
 
-    echo -e "${GREEN}\nMounting rclone remote to /home/plex/data/rclone ...\n${NC}"
-    mkdir -p /home/plex/data/rclone
-    rclone mount plex:links /home/plex/data/rclone --dir-cache-time 10s --allow-other &
+    echo -e "${GREEN}\nCreating systemd service for rclone mount...\n${NC}"
+    # Create the systemd service file
+    cat <<EOF | sudo tee /etc/systemd/system/plex_rclone.service >/dev/null
+[Unit]
+Description=RClone Mount Service for Plex
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=rclone mount plex:links /home/plex/data/rclone --dir-cache-time 10s --allow-other
+Restart=always
+
+[Install]
+WantedBy=default.target
+EOF
+
+    # Reload systemd to pick up the new service file
+    sudo systemctl daemon-reload
+
+    # Enable and start the service
+    sudo systemctl enable --now plex_rclone.service
+
+    echo -e "${GREEN}\nRClone mount systemd service 'plex_rclone' created and started successfully.\n${NC}"
 }
 
 
