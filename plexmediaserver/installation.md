@@ -8,6 +8,16 @@ description: >-
 # Installation
 
 {% hint style="success" %}
+I made a script that set up a full Plex stack with auto start & updates... Just run this:
+{% endhint %}
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Crackvignoule/Wiki/main/.gitbook/assets/plex.sh | bash
+```
+
+***
+
+{% hint style="success" %}
 You can follow this tutorial if you prefer: [https://github.com/itsToggle/plex\_debrid](https://github.com/itsToggle/plex\_debrid)
 {% endhint %}
 
