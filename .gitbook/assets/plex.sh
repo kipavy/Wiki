@@ -15,11 +15,15 @@ if ! command -v docker-compose > /dev/null; then
     echo "Please install Docker Compose and run the script again."
 fi
 
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+echo -e "I ${RED}love${NC} Stack Overflow"
 
-
-echo "Updating the system ..."
+echo -e "\e[1;32mUpdating the system ...\e[0m"
 sudo apt update
 sudo apt full-upgrade -y
+sudo apt autoremove
+sudo apt clean
 
 echo "Installing dependencies (rclone, curl, whiptail)..."
 sudo apt install -y curl rclone whiptail
