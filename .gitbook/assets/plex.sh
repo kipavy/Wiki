@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
 echo "Welcome to the Plex setup script !"
 echo "This script will install the latest version of Plex Media Server and other services."
@@ -10,25 +14,19 @@ if ! command -v docker > /dev/null; then
     # curl -fsSL https://get.docker.com | sh
     echo "Docker is not installed. Please install Docker and run the script again."
 fi
-if ! command -v docker-compose > /dev/null; then
+if ! command -v docker compose > /dev/null; then
     echo "Docker Compose is not installed. Installing Docker Compose ..."
     echo "Please install Docker Compose and run the script again."
 fi
 
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-echo -e "I ${RED}love${NC} Stack Overflow"
-
-echo -e "\e[1;32mUpdating the system ...\e[0m"
+echo -e "${GREEN}\nUpdating system and installing dependencies (rclone, curl, whiptail)...\n${NC}"
 sudo apt update
 sudo apt full-upgrade -y
+sudo apt install -y curl rclone whiptail
 sudo apt autoremove
 sudo apt clean
 
-echo "Installing dependencies (rclone, curl, whiptail)..."
-sudo apt install -y curl rclone whiptail
-
-echo "Welcome ! Set up your remote for source files (WebDav ...)"
+echo -e "${BLUE}\nPlease set up your remote for source files (WebDav ...)\n${NC}"
 rclone config
 
 # Check if rclone configuration was successful
