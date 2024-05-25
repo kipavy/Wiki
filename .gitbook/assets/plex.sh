@@ -28,17 +28,25 @@ check_docker_installation() {
 }
 
 configure_and_mount_rclone() {
-    echo -e "${BLUE}\nPlease set up your "plex" remote for source files, when done just quit config with q\n${NC}"
-    echo -e "${RED}Name your remote: plex otherwise the script will fail${NC}"
-    rclone config
+    echo -e "${BLUE}\nPlease set up your \"plex\" remote for source files. When done, just quit config with q.\n${NC}"
+    echo -e "${RED}Name your remote: plex, otherwise the script will fail.${NC}"
+
+    while true; do
+        rclone config
+        echo -e "${GREEN}\nChecking if \"plex\" remote is configured...\n${NC}"
+        if rclone listremotes | grep -q "^plex:"; then
+            echo -e "${GREEN}\n\"plex\" remote is configured successfully.\n${NC}"
+            break
+        else
+            echo -e "${RED}\n\"plex\" remote is not configured. Please try again.\n${NC}"
+        fi
+    done
+
     echo -e "${GREEN}\nMounting rclone remote to /home/plex/data/rclone ...\n${NC}"
-    # if rclone listremotes > /dev/null 2>&1; then
-    #     rclone mount plex:links /home/plex/data/rclone --dir-cache-time 10s --allow-other
-    # else
-    #     echo "rclone configuration failed or no remotes configured. Exiting."
-    #     exit 1
-    # fi
+    mkdir -p /home/plex/data/rclone
+    rclone mount plex:links /home/plex/data/rclone --dir-cache-time 10s --allow-other &
 }
+
 
 display_and_process_checklist() {
     # Define the checkable options
