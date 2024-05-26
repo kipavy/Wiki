@@ -18,13 +18,17 @@ update_and_install_dependencies() {
 
 check_docker_installation() {
     if ! command -v docker > /dev/null; then
-        # echo "Docker is not installed. Installing Docker ..."
-        # sudo usermod -aG docker $USER
-        # curl -fsSL https://get.docker.com | sh
-        echo "Docker is not installed. Please install Docker and run the script again."
+        if whiptail --title "Docker not found" --yesno "Install docker using get docker script ?" 10 50; then
+            echo "Docker is not installed. Installing Docker ..."
+            sudo usermod -aG docker $USER
+            curl -fsSL https://get.docker.com | sh
+        else
+            echo "Docker is not installed. Please install Docker and run the script again."
+        fi
     fi
     if ! command -v docker compose > /dev/null; then
         echo "Docker Compose is not installed. Please install Docker Compose and run the script again. See https://docs.docker.com/engine/install/"
+        exit 1
     fi
 }
 
