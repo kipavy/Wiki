@@ -4,7 +4,8 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# TODO : plex_debrid init config needs interactivity, no compose up -d possible
+# TODO : real testing
+# TODO : Warn about port forwarding
 
 update_and_install_dependencies() {
     echo -e "${GREEN}\nUpdating system and installing dependencies (rclone, curl, whiptail)...\n${NC}"
@@ -42,9 +43,15 @@ configure_and_mount_rclone() {
         fi
     done
 
-    echo -e "${GREEN}\nCreating systemd service for rclone mount...\n${NC}"
-    # Create the systemd service file
-    cat <<EOF | sudo tee /etc/systemd/system/plex_rclone.service >/dev/null
+    echo -e "${GREEN}\nMounting rclone remote to /home/plex/data/rclone ...\n${NC}"
+    mkdir -p /home/plex/data/rclone
+    rclone mount plex:links /home/plex/data/rclone --dir-cache-time 10s --allow-other &
+
+    # Ask user if they want to create the systemd service
+    if whiptail --title "Create Systemd Service" --yesno "Do you want to create a systemd service to mount the plex remote at boot?" 10 60; then
+        echo -e "${GREEN}\nCreating systemd service for rclone mount...\n${NC}"
+        # Create the systemd service file
+        cat <<EOF | sudo tee /etc/systemd/system/plex_rclone.service >/dev/null
 [Unit]
 Description=RClone Mount Service for Plex
 After=network-online.target
@@ -58,13 +65,16 @@ Restart=always
 WantedBy=default.target
 EOF
 
-    # Reload systemd to pick up the new service file
-    sudo systemctl daemon-reload
+        # Reload systemd to pick up the new service file
+        sudo systemctl daemon-reload
 
-    # Enable and start the service
-    sudo systemctl enable --now plex_rclone.service
+        # Enable and start the service
+        sudo systemctl enable --now plex_rclone.service
 
-    echo -e "${GREEN}\nRClone mount systemd service 'plex_rclone' created and started successfully.\n${NC}"
+        echo -e "${GREEN}\nRClone mount systemd service 'plex_rclone' created and started successfully.\n${NC}"
+    else
+        echo -e "${RED}\nSkipping creation of systemd service for rclone mount.\n${NC}"
+    fi
 }
 
 
@@ -136,7 +146,16 @@ construct_and_execute_docker_compose() {
     # Execute the docker-compose command
     eval "$DOCKER_COMPOSE_COMMAND"
 
+    exit 0
+}
+
+finish_config() {
     echo "Everything placed under /home/plex/"
+    if [[ " ${SELECTED_OPTIONS[*]} " == *"plex_debrid"* ]]; then
+        echo -e "${BLUE}\nAlmost done, Entering plex_debrid configuration...\n${NC}"
+        docker attach plex_debrid
+    fi
+    echo -e "${GREEN}\nLast step, Open Plex Web UI to start configuration by opening http://<ipaddress>:32400/web or http://localhost:32400/web\n${NC}"
     exit 0
 }
 
@@ -149,3 +168,4 @@ update_and_install_dependencies
 configure_and_mount_rclone
 display_and_process_checklist
 construct_and_execute_docker_compose
+finish_config
