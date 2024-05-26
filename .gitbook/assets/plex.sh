@@ -20,6 +20,7 @@ check_docker_installation() {
     if ! command -v docker > /dev/null; then
         if whiptail --title "Docker not found" --yesno "Install docker using get docker script ?" 10 50; then
             echo "Docker is not installed. Installing Docker ..."
+            sudo groupadd docker
             sudo usermod -aG docker $USER
             curl -fsSL https://get.docker.com | sh
         else
