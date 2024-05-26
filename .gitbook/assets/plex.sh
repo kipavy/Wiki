@@ -11,7 +11,7 @@ update_and_install_dependencies() {
     echo -e "${GREEN}\nUpdating system and installing dependencies (rclone, curl, whiptail)...\n${NC}"
     sudo apt update
     sudo apt full-upgrade -y
-    sudo apt install -y curl rclone whiptail
+    sudo apt install -y rclone whiptail
     sudo apt autoremove
     sudo apt clean
 }
