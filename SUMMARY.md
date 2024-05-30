@@ -16,6 +16,7 @@
 * [VS Code](linux/vs-code/README.md)
   * [Codespace as SSH Proxy](linux/vs-code/codespace-as-ssh-proxy.md)
   * [GUI on Codespace](linux/vs-code/gui-on-codespace.md)
+  * [Nice Extensions](linux/vs-code/nice-extensions.md)
 
 ***
 
