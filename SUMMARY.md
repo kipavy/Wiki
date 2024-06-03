@@ -40,5 +40,6 @@
 
 ## ✍️ TODO
 
+* [Docker compose](todo/docker-compose.md)
 * [R\&T](todo/r-and-t.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
