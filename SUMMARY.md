@@ -22,6 +22,7 @@
 
 * [Git](git/README.md)
   * [Github SSH Access for private repo](git/github-ssh-access-for-private-repo.md)
+  * [Creating a mirror of a repo](git/creating-a-mirror-of-a-repo.md)
 
 ## 🎬 PlexMediaServer
 
