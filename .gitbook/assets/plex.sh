@@ -6,30 +6,26 @@ NC='\033[0m' # No Color
 
 # TODO : real testing
 # TODO : Warn about port forwarding
+# TODO : Add more choices and robustness (for example, ask if user wants to run docker install script, unlock plex pass features for free...)
 
 update_and_install_dependencies() {
     echo -e "${GREEN}\nUpdating system and installing dependencies (rclone, curl, whiptail)...\n${NC}"
     sudo apt update
     sudo apt full-upgrade -y
-    sudo apt install -y rclone whiptail
+    sudo apt install -y curl rclone whiptail python3-venv
     sudo apt autoremove
     sudo apt clean
 }
 
 check_docker_installation() {
     if ! command -v docker > /dev/null; then
-        if whiptail --title "Docker not found" --yesno "Install docker using get docker script ?" 10 50; then
-            echo "Docker is not installed. Installing Docker ..."
-            sudo groupadd docker
-            sudo usermod -aG docker $USER
-            curl -fsSL https://get.docker.com | sh
-        else
-            echo "Docker is not installed. Please install Docker and run the script again."
-        fi
+        # echo "Docker is not installed. Installing Docker ..."
+        # sudo usermod -aG docker $USER
+        # curl -fsSL https://get.docker.com | sh
+        echo "Docker is not installed. Please install Docker and run the script again."
     fi
     if ! command -v docker compose > /dev/null; then
         echo "Docker Compose is not installed. Please install Docker Compose and run the script again. See https://docs.docker.com/engine/install/"
-        exit 1
     fi
 }
 
@@ -143,15 +139,26 @@ display_and_process_checklist() {
 
 construct_and_execute_docker_compose() {
     # Construct the docker-compose command based on the selected options
-    DOCKER_COMPOSE_COMMAND="curl -L https://raw.githubusercontent.com/Crackvignoule/Wiki/main/.gitbook/assets/docker-compose.yml -o - | docker compose -f - up -d"
+    DOCKER_COMPOSE_COMMAND="curl -L https://raw.githubusercontent.com/Crackvignoule/Wiki/main/.gitbook/assets/docker-compose.yml -o - | docker compose -f - up -d plex"
     for OPTION in "${SELECTED_OPTIONS[@]}"; do
         DOCKER_COMPOSE_COMMAND+=" $OPTION"
     done
 
     # Execute the docker-compose command
     eval "$DOCKER_COMPOSE_COMMAND"
+}
 
-    exit 0
+unlock_plex_pass_free() {
+    echo -e "${GREEN}\nUnlocking Plex Pass features for free (you're saving 100$)...\n${NC}"
+    # I couldnt use apt install because some patchelf versions are too recent for glib used in plex docker
+    # Installing patchelf in temp venv
+    python3 -m venv /tmp/pythonplex
+    source /tmp/pythonplex/bin/activate
+    pip install patchelf
+    PATCH_ELF_PATH=$(which patchelf)
+    sudo sh -c "PATH=$PATCH_ELF_PATH:$PATH; $(curl -sSL https://gitgud.io/yuv420p10le/plexmediaserver_crack/-/raw/master/scripts/crack_docker.sh)"
+    deactivate
+    rm -rf /tmp/pythonplex
 }
 
 finish_config() {
@@ -160,17 +167,18 @@ finish_config() {
         echo -e "${BLUE}\nAlmost done, Entering plex_debrid configuration...\n${NC}"
         docker attach plex_debrid
     fi
-    echo -e "${GREEN}\nLast step, Open Plex Web UI to start configuration by opening http://<ipaddress>:32400/web or http://localhost:32400/web\n${NC}"
+    echo -e "${GREEN}\nLast step, Open Plex Web UI to start configuration by opening http://localhost:32400/web or http://<ipaddress>:32400/web \n${NC}"
     exit 0
 }
 
 
 echo "Welcome to the Plex setup script !"
-echo "This script will install the latest version of Plex Media Server and other services."
+echo "This script has been made for Debian/Ubuntu/etc. It will install the latest version of Plex Media Server and other services."
 
 check_docker_installation
 update_and_install_dependencies
 configure_and_mount_rclone
 display_and_process_checklist
 construct_and_execute_docker_compose
+unlock_plex_pass_free
 finish_config
