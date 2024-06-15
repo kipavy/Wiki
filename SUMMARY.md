@@ -7,7 +7,7 @@
 * [Basics](linux/basics.md)
 * [Useful Commands](linux/useful-commands.md)
 * [Linux on Portable SSD](linux/linux-on-portable-ssd.md)
-* [QuickStartup Script](linux/quickstartup-script.md)
+* [Ubuntu Startup Script](linux/quickstartup-script.md)
 * [Change Bash Colors](linux/change-bash-colors.md)
 * [Add flatpak for Kubuntu 24.04](linux/add-flatpak-for-kubuntu-24.04.md)
 * [Troubleshooting](linux/troubleshooting.md)

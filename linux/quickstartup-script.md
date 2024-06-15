@@ -1,6 +1,6 @@
-# QuickStartup Script
+# Ubuntu Startup Script
 
-
+UBUNTU STARTUP SCRIPT
 
 ```bash
 #!/usr/bin/env bash
