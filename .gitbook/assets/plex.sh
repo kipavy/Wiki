@@ -46,9 +46,9 @@ configure_and_mount_rclone() {
         fi
     done
 
-    echo -e "${GREEN}\nMounting rclone remote to /home/plex/data/rclone ...\n${NC}"
-    mkdir -p /home/plex/data/rclone
-    rclone mount plex:links /home/plex/data/rclone --dir-cache-time 10s --allow-other &
+    echo -e "${GREEN}\nMounting rclone remote to /home/plex/plexmediaserver/data/rclone ...\n${NC}"
+    mkdir -p /home/plex/plexmediaserver/data/rclone
+    rclone mount plex:links /home/plex/plexmediaserver/data/rclone --dir-cache-time 10s --allow-other &
 
     # Ask user if they want to create the systemd service
     if whiptail --title "Create Systemd Service" --yesno "Do you want to create a systemd service to mount the plex remote at boot?" 10 60; then
@@ -61,7 +61,7 @@ After=network-online.target
 
 [Service]
 Type=simple
-ExecStart=rclone mount plex:links /home/plex/data/rclone --dir-cache-time 10s --allow-other
+ExecStart=rclone mount plex:links /home/plex/plexmediaserver/data/rclone --dir-cache-time 10s --allow-other
 Restart=always
 
 [Install]
