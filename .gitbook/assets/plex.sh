@@ -23,9 +23,11 @@ check_docker_installation() {
         # sudo usermod -aG docker $USER
         # curl -fsSL https://get.docker.com | sh
         echo "Docker is not installed. Please install Docker and run the script again."
+        exit 1
     fi
     if ! command -v docker compose > /dev/null; then
         echo "Docker Compose is not installed. Please install Docker Compose and run the script again. See https://docs.docker.com/engine/install/"
+        exit 1
     fi
 }
 
