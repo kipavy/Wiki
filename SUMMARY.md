@@ -10,6 +10,7 @@
 * [QuickStartup Script](linux/quickstartup-script.md)
 * [Change Bash Colors](linux/change-bash-colors.md)
 * [Add flatpak for Kubuntu 24.04](linux/add-flatpak-for-kubuntu-24.04.md)
+* [Troubleshooting](linux/troubleshooting.md)
 * [🐳 Docker](linux/docker/README.md)
   * [Introduction](linux/docker/introduction.md)
   * [Easy Monitoring](linux/docker/easy-monitoring.md)
