@@ -47,9 +47,24 @@ Here is how it should look like (ntfs if you want to use free remaining space as
 
 ## Troubleshooting
 
-### Not Booting:  busybox (initramfs) prompt. fix bad superblock :
+### Not Booting:  busybox (initramfs) prompt
+
+{% tabs %}
+{% tab title="Fix 1" %}
+### SSD got disconnected
+
+you can runb `blkid` to see if it got disconnected
+
+1. Unplug for 5s and replug SSD
+2. type `exit` and it should boot
+{% endtab %}
+
+{% tab title="Fix 2" %}
+### Recover bad superblock
 
 It happened to me many times that for no apparent reason my PC wont boot into linux on my external SSD, it would just load for a really long time and end up on a busybox (initramfs) prompt. This was really frustrating. I think it has something to do with force shutdown... Fortunately, I've found how to fix that. Check [https://www.cyberciti.biz/faq/recover-bad-superblock-from-corrupted-partition/](https://www.cyberciti.biz/faq/recover-bad-superblock-from-corrupted-partition/)
+
+
 
 1. Boot into Live USB Installation made before, Try Kubuntu
 2. Plug your external SSD
@@ -103,6 +118,8 @@ Fix? yes
 ```
 
 7. Done, now try to reboot on your external SSD and it should work.
+{% endtab %}
+{% endtabs %}
 
 ***
 
