@@ -1,6 +1,6 @@
 # Github SSH Access for private repo
 
-<pre class="language-bash"><code class="lang-bash"><strong>ssh-keygen -t ed25519 -C "your_email@example.com"
+<pre class="language-bash"><code class="lang-bash"><strong>ssh-keygen -t ed25519 -C "your_email@example.com" # PUT A PASSPHRASE OR IT WONT WORK
 </strong><strong>cat ~/.ssh/id_ed25519.pub
 </strong></code></pre>
 
