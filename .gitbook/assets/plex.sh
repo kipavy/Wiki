@@ -90,6 +90,7 @@ display_and_process_checklist() {
         "Flaresolverr" "May be used by Jackett to Bypass Captcha" ON
         "Overseerr" "Provides cool Web UI for user requests" OFF
         "Tautulli" "Management Dashboard for Plex" OFF
+        "Debrid Client Proxy" "Web UI Alldebrid Proxy" OFF
     )
 
     # Show the checklist dialog for checkable options
@@ -132,6 +133,10 @@ display_and_process_checklist() {
             "\"Tautulli\"")
                 echo "Option 6 selected: Tautulli"
                 SELECTED_OPTIONS+=( "tautulli" )
+                ;;
+            "\"Debrid Client Proxy\"")
+                echo "Option 7 selected: Debrid Client Proxy"
+                SELECTED_OPTIONS+=( "debridclientproxy" )
                 ;;
         esac
     done
@@ -179,7 +184,7 @@ echo "This script has been made for Debian/Ubuntu/etc. It will install the lates
 
 check_docker_installation
 update_and_install_dependencies
-configure_and_mount_rclone
+# configure_and_mount_rclone
 display_and_process_checklist
 construct_and_execute_docker_compose
 unlock_plex_pass_free

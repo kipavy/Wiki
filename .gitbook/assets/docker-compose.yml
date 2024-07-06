@@ -80,6 +80,14 @@ services:
         restart: unless-stopped
         pull_policy: always
         image: lscr.io/linuxserver/tautulli:latest
+    
+    debridclientproxy:
+        image: kipavy/debridclientproxy
+        restart: unless-stopped
+        ports:
+            - "80:5000"
+        environment:
+            - URL_PREFIX=/debrid
 
     watchtower:
         container_name: watchtower
