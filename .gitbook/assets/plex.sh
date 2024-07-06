@@ -85,12 +85,12 @@ display_and_process_checklist() {
     # Define the checkable options
     CHECKABLE_OPTIONS=(
         "Watchtower" "Auto update containers" ON
-        "Plex Debrid" "Used to treat users requests" ON
+        "PlexDebrid" "Used to treat users requests" ON
         "Jackett" "Scrapper" ON
         "Flaresolverr" "May be used by Jackett to Bypass Captcha" ON
         "Overseerr" "Provides cool Web UI for user requests" OFF
         "Tautulli" "Management Dashboard for Plex" OFF
-        "Debrid Client Proxy" "Web UI Alldebrid Proxy" OFF
+        "DebridClientProxy" "Web UI Alldebrid Proxy" OFF
     )
 
     # Show the checklist dialog for checkable options
@@ -108,14 +108,13 @@ display_and_process_checklist() {
     SELECTED_OPTIONS=()
 
     # Process the selected checkable options
-    eval "CHOICES=($CHOICES)"
-    for CHOICE in "${CHOICES[@]}"; do
+    for CHOICE in $CHOICES; do
         case $CHOICE in
             "\"Watchtower\"")
                 echo "Option 1 selected: Watchtower"
                 SELECTED_OPTIONS+=( "watchtower" )
                 ;;
-            "\"Plex Debrid\"")
+            "\"PlexDebrid\"")
                 echo "Option 2 selected: Plex Debrid"
                 SELECTED_OPTIONS+=( "plex_debrid" )
                 ;;
@@ -135,7 +134,7 @@ display_and_process_checklist() {
                 echo "Option 6 selected: Tautulli"
                 SELECTED_OPTIONS+=( "tautulli" )
                 ;;
-            "\"Debrid Client Proxy\"")
+            "\"DebridClientProxy\"")
                 echo "Option 7 selected: Debrid Client Proxy"
                 SELECTED_OPTIONS+=( "debridclientproxy" )
                 ;;
