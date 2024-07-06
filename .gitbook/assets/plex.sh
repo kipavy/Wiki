@@ -6,6 +6,7 @@ NC='\033[0m' # No Color
 
 # TODO : real testing
 # TODO : Warn about port forwarding
+# TODO : Clearly show to user, debridclientproxy URL
 # TODO : Add more choices and robustness (for example, ask if user wants to run docker install script, unlock plex pass features for free...)
 
 update_and_install_dependencies() {
@@ -184,7 +185,7 @@ echo "This script has been made for Debian/Ubuntu/etc. It will install the lates
 
 check_docker_installation
 update_and_install_dependencies
-# configure_and_mount_rclone
+configure_and_mount_rclone
 display_and_process_checklist
 construct_and_execute_docker_compose
 unlock_plex_pass_free
