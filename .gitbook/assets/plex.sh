@@ -108,7 +108,8 @@ display_and_process_checklist() {
     SELECTED_OPTIONS=()
 
     # Process the selected checkable options
-    for CHOICE in $CHOICES; do
+    eval "CHOICES=($CHOICES)"
+    for CHOICE in "${CHOICES[@]}"; do
         case $CHOICE in
             "\"Watchtower\"")
                 echo "Option 1 selected: Watchtower"
