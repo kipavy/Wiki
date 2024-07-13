@@ -60,6 +60,15 @@ you can runb `blkid` to see if it got disconnected
 {% endtab %}
 
 {% tab title="Fix 2" %}
+```bash
+sudo fsck -ac /dev/sda2  # your root partition
+
+# You can also try this one
+sudo fsck -f /dev/sda2  # your root partition 
+```
+{% endtab %}
+
+{% tab title="Fix 3" %}
 ### Recover bad superblock
 
 It happened to me many times that for no apparent reason my PC wont boot into linux on my external SSD, it would just load for a really long time and end up on a busybox (initramfs) prompt. This was really frustrating. I think it has something to do with force shutdown... Fortunately, I've found how to fix that. Check [https://www.cyberciti.biz/faq/recover-bad-superblock-from-corrupted-partition/](https://www.cyberciti.biz/faq/recover-bad-superblock-from-corrupted-partition/)
