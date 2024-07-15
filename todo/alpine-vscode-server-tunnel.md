@@ -35,7 +35,9 @@ depend() {
 EOF
 
 chmod +x /etc/init.d/code-tunnel
+rc-update add docker boot
 rc-update add code-tunnel default
+service docker start
 rc-service code-tunnel start
 
 ```
