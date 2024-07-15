@@ -18,13 +18,14 @@ https://wiki.alpinelinux.org/wiki/Docker
 apk add docker docker-cli-compose
 
 mkdir -p /etc/init.d
+# Commande user root so that terminal are root by default in vscode to run docker easily
 cat <<EOF >file
 #!/sbin/openrc-run
 
 name="code-tunnel"
 command="/home/alpine/code"
 command_args="tunnel"
-command_user="alpine"
+command_user="root"
 pidfile="/var/run/${RC_SVCNAME}.pid"
 logfile="/var/log/${RC_SVCNAME}.log"
 
