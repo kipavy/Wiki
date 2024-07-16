@@ -33,3 +33,5 @@ After installing zsh, if you want to change prompt (for e.g mine below) you can 
 2. Seek for the line with <mark style="color:red;">`POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`</mark>&#x20;
 3. You can then add whatever element you want to the list, it will show on the left side of the prompt in the order you specified, here is a list of elements for reference: [https://github.com/Powerlevel9k/powerlevel9k/blob/master/README.md#available-prompt-segments](https://github.com/Powerlevel9k/powerlevel9k/blob/master/README.md#available-prompt-segments)
 
+You can also change font-family: [https://github.com/romkatv/powerlevel10k?tab=readme-ov-file#manual-font-installation](https://github.com/romkatv/powerlevel10k?tab=readme-ov-file#manual-font-installation)&#x20;
+
