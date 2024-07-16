@@ -3,7 +3,7 @@
 #### Change default shell:
 
 ```bash
-chsh -s /bin/bash username
+chsh -s /bin/bash $USER
 ```
 
 **Create GIF with your screen view:**
