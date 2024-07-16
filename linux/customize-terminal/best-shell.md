@@ -27,7 +27,7 @@ fi
 
 After installing zsh, if you want to change prompt (for e.g mine below) you can by following these steps:
 
-<figure><img src="../../.gitbook/assets/image (11).png" alt=""><figcaption><p>Custom Prompt</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (13).png" alt=""><figcaption><p>Custom Prompt</p></figcaption></figure>
 
 1. Open <mark style="color:red;">`~/.p10k.zsh`</mark> in a text editor
 2. Seek for the line with <mark style="color:red;">`POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`</mark>&#x20;
