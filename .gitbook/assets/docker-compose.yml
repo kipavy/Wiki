@@ -81,6 +81,25 @@ services:
         pull_policy: always
         image: lscr.io/linuxserver/tautulli:latest
     
+    rclone:
+        image: rclone/rclone
+        container_name: rclone
+        restart: unless-stopped
+        devices:
+          - /dev/fuse
+        cap_add:
+          - SYS_ADMIN
+        security_opt:
+          - apparmor:unconfined
+        volumes:
+          - /home/plex/plexmediaserver/data/rclone/:/mnt/mountpoint:shared
+          - /home/plex/rclone.conf:/config/rclone/rclone.conf
+        command: mount plex:links /mnt/mountpoint \
+                 --dir-cache-time 10s \
+                 --allow-other \
+                 --allow-non-empty \
+                 --config /config/rclone/rclone.conf
+    
     debridclientproxy:
         image: kipavy/debridclientproxy
         restart: unless-stopped

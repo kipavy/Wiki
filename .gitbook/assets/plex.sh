@@ -5,6 +5,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # TODO : real testing
+# TODO : Add DISCLAIMER Warning about /home/plex/ creation
 # TODO : Warn about port forwarding
 # TODO : Clearly show to user, debridclientproxy URL
 # TODO : Add more choices and robustness (for example, ask if user wants to run docker install script, unlock plex pass features for free...)
@@ -32,55 +33,26 @@ check_docker_installation() {
     fi
 }
 
-configure_and_mount_rclone() {
-    echo -e "${BLUE}\nPlease set up your \"plex\" remote for source files. When done, just quit config with q.\n${NC}"
-    echo -e "${RED}Name your remote: plex, otherwise the script will fail.${NC}"
+rclone_config() {
+    # Asks for Alldebrid API Key then store it in API_KEY:
+    REMOTE_PASS=eeeee  # See https://help.alldebrid.com/en/Alldebrid%20tools/webdav
+    API_KEY=$(whiptail --inputbox "Please enter your Alldebrid API Key (https://alldebrid.com/apikeys/)" 8 78 --title "Alldebrid API Key" 3>&1 1>&2 2>&3)
+    OBSCURED_PASS=$(docker run --rm rclone/rclone obscure $REMOTE_PASS)
 
-    while true; do
-        rclone config
-        echo -e "${GREEN}\nChecking if \"plex\" remote is configured...\n${NC}"
-        if rclone listremotes | grep -q "^plex:"; then
-            echo -e "${GREEN}\n\"plex\" remote is configured successfully.\n${NC}"
-            break
-        else
-            echo -e "${RED}\n\"plex\" remote is not configured. Please try again.\n${NC}"
-        fi
-    done
+    # Use sudo to create the directory
+    sudo mkdir -p /home/plex
 
-    echo -e "${GREEN}\nMounting rclone remote to /home/plex/plexmediaserver/data/rclone ...\n${NC}"
-    mkdir -p /home/plex/plexmediaserver/data/rclone
-    rclone mount plex:links /home/plex/plexmediaserver/data/rclone --dir-cache-time 10s --allow-other &
-
-    # Ask user if they want to create the systemd service
-    if whiptail --title "Create Systemd Service" --yesno "Do you want to create a systemd service to mount the plex remote at boot?" 10 60; then
-        echo -e "${GREEN}\nCreating systemd service for rclone mount...\n${NC}"
-        # Create the systemd service file
-        cat <<EOF | sudo tee /etc/systemd/system/plex_rclone.service >/dev/null
-[Unit]
-Description=RClone Mount Service for Plex
-After=network-online.target
-
-[Service]
-Type=simple
-ExecStart=rclone mount plex:links /home/plex/plexmediaserver/data/rclone --dir-cache-time 10s --allow-other
-Restart=always
-
-[Install]
-WantedBy=default.target
+    # Use sudo and tee to write the file without needing to run the entire script as root
+    cat <<EOF | sudo tee /home/plex/rclone.conf > /dev/null
+[plex]
+type = webdav
+url = https://webdav.debrid.it/
+vendor = other
+user = $API_KEY
+pass = $OBSCURED_PASS
 EOF
-
-        # Reload systemd to pick up the new service file
-        sudo systemctl daemon-reload
-
-        # Enable and start the service
-        sudo systemctl enable --now plex_rclone.service
-
-        echo -e "${GREEN}\nRClone mount systemd service 'plex_rclone' created and started successfully.\n${NC}"
-    else
-        echo -e "${RED}\nSkipping creation of systemd service for rclone mount.\n${NC}"
-    fi
+    echo -e "${GREEN}\nRclone configuration done !\n${NC}"
 }
-
 
 display_and_process_checklist() {
     # Define the checkable options
@@ -147,7 +119,7 @@ display_and_process_checklist() {
 
 construct_and_execute_docker_compose() {
     # Construct the docker-compose command based on the selected options
-    DOCKER_COMPOSE_COMMAND="curl -L https://raw.githubusercontent.com/Crackvignoule/Wiki/main/.gitbook/assets/docker-compose.yml -o - | docker compose -f - up -d plex"
+    DOCKER_COMPOSE_COMMAND="curl -L https://raw.githubusercontent.com/Crackvignoule/Wiki/main/.gitbook/assets/docker-compose.yml -o - | docker compose -f - up -d plex rclone"
     for OPTION in "${SELECTED_OPTIONS[@]}"; do
         DOCKER_COMPOSE_COMMAND+=" $OPTION"
     done
@@ -185,7 +157,7 @@ echo "This script has been made for Debian/Ubuntu/etc. It will install the lates
 
 check_docker_installation
 update_and_install_dependencies
-configure_and_mount_rclone
+rclone_config
 display_and_process_checklist
 construct_and_execute_docker_compose
 unlock_plex_pass_free
