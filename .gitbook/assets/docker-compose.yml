@@ -81,6 +81,19 @@ services:
         pull_policy: always
         image: lscr.io/linuxserver/tautulli:latest
     
+    # TODO FIX:
+#     docker run -d \
+#   --name rclone \
+#   --device /dev/fuse \
+#   --cap-add SYS_ADMIN \
+#   --security-opt apparmor=unconfined \
+#   -v /home/rdpclient/plexmediaserver/data/rclone/:/mnt/mountpoint:shared \
+#   -v /root/scripts/rclone.conf:/config/rclone/rclone.conf \
+#   rclone/rclone mount plex:links /mnt/mountpoint \
+#   --dir-cache-time 10s \
+#   --allow-other \
+#   --allow-non-empty \
+#   --config /config/rclone/rclone.conf
     rclone:
         image: rclone/rclone
         container_name: rclone

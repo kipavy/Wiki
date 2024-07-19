@@ -11,10 +11,10 @@ NC='\033[0m' # No Color
 # TODO : Add more choices and robustness (for example, ask if user wants to run docker install script, unlock plex pass features for free...)
 
 update_and_install_dependencies() {
-    echo -e "${GREEN}\nUpdating system and installing dependencies (rclone, curl, whiptail)...\n${NC}"
+    echo -e "${GREEN}\nUpdating system and installing dependencies ...\n${NC}"
     sudo apt update
     sudo apt full-upgrade -y
-    sudo apt install -y curl rclone whiptail python3-venv
+    sudo apt install -y whiptail python3-venv
     sudo apt autoremove
     sudo apt clean
 }
