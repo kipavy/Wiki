@@ -19,3 +19,10 @@ If you think you'll use it frequently you can add an alias to your \~/.bashrc or
 ```bash
 alias runlike="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:ro assaflavie/runlike"
 ```
+
+After restarting your terminal, you acn use it like this:
+
+```bash
+runlike rclone  # container name
+runlike c64  # container ID
+```
