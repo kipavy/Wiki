@@ -51,7 +51,7 @@ vendor = other
 user = $API_KEY
 pass = $OBSCURED_PASS
 EOF
-    echo -e "${GREEN}\nRclone configuration done !\n${NC}"
+    echo -e "${GREEN}\nRclone config done ! \n${NC}"
 }
 
 display_and_process_checklist() {
