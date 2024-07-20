@@ -52,6 +52,8 @@ user = $API_KEY
 pass = $OBSCURED_PASS
 EOF
     echo -e "${GREEN}\nRclone config done ! \n${NC}"
+    # If issues with rclone, use the following commands to unmount and remount the rclone directory
+    # sudo fusermount -uz /home/rdpclient/plexmediaserver/data/rclone
 }
 
 display_and_process_checklist() {
