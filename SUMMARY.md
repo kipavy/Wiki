@@ -17,6 +17,7 @@
 * [Troubleshooting](linux/troubleshooting.md)
 * [🐳 Docker](linux/docker/README.md)
   * [Introduction](linux/docker/introduction.md)
+  * [Useful Tips](linux/docker/useful-tips.md)
   * [Easy Monitoring](linux/docker/easy-monitoring.md)
 * [VS Code](linux/vs-code/README.md)
   * [Codespace as SSH Proxy](linux/vs-code/codespace-as-ssh-proxy.md)
