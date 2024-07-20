@@ -1,18 +1,19 @@
-name: plexmediaserver
 services:
     plex_debrid:
         container_name: plex_debrid
-        volumes:
-            - /home/plex/plex_debrid/config/:/config
-        network_mode: host
-        tty: true
-        stdin_open: true
+        image: itstoggle/plex_debrid
         restart: unless-stopped
         pull_policy: always
-        image: itstoggle/plex_debrid
+        network_mode: host
+        volumes:
+            - /home/plex/plex_debrid/config/:/config
+        tty: true
+        stdin_open: true
 
     jackett:
         container_name: jackett
+        image: lscr.io/linuxserver/jackett:latest
+        restart: unless-stopped
         environment:
             - PUID=1000
             - PGID=1000
@@ -24,12 +25,13 @@ services:
             - /home/plex/jackett/config/:/config
             - /home/plex/jackett/downloads/:/downloads
         dns:
-            - 1.1.1.1
-        restart: unless-stopped
-        image: lscr.io/linuxserver/jackett:latest
+            - 1.1.1.1     
 
     plex:
         container_name: plex
+        image: lscr.io/linuxserver/plex:latest
+        restart: unless-stopped
+        pull_policy: always
         network_mode: host
         environment:
             - TZ=Europe/London
@@ -37,24 +39,24 @@ services:
             - /home/plex/plexmediaserver/config/:/config
             - /home/plex/plexmediaserver/transcode/:/transcode
             - /home/plex/plexmediaserver/data/:/data
-        restart: unless-stopped
-        pull_policy: always
         labels:
             - "com.centurylinklabs.watchtower.enable=false"
-        image: lscr.io/linuxserver/plex:latest
 
     flaresolverr:
         container_name: flaresolverr
+        image: ghcr.io/flaresolverr/flaresolverr:latest
+        restart: unless-stopped
+        pull_policy: always
         ports:
             - 8191:8191
         environment:
             - LOG_LEVEL=info
-        restart: unless-stopped
-        pull_policy: always
-        image: ghcr.io/flaresolverr/flaresolverr:latest
 
     overseerr:
         container_name: overseerr
+        image: lscr.io/linuxserver/overseerr:latest
+        restart: unless-stopped
+        pull_policy: always
         environment:
             - PUID=1000
             - PGID=1000
@@ -63,12 +65,12 @@ services:
             - 5055:5055
         volumes:
             - /home/plex/overseerr/config/:/config
-        restart: unless-stopped
-        pull_policy: always
-        image: lscr.io/linuxserver/overseerr:latest
 
     tautulli:
         container_name: tautulli
+        image: lscr.io/linuxserver/tautulli:latest
+        restart: unless-stopped
+        pull_policy: always
         environment:
             - PUID=1000
             - PGID=1000
@@ -76,14 +78,11 @@ services:
         ports:
             - 8181:8181
         volumes:
-            - /home/plex/tautulli/config/:/config
-        restart: unless-stopped
-        pull_policy: always
-        image: lscr.io/linuxserver/tautulli:latest
+            - /home/plex/tautulli/config/:/config    
     
     rclone:
-        image: rclone/rclone
         container_name: rclone
+        image: rclone/rclone
         restart: unless-stopped
         devices:
           - /dev/fuse
@@ -102,6 +101,7 @@ services:
             --config /config/rclone/rclone.conf
     
     debridclientproxy:
+        container_name: debridclientproxy
         image: kipavy/debridclientproxy
         restart: unless-stopped
         ports:
@@ -111,8 +111,8 @@ services:
 
     watchtower:
         container_name: watchtower
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
+        image: containrrr/watchtower:latest
         restart: unless-stopped
         pull_policy: always
-        image: containrrr/watchtower:latest
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
