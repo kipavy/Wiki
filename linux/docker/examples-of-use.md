@@ -20,3 +20,5 @@ docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```bash
 docker run -d -p 3306:3306 --name=mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw mysql:latest
 ```
+
+### Multi-repo project, docker compose example at [https://github.com/cvut-chat/cvutchat/](https://github.com/cvut-chat/cvutchat/)

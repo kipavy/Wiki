@@ -1,8 +1,26 @@
+---
+description: >-
+  Starts a VSCode Server that can be used with
+  https://marketplace.visualstudio.com/items?itemName=ms-vscode.remote-server
+  extension
+---
+
 # Alpine Vscode Server Tunnel
 
+### Prerequisites:
+
+* Install alpine + create normal user "alpine"
+
 ```bash
-# Install alpine + create alpine normal user
-# add community repo
+# adds community repo
+cat > /etc/apk/repositories << EOF; $(echo)
+
+https://dl-cdn.alpinelinux.org/alpine/v$(cut -d'.' -f1,2 /etc/alpine-release)/main/
+https://dl-cdn.alpinelinux.org/alpine/v$(cut -d'.' -f1,2 /etc/alpine-release)/community/
+https://dl-cdn.alpinelinux.org/alpine/edge/testing/
+
+EOF
+
 apk update
 apk upgrade
 apk add curl git

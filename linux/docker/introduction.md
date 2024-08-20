@@ -118,6 +118,10 @@ and run:
 <pre class="language-bash" data-full-width="false"><code class="lang-bash">docker compose up <a data-footnote-ref href="#user-content-fn-7">-d</a>
 </code></pre>
 
+### Examples
+
+
+
 ### [Basic commands](https://docs.docker.com/reference/cli/docker/compose/)
 
 * Run Docker Compose file: <mark style="color:red;">`docker compose up -d`</mark>

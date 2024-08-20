@@ -1,5 +1,26 @@
 # Useful Tips
 
+### Build image in docker compose
+
+It is possible to build an image directly inside docker compose.
+
+<pre class="language-docker"><code class="lang-docker">udf:
+    build: https://github.com/Crackvignoule/tradingview-udf-binance-node.git
+    restart: always
+<strong>    ports:
+</strong>      - "9090:443"
+</code></pre>
+
+Even better, you can specify a branch, example for dev branch:
+
+```docker
+build: https://github.com/Crackvignoule/tradingview-udf-binance-node.git#dev
+```
+
+***
+
+### Get container start command
+
 You started a container with docker run CLI but you forgot the command you used ? You can kinda get it back with these steps:
 
 1. Get your container ID (you can just take a few char if you want):

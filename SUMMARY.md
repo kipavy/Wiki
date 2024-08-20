@@ -21,6 +21,7 @@
   * [Easy Monitoring](linux/docker/easy-monitoring.md)
   * [Examples of use](linux/docker/examples-of-use.md)
 * [VS Code](linux/vs-code/README.md)
+  * [Alpine Vscode Server Tunnel](linux/vs-code/alpine-vscode-server-tunnel.md)
   * [Codespace as SSH Proxy](linux/vs-code/codespace-as-ssh-proxy.md)
   * [GUI on Codespace](linux/vs-code/gui-on-codespace.md)
   * [Nice Extensions](linux/vs-code/nice-extensions.md)
@@ -50,9 +51,7 @@
 
 ## ✍️ TODO
 
-* [Alpine Vscode Server Tunnel](todo/alpine-vscode-server-tunnel.md)
 * [Git](todo/git.md)
-* [Docker compose](todo/docker-compose.md)
 * [R\&T](todo/r-and-t.md)
 * [Github Actions](todo/github-actions.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
