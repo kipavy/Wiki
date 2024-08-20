@@ -9,14 +9,14 @@ npm() {
   docker run --rm --network host \
   -v "$(pwd):/workdir" \
   -it node:current-alpine \
-  sh -c "cd /workdir && npm \"$@\""
+  sh -c "cd /workdir && npm $*"
 }
 
 node() {
   docker run --rm --network host \
   -v "$(pwd):/workdir" \
   -it node:current-alpine \
-  sh -c "cd /workdir && node \"$@\""
+  sh -c "cd /workdir && node $*"
 }
 ```
 
