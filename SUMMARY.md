@@ -43,7 +43,8 @@
 ## 😎 Awesome Sites
 
 * [Hacking Wiki](https://book.hacktricks.xyz)
-* [Github Awesome](https://github.com/sindresorhus/awesome)
+* [⭐ FMHY](https://fmhy.net/)
+* [👓 Github Awesome](https://github.com/sindresorhus/awesome)
 * [QuickRef](https://quickref.me/)
 
 ## ✍️ TODO
