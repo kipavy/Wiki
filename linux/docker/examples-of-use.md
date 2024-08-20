@@ -2,12 +2,27 @@
 
 ### Use node and npm commands without installing:
 
+copy paste at end of your \~/.bashrc or \~/.zshrc to have node and npm commands working with docker:
+
 ```bash
-docker run --rm --network host \
--v /home/killian/Documents/web_project/:/web_project/ \
--it node:current-alpine \
-sh -c "cd web_project && npm i && npm run dev"
+npm() {
+  docker run --rm --network host \
+  -v "$(pwd):/workdir" \
+  -it node:current-alpine \
+  sh -c "cd /workdir && npm \"$@\""
+}
+
+node() {
+  docker run --rm --network host \
+  -v "$(pwd):/workdir" \
+  -it node:current-alpine \
+  sh -c "cd /workdir && node \"$@\""
+}
 ```
+
+{% hint style="info" %}
+That this shouldn't be a permanent setup cause it will be a lot slower than native commands cause this will create and delete a docker container each time you use the command
+{% endhint %}
 
 ### MongoDB
 
