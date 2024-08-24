@@ -14,9 +14,37 @@ Easiest way to install WSL is to have Visual Studio Code, open it
 <figure><img src="../../.gitbook/assets/image (10).png" alt=""><figcaption></figcaption></figure>
 
 3. Wait, after install, reboot PC
-4. Done, you can now open Ubuntu terminal.
+4. Finally, Open Ubuntu terminal and setup username and password (don't leave it empty)
 
 
 
 You can uninstall snap if you dont use it:
 
+```bash
+bash <(curl -fsSL https://gitlab.com/scripts94/kubuntu-get-rid-of-snap/-/raw/main/Kubuntu_get_rid_of_Snap.sh)
+```
+
+***
+
+{% hint style="info" %}
+If you notice your WSL2 is taking too much space even after some clean, here's how you can compact your WSL2 virtual disk on windows (If you're having trouble with automatic, just doit manually)
+{% endhint %}
+
+{% tabs %}
+{% tab title="Automatic" %}
+```powershell
+Invoke-WebRequest -Uri "https://gist.githubusercontent.com/Crackvignoule/fb858118c2b373369741ac084c6c3d45/raw/7598671681ec3513d9c27931d9730f57639f1436/compact-wsl2.ps1" -OutFile "$env:TEMP\compact-wsl2.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\compact-wsl2.ps1"
+```
+{% endtab %}
+
+{% tab title="Manual" %}
+```powershell
+#locate ext4.vhdx file with everything or windirstat. copy path
+#open powershell
+wsl --shutdown
+diskpart
+DISKPART> select vdisk file="<path to .vhdx>"
+DISKPART> compact disk
+```
+{% endtab %}
+{% endtabs %}

@@ -51,7 +51,6 @@
 
 ## ✍️ TODO
 
-* [WSL2 Compact Disk](todo/wsl2-compact-disk.md)
 * [Git](todo/git.md)
 * [R\&T](todo/r-and-t.md)
 * [Github Actions](todo/github-actions.md)
