@@ -30,6 +30,8 @@ bash <(curl -fsSL https://gitlab.com/scripts94/kubuntu-get-rid-of-snap/-/raw/mai
 If you notice your WSL2 is taking too much space even after some clean, here's how you can compact your WSL2 virtual disk on windows (If you're having trouble with automatic, just doit manually)
 {% endhint %}
 
+Use [wslcompact](https://github.com/okibcn/wslcompact?tab=readme-ov-file#option-1-as-a-powershell-module). If wslcompact did nothing, you can try the following script to compact vdisk:
+
 {% tabs %}
 {% tab title="Automatic" %}
 ```powershell

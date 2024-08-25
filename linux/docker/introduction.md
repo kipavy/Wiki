@@ -57,7 +57,7 @@ sudo apt install docker-compose-plugin
 
 ### Usage
 
-The docker compose command makes the creation of containers easy. You first need to create a docker-compose.yml file, here is an example :
+The docker compose command makes the creation of containers easy. You first need to create a compose.yaml file, here is an example :
 
 {% hint style="warning" %}
 Be Careful: Each Docker Volume/Network used need to be created in the compose file outside of services (level 0 of yaml), see the end of the example. By default all of the containers will be created in the same docker network.
@@ -142,4 +142,4 @@ and run:
 
 [^6]: hostname of container, can be used thanks to docker dns service
 
-[^7]: Detached mode: Run containers in the background
+[^7]: (Optionnal) Detached mode: Run containers in the background
