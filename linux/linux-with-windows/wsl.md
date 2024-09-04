@@ -1,9 +1,23 @@
 # WSL
 
-Easiest way to install WSL is to have Visual Studio Code, open it
+
+
+{% tabs %}
+{% tab title="Easy way" %}
+Open Terminal.
+
+```powershell
+wsl --install
+```
+
+1. Wait, after install, reboot PC
+2. Finally, Open Ubuntu terminal and setup username and password (don't leave it empty)
+{% endtab %}
+
+{% tab title="Easy way 2" %}
+Open Visual Studio Code.
 
 1. Install the [WSL extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl). If you plan to work with other remote extensions in VS Code, you may choose to install the [Remote Development extension pack](https://aka.ms/vscode-remote/download/extension)
-2.
 
 <figure><img src="../../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
 
@@ -13,10 +27,10 @@ Easiest way to install WSL is to have Visual Studio Code, open it
 
 <figure><img src="../../.gitbook/assets/image (10).png" alt=""><figcaption></figcaption></figure>
 
-3. Wait, after install, reboot PC
-4. Finally, Open Ubuntu terminal and setup username and password (don't leave it empty)
-
-
+2. Wait, after install, reboot PC
+3. Finally, Open Ubuntu terminal and setup username and password (don't leave it empty)
+{% endtab %}
+{% endtabs %}
 
 You can uninstall snap if you dont use it:
 
