@@ -120,14 +120,20 @@ display_and_process_checklist() {
 }
 
 construct_and_execute_docker_compose() {
-    # Construct the docker-compose command based on the selected options
-    DOCKER_COMPOSE_COMMAND="curl -L https://raw.githubusercontent.com/Crackvignoule/Wiki/main/.gitbook/assets/docker-compose.yml -o - | docker compose -f - up -d plex rclone"
-    for OPTION in "${SELECTED_OPTIONS[@]}"; do
-        DOCKER_COMPOSE_COMMAND+=" $OPTION"
-    done
+    # # Construct the docker-compose command based on the selected options
+    # DOCKER_COMPOSE_COMMAND="curl -L https://raw.githubusercontent.com/Crackvignoule/Wiki/main/.gitbook/assets/docker-compose.yml -o - | docker compose -f - up -d plex rclone"
+    # for OPTION in "${SELECTED_OPTIONS[@]}"; do
+    #     DOCKER_COMPOSE_COMMAND+=" $OPTION"
+    # done
 
-    # Execute the docker-compose command
-    eval "$DOCKER_COMPOSE_COMMAND"
+    # # Execute the docker-compose command
+    # eval "$DOCKER_COMPOSE_COMMAND"
+
+    # just download the docker-compose file in /home/plex/scripts/
+    mkdir -p /home/plex/scripts/
+    curl -L https://raw.githubusercontent.com/Crackvignoule/Wiki/main/.gitbook/assets/docker-compose.yml -o /home/plex/scripts/docker-compose.yml
+    cd /home/plex/scripts/
+    docker compose -f docker-compose.yml up -d plex rclone ${SELECTED_OPTIONS[*]}
 }
 
 unlock_plex_pass_free() {
