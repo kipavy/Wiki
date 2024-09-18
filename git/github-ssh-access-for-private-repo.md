@@ -1,4 +1,14 @@
-# Github SSH Access for private repo
+# SSH Keys & PAT
+
+#### PAT (Personnal Access Token)
+
+In your account settings, you can generate a PAT and then use it like so:
+
+```bash
+https://<username>:<PAT>@github.com/username/repo.git
+```
+
+#### SSH Keys
 
 <pre class="language-bash"><code class="lang-bash"><strong>ssh-keygen -t ed25519  # PUT A PASSPHRASE OR IT WONT WORK
 </strong><strong>cat ~/.ssh/id_ed25519.pub  # KEEP DEFAULT NAME OR IT WONT WORK

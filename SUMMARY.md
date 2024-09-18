@@ -29,7 +29,7 @@
 ***
 
 * [Git](git/README.md)
-  * [Github SSH Access for private repo](git/github-ssh-access-for-private-repo.md)
+  * [SSH Keys & PAT](git/github-ssh-access-for-private-repo.md)
   * [Updating fork](git/updating-fork.md)
   * [Creating a mirror of a repo](git/creating-a-mirror-of-a-repo.md)
   * [Renaming a pushed commit](git/renaming-a-pushed-commit.md)
