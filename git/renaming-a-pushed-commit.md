@@ -1,11 +1,14 @@
 # Renaming a pushed commit
 
+{% hint style="warning" %}
+If you want to git push --force on main, you may disable force protection on this branch in repo settings -> branches (e.g: [https://gitlab.com/USER/REPO/-/settings/repository/branch\_rules?branch=main](https://gitlab.com/jeanemar1/test/-/settings/repository/branch\_rules?branch=main))
+{% endhint %}
+
 #### Renaming the latest commit:
 
-```bash
-git commit --amend -m "New commit message"
-git push --force origin example-branch
-```
+<pre class="language-bash"><code class="lang-bash"><strong>git commit --amend -m "New commit message"
+</strong>git push --force origin example-branch
+</code></pre>
 
 #### Renaming any commit:
 
