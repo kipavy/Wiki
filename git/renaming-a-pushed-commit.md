@@ -12,10 +12,25 @@ If you want to git push --force on main, you may disable force protection on thi
 
 #### Renaming any commit:
 
-<pre class="language-bash"><code class="lang-bash">git rebase -i HEAD~n  # Replace n with the number of commits you want to go back
-git commit --amend -m "New commit message"
-git rebase --continue
-git push <a data-footnote-ref href="#user-content-fn-1">-f</a> origin example-branch
+For example: renaming HEAD\~2 commit (HEAD is latest commit)
+
+```bash
+git rebase -i HEAD~2  # Replace 2 with the number of commits you want to go back
+```
+
+It will open text editor, You'll see something like this:
+
+<div align="left">
+
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+
+</div>
+
+find the correct pick \<commit hash> message and replace 'pick' to 'reword'
+
+save and exit
+
+<pre class="language-bash"><code class="lang-bash">git push -f <a data-footnote-ref href="#user-content-fn-1">origin example-branch</a>
 </code></pre>
 
 #### Replacing x last commits with 1 new single commit:
@@ -28,4 +43,4 @@ squash <commit-hash> Commit message 3
 git push -f origin example-branch
 ```
 
-[^1]: \--force
+[^1]: can be omitted if its main
