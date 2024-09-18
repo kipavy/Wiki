@@ -35,12 +35,15 @@ save and exit
 
 #### Replacing x last commits with 1 new single commit:
 
-```bash
-git rebase -i HEAD~x  # Replace x with the number of commits you want to squash into one
-pick <commit-hash> Commit message 1
-squash <commit-hash> Commit message 2
-squash <commit-hash> Commit message 3
-git push -f origin example-branch
-```
+<pre class="language-bash"><code class="lang-bash">git rebase -i HEAD~x  # Replace x with the number of commits you want to squash into one
+pick &#x3C;commit-hash> Commit message 1
+squash &#x3C;commit-hash> Commit message 2
+squash &#x3C;commit-hash> Commit message 3
+<strong># save and exit
+</strong><strong># close 2nd text editor
+</strong><strong># You could now if you want remove/add/edit files and then
+</strong><strong># git add . &#x26;&#x26; git commit -m "squash" &#x26;&#x26; git push -f
+</strong>git push -f origin example-branch
+</code></pre>
 
 [^1]: can be omitted if its main
