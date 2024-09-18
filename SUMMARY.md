@@ -32,7 +32,7 @@
   * [SSH Keys & PAT](git/github-ssh-access-for-private-repo.md)
   * [Updating fork](git/updating-fork.md)
   * [Creating a mirror of a repo](git/creating-a-mirror-of-a-repo.md)
-  * [Renaming a pushed commit](git/renaming-a-pushed-commit.md)
+  * [Rename/Edit previous commit(s)](git/renaming-a-pushed-commit.md)
 
 ## 🎬 PlexMediaServer
 
@@ -52,7 +52,6 @@
 
 ## ✍️ TODO
 
-* [Git](todo/git.md)
 * [R\&T](todo/r-and-t.md)
 * [Github Actions](todo/github-actions.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
