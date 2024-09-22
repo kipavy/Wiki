@@ -24,6 +24,12 @@ node() {
 That this shouldn't be a permanent setup cause it will be a lot slower than native commands cause this will create and delete a docker container each time you use the command
 {% endhint %}
 
+### Monitor Disk Usage
+
+```bash
+docker run --rm -it --privileged -v /:/mnt alpine sh -c "apk add ncdu && ncdu -x /mnt --exclude /mnt"
+```
+
 ### MongoDB
 
 ```bash

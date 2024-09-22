@@ -1,5 +1,11 @@
 # Useful Tips
 
+### Clean every unused images, containers, networks & build cache)
+
+```bash
+docker system prune -a
+```
+
 ### Build image in docker compose
 
 It is possible to build an image directly inside docker compose.
