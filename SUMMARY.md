@@ -52,6 +52,7 @@
 
 ## ✍️ TODO
 
+* [Run GUI apps in docker in WSL2 using WSLg](todo/run-gui-apps-in-docker-in-wsl2-using-wslg.md)
 * [R\&T](todo/r-and-t.md)
 * [Github Actions](todo/github-actions.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
