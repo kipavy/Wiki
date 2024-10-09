@@ -33,6 +33,7 @@
   * [Updating fork](git/updating-fork.md)
   * [Creating a mirror of a repo](git/creating-a-mirror-of-a-repo.md)
   * [Rename/Edit previous commit(s)](git/renaming-a-pushed-commit.md)
+  * [Github Actions](git/github-actions.md)
 
 ## 🎬 PlexMediaServer
 
@@ -52,8 +53,8 @@
 
 ## ✍️ TODO
 
-* [Page](todo/page.md)
+* [Python tips](todo/python-tips.md)
 * [Run GUI apps in docker in WSL2 using WSLg](todo/run-gui-apps-in-docker-in-wsl2-using-wslg.md)
+* [plex](todo/plex.md)
 * [R\&T](todo/r-and-t.md)
-* [Github Actions](todo/github-actions.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)

@@ -24,34 +24,34 @@ For any PC to be able to detect the SSD as bootable, the SSD must include an esp
 
     * root:
 
-    &#x20;     type: ext4
+    type: ext4
 
-    &#x20;     mount point: ‘/’
+    mount point: ‘/’
 
-    &#x20;     size you want for the OS eg: 75 GB
+    size you want for the OS eg: 75 GB
 
     * efi:
 
-    &#x20;     type: fat32
+    type: fat32
 
-    &#x20;     mount point: '/boot/efi'
+    mount point: '/boot/efi'
 
-    &#x20;     size: 300MB
+    size: 300MB
 
 Here is how it should look like (ntfs if you want to use free remaining space as usb drive):
 
 <figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption><p>Here I formatted the free space to NTFS to use the free space as an external Drive in any OS</p></figcaption></figure>
 
 9. Continue install normally
-10. &#x20;Done, now you can boot on your external drive by choosing the right boot option
+10. Done, now you can boot on your external drive by choosing the right boot option
 
 ## Troubleshooting
 
-### Not Booting:  busybox (initramfs) prompt
+### Not Booting: busybox (initramfs) prompt
 
 {% tabs %}
 {% tab title="Fix 1" %}
-### SSD got disconnected
+#### SSD got disconnected
 
 you can runb `blkid` to see if it got disconnected
 
@@ -69,17 +69,15 @@ sudo fsck -f /dev/sda2  # your root partition
 {% endtab %}
 
 {% tab title="Fix 3" %}
-### Recover bad superblock
+#### Recover bad superblock
 
 It happened to me many times that for no apparent reason my PC wont boot into linux on my external SSD, it would just load for a really long time and end up on a busybox (initramfs) prompt. This was really frustrating. I think it has something to do with force shutdown... Fortunately, I've found how to fix that. Check [https://www.cyberciti.biz/faq/recover-bad-superblock-from-corrupted-partition/](https://www.cyberciti.biz/faq/recover-bad-superblock-from-corrupted-partition/)
-
-
 
 1. Boot into Live USB Installation made before, Try Kubuntu
 2. Plug your external SSD
 3. Identify your root partition number with command <mark style="color:red;">`lsblk`</mark>, mine was sdb2
 4. <mark style="color:red;">`sudo su`</mark>
-5. [<mark style="color:red;">`dumpe2fs /dev/sda2 | grep superblock`</mark>](#user-content-fn-1)[^1]
+5. <mark style="color:red;">`dumpe2fs /dev/sda2 | grep superblock`</mark>
 
 Sample Output:
 
@@ -169,5 +167,3 @@ before it was necessary to add these steps after 2.
   \
   AND at the end add back the boot+esp flags on original drive:
 * Once you are in ubuntu, do <mark style="color:red;">`sudo update-grub`</mark> and install gparted to re-enable the EFI flags on your PC's main OS: <mark style="color:red;">`sudo apt install gparted`</mark> re-enable boot + esp flags for the drives that had it before step 5. (basically your boot drives, C: drive on windows)
-
-[^1]: 
