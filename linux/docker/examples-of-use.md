@@ -30,6 +30,12 @@ That this shouldn't be a permanent setup cause it will be a lot slower than nati
 docker run --rm -it --privileged -v /:/mnt alpine sh -c "apk add ncdu && ncdu -x /mnt --exclude /mnt"
 ```
 
+### Share terminal over the web
+
+```bash
+docker run -d -p 7681:7681 tsl0922/ttyd
+```
+
 ### MongoDB
 
 ```bash
