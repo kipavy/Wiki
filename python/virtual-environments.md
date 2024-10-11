@@ -1,6 +1,8 @@
 # Virtual Environments
 
+A Python virtual environment (venv) is an isolated environment that allows you to manage dependencies for different projects separately. This isolation helps avoid conflicts between packages and ensures that each project has access to the specific versions of libraries it needs.
 
+<figure><img src="../.gitbook/assets/image.png" alt="" width="563"><figcaption></figcaption></figure>
 
 <details>
 

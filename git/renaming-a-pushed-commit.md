@@ -1,4 +1,4 @@
-# Renaming a pushed commit
+# Rename/Edit previous commit(s)
 
 {% hint style="warning" %}
 If you want to git push --force on main, you may disable force protection on this branch in repo settings -> branches (e.g: [https://gitlab.com/USER/REPO/-/settings/repository/branch\_rules?branch=main](https://gitlab.com/jeanemar1/test/-/settings/repository/branch\_rules?branch=main))
@@ -22,7 +22,7 @@ It will open text editor, You'll see something like this:
 
 <div align="left">
 
-<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
 </div>
 
