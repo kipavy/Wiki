@@ -17,23 +17,26 @@
 * [Troubleshooting](linux/troubleshooting.md)
 * [🐳 Docker](linux/docker/README.md)
   * [Introduction](linux/docker/introduction.md)
-  * [Useful Tips](linux/docker/useful-tips.md)
+  * [Tips & Tricks](linux/docker/useful-tips.md)
   * [Easy Monitoring](linux/docker/easy-monitoring.md)
   * [Examples of use](linux/docker/examples-of-use.md)
-* [VS Code](linux/vs-code/README.md)
-  * [Alpine Vscode Server Tunnel](linux/vs-code/alpine-vscode-server-tunnel.md)
-  * [Codespace as SSH Proxy](linux/vs-code/codespace-as-ssh-proxy.md)
-  * [GUI on Codespace](linux/vs-code/gui-on-codespace.md)
-  * [Nice Extensions](linux/vs-code/nice-extensions.md)
 
 ***
 
+* [VS Code](vs-code/README.md)
+  * [Alpine Vscode Server Tunnel](vs-code/alpine-vscode-server-tunnel.md)
+  * [Codespace as SSH Proxy](vs-code/codespace-as-ssh-proxy.md)
+  * [GUI on Codespace](vs-code/gui-on-codespace.md)
+  * [Nice Extensions](vs-code/nice-extensions.md)
 * [Git](git/README.md)
   * [SSH Keys & PAT](git/github-ssh-access-for-private-repo.md)
   * [Updating fork](git/updating-fork.md)
   * [Creating a mirror of a repo](git/creating-a-mirror-of-a-repo.md)
   * [Rename/Edit previous commit(s)](git/renaming-a-pushed-commit.md)
   * [Github Actions](git/github-actions.md)
+* [Python](python/README.md)
+  * [Virtual Environments](python/virtual-environments.md)
+  * [Tips & Tricks](python/tips-and-tricks.md)
 
 ## 🎬 PlexMediaServer
 
@@ -53,7 +56,6 @@
 
 ## ✍️ TODO
 
-* [Python tips](todo/python-tips.md)
 * [plex](todo/plex.md)
 * [R\&T](todo/r-and-t.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
