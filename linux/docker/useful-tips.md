@@ -53,3 +53,21 @@ After restarting your terminal, you can use it like this:
 runlike rclone  # container name
 runlike c64  # container ID
 ```
+
+### Run GUI apps in docker in WSL2 using WSLg
+
+```bash
+docker run -it --rm \
+  -v $(pwd):/app \
+  -e DISPLAY=:0 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  -e XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir \
+  -e PULSE_SERVER=/mnt/wslg/PulseServer \
+  image
+```
+
+If fonts are missing in your app, it may be necessary to install fonts, on alpine I needed to run this for firefox to work properly:
+
+```bash
+apk add font-noto font-noto-cjk font-noto-emoji
+```
