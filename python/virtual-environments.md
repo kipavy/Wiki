@@ -24,7 +24,7 @@ source myenv/bin/activate
 * Activate the environment (Windows):
 
 ```powershell
-myenv\Scripts\activate.bat
+.\myenv\Scripts\activate
 ```
 
 </details>
