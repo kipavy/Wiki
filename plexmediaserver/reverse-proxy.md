@@ -2,7 +2,7 @@
 
 ### **Why Use a Reverse Proxy?**
 
-A reverse proxy is a server that sits between your client devices and your backend servers. It helps manage and distribute incoming traffic, providing benefits like improved security, load balancing, and easier management of multiple services. Setting up a reverse proxy can make accessing your Plex server and other services more seamless and secure. Using a reverse proxy, you can map different services to subdomains of your main domain. For example:
+A reverse proxy is a server that sits between your client devices and your backend servers. It helps manage and distribute incoming traffic, providing benefits like improved **security**, **load balancing**, and **easier management** of multiple services. Setting up a reverse proxy can make accessing your Plex server and other services more seamless and secure. Using a reverse proxy, you can **map different services to subdomains** of your main domain. For example:
 
 * [Vaultwarden](../) service available at [http://yourserverip:11001](http://yourserverip:11001) can be turned into [https://vaultwarden.yourdomain.fr](../)
 * [Immich](https://github.com/immich-app/immich) at [http://yourserverip:2283](http://yourserverip:2283) -> [https://immich.yourdomain.fr](https://immich.yourdomain.fr)
