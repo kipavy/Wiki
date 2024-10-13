@@ -41,6 +41,7 @@
 ## 🎬 PlexMediaServer
 
 * [Installation](plexmediaserver/installation.md)
+* [Reverse Proxy](plexmediaserver/reverse-proxy.md)
 * [Forward Port on Oracle Free Tier](plexmediaserver/forward-port-on-oracle-free-tier.md)
 
 ## 💻 Awesome Tools
@@ -56,6 +57,5 @@
 
 ## ✍️ TODO
 
-* [plex](todo/plex.md)
 * [R\&T](todo/r-and-t.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)

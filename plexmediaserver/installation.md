@@ -68,6 +68,8 @@ You'll need to setup port forwarding on your server to access Plex anywere
 
 ### Setup&#x20;
 
+If you want to access your micro-services (overseerr, riven, prowlarr...) with your domain name, read this: [reverse-proxy.md](reverse-proxy.md "mention")
+
 {% hint style="warning" %}
 I don't provide tutorial for setting up jackett with flaresolverr, overseerr and tautulli as it is really simple and optionnal (actually jackett is optionnal but it is very hard to do without it).
 {% endhint %}
