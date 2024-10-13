@@ -9,7 +9,7 @@ A reverse proxy is a server that sits between your client devices and your backe
 
 ### Choosing a reverse proxy server
 
-You could use [Nginx](https://www.it-connect.fr/configurer-nginx-en-tant-que-reverse-proxy/) or [Apache](https://www.it-connect.fr/mise-en-place-dun-reverse-proxy-apache-avec-mod\_proxy/) but [Traefik](https://doc.traefik.io/traefik/) is awesome and is by far the best, here are a few advantages of Traefik:
+You could use [Nginx](https://www.it-connect.fr/configurer-nginx-en-tant-que-reverse-proxy/) or [Apache](https://www.it-connect.fr/mise-en-place-dun-reverse-proxy-apache-avec-mod\_proxy/) but [Traefik](https://doc.traefik.io/traefik/) is awesome and is by far the best imo, here are a few advantages of Traefik:
 
 * Automatically discovers the right configuration for your services.
 * Built-in Let's Encrypt Integration (HTTPS) (Automatically handles SSL certificate generation and renewal with Let's Encrypt.)
@@ -21,18 +21,21 @@ You could use [Nginx](https://www.it-connect.fr/configurer-nginx-en-tant-que-rev
 
 I recommend you also take a look at this [guide](https://www.smarthomebeginner.com/cloudflare-settings-for-traefik-docker/).
 
+first of all create config folder that will store SSL certificates and more:
+
+```bash
+mkdir -p /etc/traefik/letsencrypt
+```
+
 1. Setup Cloudflare DNS records + SSL Mode to FULL (not strict)
 2. If you plan to use http basic auth middleware for one of your services (only use over https) (for example to protect a service that would otherwise be freely accessible by anyone), you can generate your USERNAME + PASS with this command:
 
-```bash
-docker run --rm httpd:alpine htpasswd -nb USERNAME PASS | sed 's/\$/\$\$/g' 
-```
+<pre class="language-bash"><code class="lang-bash"><strong>docker run --rm httpd:alpine htpasswd -nb USERNAME PASS >> /etc/traefik/usersfile
+</strong></code></pre>
 
 3. Example of traefik config in docker-compose.yml:
 
-{% code fullWidth="true" %}
-```yaml
-services:
+<pre class="language-yaml" data-full-width="true"><code class="lang-yaml">services:
     traefik:
       image: traefik:latest
       container_name: traefik
@@ -45,13 +48,13 @@ services:
           - "--certificatesresolvers.myresolver.acme.dnschallenge=true"  # DNS challenge for Let's Encrypt
           - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=cloudflare"
           - "--certificatesresolvers.myresolver.acme.email=youremail@gmail.com"  # Your email for Let's Encrypt
-          - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"  # Store Let's Encrypt certs
+          - "--certificatesresolvers.myresolver.acme.storage=/etc/letsencrypt/acme.json"  # Store Let's Encrypt certs
       ports:
           - "80:80"
           - "443:443"
       volumes:
           - "/var/run/docker.sock:/var/run/docker.sock"  # Required to connect to Docker
-          - "/etc/traefik/letsencrypt:/letsencrypt"  # Store Let's Encrypt certificates
+          - "/etc/traefik:/etc"  # to store lets encrypt certificates + usersfile ...
       environment:
           - CF_API_EMAIL=yourcloudflareemail@gmail.com
           - CF_API_KEY=YOUR_CF_API_KEY
@@ -63,8 +66,8 @@ services:
           - "traefik.http.routers.traefik.service=api@internal"
           - "traefik.http.routers.traefik.tls.certresolver=myresolver"      
           - "traefik.http.routers.traefik.middlewares=traefik-auth"
-          - "traefik.http.middlewares.traefik-auth.basicauth.users=killian:$$apr1$$MEGYc7Xw$$nTfo0Rb0lcSWki6IgHd."  # Double $$ for escaping
-    
+          - <a data-footnote-ref href="#user-content-fn-1">"traefik.http.middlewares.traefik-auth.basicauth.usersfile=/etc/usersfile"</a>
+
     debridclientproxy:
         container_name: debridclientproxy
         image: kipavy/debridclientproxy
@@ -77,8 +80,13 @@ services:
             - "traefik.http.routers.debridclientproxy.entrypoints=websecure"
             - "traefik.http.routers.debridclientproxy.tls.certresolver=myresolver"
             - "traefik.http.routers.debridclientproxy.middlewares=traefik-auth"  # This single line will add auth layer
-```
-{% endcode %}
+</code></pre>
 
 
 
+
+
+[^1]: or you could use basicauth.users with this syntax: user1:pass,user2:pass,...\
+    if you do this, you should use this command to generate with duplicate $:\
+    \
+    docker run --rm httpd:alpine htpasswd -nb USERNAME PASS | sed 's/\\$/\\$\\$/g'
