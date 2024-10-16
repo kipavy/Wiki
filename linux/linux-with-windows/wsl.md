@@ -1,7 +1,5 @@
 # WSL
 
-
-
 {% tabs %}
 {% tab title="Easy way" %}
 Open Terminal.
@@ -32,10 +30,24 @@ Open Visual Studio Code.
 {% endtab %}
 {% endtabs %}
 
-You can uninstall snap if you dont use it:
+You can uninstall snap if you dont use it (run inside wsl ubuntu):
 
 ```bash
 bash <(curl -fsSL https://gitlab.com/scripts94/kubuntu-get-rid-of-snap/-/raw/main/Kubuntu_get_rid_of_Snap.sh)
+```
+
+### Useful commands
+
+#### List installed distros
+
+<pre class="language-powershell"><code class="lang-powershell">wsl <a data-footnote-ref href="#user-content-fn-1">-l -v</a>
+</code></pre>
+
+#### Reinstall distro
+
+```powershell
+wsl --unregister <distro-name>
+wsl --install -d <distro-name>
 ```
 
 ***
@@ -64,3 +76,5 @@ DISKPART> compact disk
 ```
 {% endtab %}
 {% endtabs %}
+
+[^1]: \--list --verbose
