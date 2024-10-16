@@ -36,14 +36,14 @@ You can uninstall snap if you dont use it (run inside wsl ubuntu):
 bash <(curl -fsSL https://gitlab.com/scripts94/kubuntu-get-rid-of-snap/-/raw/main/Kubuntu_get_rid_of_Snap.sh)
 ```
 
-### Useful commands
+## Useful commands
 
-#### List installed distros
+### List installed distros
 
 <pre class="language-powershell"><code class="lang-powershell">wsl <a data-footnote-ref href="#user-content-fn-1">-l -v</a>
 </code></pre>
 
-#### Reinstall distro
+### Reinstall distro
 
 ```powershell
 wsl --unregister <distro-name>
@@ -51,6 +51,8 @@ wsl --install -d <distro-name>
 ```
 
 ***
+
+### WSL takes too much space ?
 
 {% hint style="info" %}
 If you notice your WSL2 is taking too much space even after some clean, here's how you can compact your WSL2 virtual disk on windows (If you're having trouble with automatic, just doit manually)
