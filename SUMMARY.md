@@ -6,6 +6,7 @@
 
 * [Basics](linux/basics.md)
 * [Useful Commands](linux/useful-commands.md)
+* [SSH](linux/ssh.md)
 * [Linux with Windows](linux/linux-with-windows/README.md)
   * [WSL](linux/linux-with-windows/wsl.md)
   * [Linux on Portable SSD](linux/linux-with-windows/linux-on-portable-ssd.md)
@@ -57,6 +58,5 @@
 
 ## ✍️ TODO
 
-* [SSH](todo/ssh.md)
 * [R\&T](todo/r-and-t.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)

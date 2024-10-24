@@ -1,3 +1,8 @@
+---
+description: Setup SSH authentication on a Linux server from Linux/Windows
+icon: square-terminal
+---
+
 # SSH
 
 ### Generate SSH Keys
