@@ -25,12 +25,33 @@ cat ~/.ssh/id_rsa.pub | ssh <user>@<hostname> 'umask 0077; mkdir -p .ssh; cat >>
 type $env:USERPROFILE\.ssh\id_rsa.pub | ssh {IP-ADDRESS-OR-FQDN} "cat >> .ssh/authorized_keys"
 ```
 
+### (Optional) SSH Config
 
+Create .ssh/config file&#x20;
 
+<pre><code>Host MyServer
+  HostName &#x3C;hostname>
+  User &#x3C;user>
+  IdentityFile <a data-footnote-ref href="#user-content-fn-2">~/.ssh/id_rsa</a>
 
+Host blabla
+  HostName &#x3C;hostname>
+  User &#x3C;user>
+  IdentityFile ~/.ssh/id_rsa_blabla
+</code></pre>
+
+You can then connect easily to ssh like this:
+
+```bash
+ssh MyServer
+```
+
+If you use VSCode, it will also detect your SSH Hosts from config file.
 
 
 
 
 
 [^1]: IP or FQDN
+
+[^2]: path to private key
