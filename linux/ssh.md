@@ -1,6 +1,6 @@
 ---
-description: Setup SSH authentication on a Linux server from Linux/Windows
 icon: square-terminal
+description: Setup SSH authentication on a Linux server from Linux/Windows
 ---
 
 # SSH
@@ -27,7 +27,7 @@ cat ~/.ssh/id_rsa.pub | ssh <user>@<hostname> 'umask 0077; mkdir -p .ssh; cat >>
 #### From Windows:
 
 ```powershell
-type $env:USERPROFILE\.ssh\id_rsa.pub | ssh {IP-ADDRESS-OR-FQDN} "cat >> .ssh/authorized_keys"
+type $env:USERPROFILE\.ssh\id_rsa.pub | ssh <hostname> "cat >> .ssh/authorized_keys"
 ```
 
 ### (Optional) SSH Config
@@ -57,6 +57,6 @@ If you use VSCode, it will also detect your SSH Hosts from config file.
 
 
 
-[^1]: IP or FQDN
+[^1]: IP Address or FQDN (domain name)
 
 [^2]: path to private key
