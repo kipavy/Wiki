@@ -53,9 +53,19 @@ ssh MyServer
 
 If you use VSCode, it will also detect your SSH Hosts from config file.
 
+{% hint style="info" %}
+You might encounter an issue with VSCode where it'll ask you everytime the Remote Platform, here's how to fix it
+{% endhint %}
 
+1. Press F1 and <mark style="color:red;">**open user Settings (JSON)**</mark>
+2. Add your remote hosts like this:
 
-
+```json
+"remote.SSH.remotePlatform": {
+    "grenx": "linux",
+    "ServMaison": "linux"
+  }
+```
 
 [^1]: IP Address or FQDN (domain name)
 
