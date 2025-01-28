@@ -33,7 +33,7 @@
   * [SSH Keys & PAT](git/github-ssh-access-for-private-repo.md)
   * [Updating fork](git/updating-fork.md)
   * [Creating a mirror of a repo](git/creating-a-mirror-of-a-repo.md)
-  * [Rename/Edit previous commit(s)](git/renaming-a-pushed-commit.md)
+  * [Rename/Edit/Squash commit(s)](git/renaming-a-pushed-commit.md)
   * [Github Actions](git/github-actions.md)
 * [Python](python/README.md)
   * [Virtual Environments](python/virtual-environments.md)
