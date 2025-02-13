@@ -4,6 +4,8 @@
 
 [https://github.com/Crackvignoule/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml](https://github.com/Crackvignoule/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml)
 
+another more complex example with testing requirement: [https://github.com/Slynax/dump.fun/actions/runs/13072892669](https://github.com/Slynax/dump.fun/actions/runs/13072892669)
+
 ### Automate Pypi releases (test on pre-release, official on releases)
 
 [https://github.com/CEA-MetroCarac/pyvsnr/tree/main/.github/workflows](https://github.com/CEA-MetroCarac/pyvsnr/tree/main/.github/workflows)
