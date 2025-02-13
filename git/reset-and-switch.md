@@ -2,22 +2,12 @@
 
 ### What is HEAD
 
-HEAD refers to latest commit, you can see the \<commit-id> where HEAD is with:
+HEAD is a pointer that represents the current commit. It can be used as a commit id, and you can also refer to commits relative to HEAD. For example, using HEAD\~X (like HEAD\~1, HEAD\~2...) lets you refer to X commits before HEAD.
 
-```bash
-git rev-parse HEAD
-```
+You can see the \<commit-id> where HEAD is with:
 
-HEAD can be used as a \<commit-id>, and it can also be used to go X commits before HEAD:
-
-<pre class="language-bash"><code class="lang-bash"><strong>git switch --detach HEAD~1
-</strong></code></pre>
-
-HEAD\~1 refers to the 1 commit before HEAD, if you want to make sure you can use the previous command to see commit hash:
-
-```bash
-git rev-parse HEAD
-```
+<pre class="language-bash"><code class="lang-bash">git rev-parse HEAD  # for <a data-footnote-ref href="#user-content-fn-1">e.g</a> you could use HEAD~X here
+</code></pre>
 
 ### Switch to a commit (move HEAD + files)
 
@@ -37,3 +27,5 @@ For example, here is what you can do if you want to be in the exact same state y
 ```bash
 git switch --detach bbbb && git reset HEAD~1
 ```
+
+[^1]: example
