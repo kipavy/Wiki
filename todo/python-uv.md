@@ -4,6 +4,10 @@ https://docs.astral.sh/uv
 
 create a .venv in current dir uv venv no need to activate venv with uv
 
+uv venv
+
+uv venv --seed   # To have pip installed in venv, can be useful for vscode extensions that arent compatible with uv
+
 (dont need to install script in editable mode, its automatically done if you have a pyproject.toml with scripts) uv run fitspy
 
 uv sync ?
