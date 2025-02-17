@@ -13,4 +13,13 @@ uv sync ?
 uv pip = pip uv run is like python \<script> (can be used for file or packages scripts)\
 uv run python
 
-uvx = uv tool run : run tools without installing e.g: uvx fitspy ; uvx spectroview ; uvx
+uvx = uv tool run : run tools without installing e.g:
+
+```bash
+uvx fitspy
+uvx spectroview
+uvx spider
+uvx --from jupyterlab jupyter-lab
+uvx streamlit
+...
+```
