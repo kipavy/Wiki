@@ -59,5 +59,6 @@
 
 ## ✍️ TODO
 
+* [Python UV](todo/python-uv.md)
 * [R\&T](todo/r-and-t.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
