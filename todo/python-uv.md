@@ -20,6 +20,7 @@ uvx fitspy
 uvx spectroview
 uvx spider
 uvx --from jupyterlab jupyter-lab
-uvx streamlit
 ...
 ```
+
+uv cache clean
