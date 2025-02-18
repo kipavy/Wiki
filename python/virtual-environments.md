@@ -4,10 +4,13 @@ A Python virtual environment (venv) is an isolated environment that allows you t
 
 <figure><img src="../.gitbook/assets/image.png" alt="" width="563"><figcaption></figcaption></figure>
 
-<details>
+{% tabs %}
+{% tab title="Using UV (Recommended)" %}
+1. [#installation](uv.md#installation "mention")
+2. [#creating-and-using-venv](uv.md#creating-and-using-venv "mention")
+{% endtab %}
 
-<summary>Using venv</summary>
-
+{% tab title="Using venv" %}
 **Creating and activating an environment** You can do this by running the following on a terminal [https://doc.qt.io/qtforpython-6/quickstart.html#quick-start:](https://doc.qt.io/qtforpython-6/quickstart.html#quick-start:)
 
 * Create environment (Your Python executable might be called `python3`):
@@ -26,25 +29,21 @@ source myenv/bin/activate
 ```powershell
 .\myenv\Scripts\activate
 ```
+{% endtab %}
 
-</details>
-
-<details>
-
-<summary>Using conda</summary>
-
-1. Install miniconda for example (conda init if not already)
+{% tab title="Using conda" %}
+1. [Install miniconda](https://docs.anaconda.com/miniconda/install/#quickstart-install-instructions) for example (and run conda init if not already)
 2. Create env:
 
 <pre class="language-bash"><code class="lang-bash"><strong>conda create <a data-footnote-ref href="#user-content-fn-2">--prefix FULL_PATH_ENV</a> <a data-footnote-ref href="#user-content-fn-3">python=3.12</a>
 </strong></code></pre>
 
-* Activate venv:
+3. Activate venv:
 
 <pre class="language-bash"><code class="lang-bash">conda activate <a data-footnote-ref href="#user-content-fn-4">FULL_PATH_ENV</a>
 </code></pre>
-
-</details>
+{% endtab %}
+{% endtabs %}
 
 
 

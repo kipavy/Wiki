@@ -1,9 +1,15 @@
-# Useful Tips
+# Tips & Tricks
 
 ### Clean every unused images, containers, networks & build cache)
 
 ```bash
 docker system prune -a
+```
+
+### Delete all containers at once
+
+```bash
+docker rm -f $(docker ps -aq)
 ```
 
 ### Build image in docker compose

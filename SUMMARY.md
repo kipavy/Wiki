@@ -38,6 +38,7 @@
   * [Github Actions](git/github-actions.md)
 * [Python](python/README.md)
   * [Virtual Environments](python/virtual-environments.md)
+  * [UV](python/uv.md)
   * [Tips & Tricks](python/tips-and-tricks.md)
 
 ## 🎬 PlexMediaServer
@@ -59,6 +60,5 @@
 
 ## ✍️ TODO
 
-* [Python UV](todo/python-uv.md)
 * [R\&T](todo/r-and-t.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)
