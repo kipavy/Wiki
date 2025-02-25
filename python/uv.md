@@ -28,7 +28,9 @@ uv venv
 uv venv --seed
 ```
 
-#### Update project's environment (installs project in editable mode)
+#### Project's environment (installs project in editable mode)
+
+If you have pyproject.toml in your project, this command will create/update .venv for the project
 
 ```bash
 uv sync
@@ -53,7 +55,7 @@ uvx = uv tool run : run tools without installing e.g:
 
 ```bash
 uvx fitspy
-uvx spectroview
+uvx git+https://github.com/CEA-MetroCarac/fitspy@c3a00fd
 uvx spider
 uvx --from jupyterlab jupyter-lab
 ...
