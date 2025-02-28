@@ -20,12 +20,14 @@ You can see the \<commit-id> where HEAD is with:
 git reset <commit-id>
 ```
 
-
-
 For example, here is what you can do if you want to be in the exact same state your collegue was before pushing a commit bbbb on top of a commit aaaa, with his changes in the working tree:
 
 ```bash
 git switch --detach bbbb && git reset HEAD~1
 ```
+
+{% hint style="info" %}
+`git reset --hard` can be used to also reset files, but be careful, unlike `git switch --detach`, unpushed commits will be lost, and pushed commits will need to be pulled again.
+{% endhint %}
 
 [^1]: example
