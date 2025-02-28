@@ -36,6 +36,7 @@
   * [Rename/Edit/Squash commit(s)](git/renaming-a-pushed-commit.md)
   * [Reset and Switch](git/reset-and-switch.md)
   * [Github Actions](git/github-actions.md)
+  * [Tips & Tricks](git/tips-and-tricks.md)
 * [Python](python/README.md)
   * [Virtual Environments](python/virtual-environments.md)
   * [UV](python/uv.md)
