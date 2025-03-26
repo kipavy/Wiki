@@ -6,13 +6,13 @@
 chsh -s /bin/bash $USER
 ```
 
-**Create GIF with your screen view:**
+#### **Create GIF with your screen view:**
 
 ```bash
 sudo apt install -y peek && peek
 ```
 
-**fuck :** [_**The Fuck**_](https://github.com/nvbn/thefuck) **is a magnificent app that corrects errors in previous console commands. Install script:**
+#### **fuck :** [_**The Fuck**_](https://github.com/nvbn/thefuck) **is a magnificent app that corrects errors in previous console commands. Install script:**
 
 ```bash
 #!/usr/bin/env bash
@@ -25,4 +25,10 @@ pip install git+https://github.com/nvbn/thefuck.git
 echo 'export PATH="$HOME/.config/thefuck/bin:$PATH"' >> ~/.bashrc
 fuck
 fuck
+```
+
+#### Remove unused packages
+
+```bash
+sudo apt autoremove
 ```
