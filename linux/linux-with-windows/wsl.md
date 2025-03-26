@@ -74,7 +74,7 @@ Invoke-WebRequest -Uri "https://gist.githubusercontent.com/Crackvignoule/fb85811
 wsl --shutdown
 diskpart
 DISKPART> select vdisk file="<path to .vhdx>"
-DISKPART> compact disk
+DISKPART> compact vdisk
 ```
 {% endtab %}
 {% endtabs %}
