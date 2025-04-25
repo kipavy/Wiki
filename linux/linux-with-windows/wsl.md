@@ -58,6 +58,8 @@ wsl --install -d <distro-name>
 If you notice your WSL2 is taking too much space even after some clean, here's how you can compact your WSL2 virtual disk on windows (If you're having trouble with automatic, just doit manually)
 {% endhint %}
 
+When this [issue](https://github.com/microsoft/WSL/issues/4699) will be fixed this part will be useless.
+
 Use [wslcompact](https://github.com/okibcn/wslcompact?tab=readme-ov-file#option-1-as-a-powershell-module). If wslcompact did nothing, you can try the following script to compact vdisk:
 
 {% tabs %}
@@ -68,6 +70,13 @@ Invoke-WebRequest -Uri "https://gist.githubusercontent.com/Crackvignoule/fb85811
 {% endtab %}
 
 {% tab title="Manual" %}
+```powershell
+# open admin powershell
+Optimize-VHD -Path ./ext4.vhdx -Mode Full
+```
+
+Or
+
 ```powershell
 #locate ext4.vhdx file with everything or windirstat. copy path
 #open powershell
