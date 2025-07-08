@@ -43,8 +43,8 @@ git commit <a data-footnote-ref href="#user-content-fn-2">--amend</a> --date="$D
 5. Repeat 3. and 4. for the rest of the commits
 6. Push commit to your branch with the following command (replace `branch-name` with your target branch):
 
-<pre class="language-bash"><code class="lang-bash">git push <a data-footnote-ref href="#user-content-fn-4">--force-with-lease</a> origin branch-name
-</code></pre>
+   <pre class="language-bash"><code class="lang-bash">git push <a data-footnote-ref href="#user-content-fn-4">--force-with-lease</a> origin branch-name
+   </code></pre>
 
 ### Push commits in multiple times
 
