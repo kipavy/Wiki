@@ -17,7 +17,7 @@ docker rm -f $(docker ps -aq)
 It is possible to build an image directly inside docker compose.
 
 <pre class="language-docker"><code class="lang-docker">udf:
-    build: https://github.com/Crackvignoule/tradingview-udf-binance-node.git
+    build: https://github.com/kipavy/tradingview-udf-binance-node.git
     restart: always
 <strong>    ports:
 </strong>      - "9090:443"
@@ -26,7 +26,7 @@ It is possible to build an image directly inside docker compose.
 Even better, you can specify a branch, example for dev branch:
 
 ```docker
-build: https://github.com/Crackvignoule/tradingview-udf-binance-node.git#dev
+build: https://github.com/kipavy/tradingview-udf-binance-node.git#dev
 ```
 
 ***

@@ -65,7 +65,7 @@ Use [wslcompact](https://github.com/okibcn/wslcompact?tab=readme-ov-file#option-
 {% tabs %}
 {% tab title="Automatic" %}
 ```powershell
-Invoke-WebRequest -Uri "https://gist.githubusercontent.com/Crackvignoule/fb858118c2b373369741ac084c6c3d45/raw/7598671681ec3513d9c27931d9730f57639f1436/compact-wsl2.ps1" -OutFile "$env:TEMP\compact-wsl2.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\compact-wsl2.ps1"
+Invoke-WebRequest -Uri "https://gist.githubusercontent.com/kipavy/fb858118c2b373369741ac084c6c3d45/raw/7598671681ec3513d9c27931d9730f57639f1436/compact-wsl2.ps1" -OutFile "$env:TEMP\compact-wsl2.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\compact-wsl2.ps1"
 ```
 {% endtab %}
 

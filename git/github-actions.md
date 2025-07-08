@@ -2,7 +2,7 @@
 
 ### Automate docker image build publish
 
-[https://github.com/Crackvignoule/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml](https://github.com/Crackvignoule/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml)
+[https://github.com/kipavy/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml](https://github.com/kipavy/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml)
 
 another more complex example with testing requirement: [https://github.com/Slynax/dump.fun/actions/runs/13072892669](https://github.com/Slynax/dump.fun/actions/runs/13072892669)
 
@@ -14,11 +14,11 @@ another more complex example with testing requirement: [https://github.com/Slyna
 
 {% tabs %}
 {% tab title="ViteJS" %}
-[https://github.com/Crackvignoule/trade-of-exile/blob/main/.github/workflows/deploy.yml](https://github.com/Crackvignoule/trade-of-exile/blob/main/.github/workflows/deploy.yml)
+[https://github.com/kipavy/trade-of-exile/blob/main/.github/workflows/deploy.yml](https://github.com/kipavy/trade-of-exile/blob/main/.github/workflows/deploy.yml)
 {% endtab %}
 
 {% tab title="NextJS" %}
-[https://github.com/Crackvignoule/Portfolio/blob/main/.github/workflows/nextjs.yml](https://github.com/Crackvignoule/Portfolio/blob/main/.github/workflows/nextjs.yml)
+[https://github.com/kipavy/Portfolio/blob/main/.github/workflows/nextjs.yml](https://github.com/kipavy/Portfolio/blob/main/.github/workflows/nextjs.yml)
 {% endtab %}
 {% endtabs %}
 
