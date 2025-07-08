@@ -6,6 +6,8 @@ Sometimes you want to change the date of a commit, for example to correct a mist
 
 #### Change the Date of the Last Commit
 
+Alternatively, you can use the [Commit with Date](https://marketplace.visualstudio.com/items?itemName=brandonfowler.commit-with-date) VS Code extension to amend the commit date via a graphical interface.
+
 Replace `YYYY-MM-DD HH:MM:SS` with your desired date and time.
 
 **Bash (Linux/macOS/Git Bash):**
@@ -35,8 +37,6 @@ git commit <a data-footnote-ref href="#user-content-fn-2">--amend</a> --date="$D
     <pre class="language-bash"><code class="lang-bash">DATE="YYYY-MM-DD HH:MM:SS"
     GIT_AUTHOR_DATE="$DATE" GIT_COMMITTER_DATE="$DATE" git commit --amend --date="$DATE" <a data-footnote-ref href="#user-content-fn-3">--no-edit</a>
     </code></pre>
-    
-    Alternatively, you can use the [Commit with Date](https://marketplace.visualstudio.com/items?itemName=brandonfowler.commit-with-date) VS Code extension to amend the commit date via a graphical interface.
 4.  Continue the rebase:
 
     ```bash
