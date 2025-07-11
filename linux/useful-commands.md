@@ -6,6 +6,11 @@
 chsh -s /bin/bash $USER
 ```
 
+#### Restart shell (for bash, zsh, may not work with fish, csh, sh...)
+
+<pre><code>exec "$SHELL" <a data-footnote-ref href="#user-content-fn-1">-l</a>
+</code></pre>
+
 #### **Create GIF with your screen view:**
 
 ```bash
@@ -32,3 +37,5 @@ fuck
 ```bash
 sudo apt autoremove
 ```
+
+[^1]: login shell: it will reload \~/.bashrc ...
