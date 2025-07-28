@@ -30,4 +30,10 @@ git switch --detach bbbb && git reset HEAD~1
 `git reset --hard` can be used to also reset files, but be careful, unlike `git switch --detach`, unpushed commits will be lost, and pushed commits will need to be pulled again.
 {% endhint %}
 
+### `git reset --hard` vs `git switch --detach`
+
+`git reset --hard`: Modifies your current branch history (by moving the branch pointer) and destroys uncommitted local changes. Can be used to change commits history and pushed with `git push -f`
+
+`git switch --detach`: Does not modify your branch history but puts you in a state where new commits are "detached" from any branch. It's for exploration or temporary work without altering your main branches.
+
 [^1]: example
