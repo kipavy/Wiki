@@ -13,7 +13,7 @@ echo "hello world 2" >> file  # This concatenate
 
 {% code fullWidth="false" %}
 ```bash
-cat <<EOF >file
+cat > file <<EOF
 bla bla
 ...
 bla bla
