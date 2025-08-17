@@ -36,7 +36,11 @@ You can uninstall snap if you dont use it (run inside wsl ubuntu):
 bash <(curl -fsSL https://gitlab.com/scripts94/kubuntu-get-rid-of-snap/-/raw/main/Kubuntu_get_rid_of_Snap.sh)
 ```
 
-## Useful commands
+## Useful commands/tools
+
+### WSL Distro Manager
+
+[https://github.com/bostrot/wsl2-distro-manager](https://github.com/bostrot/wsl2-distro-manager)
 
 ### List installed distros
 
