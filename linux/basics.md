@@ -5,11 +5,13 @@
 #### single line:
 
 ```
-echo "hello world" > file  # This override the content
-echo "hello world 2" >> file  # This concatenate
+echo "hello world" > file  # “create/overwrite” operation
+echo "hello world 2" >> file  # concatenate (append)
 ```
 
 #### Multiple lines:
+
+create/overwrite
 
 {% code fullWidth="false" %}
 ```bash
@@ -20,6 +22,16 @@ bla bla
 EOF
 ```
 {% endcode %}
+
+concatenate (append)
+
+```bash
+cat >> file <<EOF
+bla bla
+...
+bla bla
+EOF
+```
 
 ### Create Desktop shortcut
 
