@@ -25,11 +25,9 @@ bash <(curl -fsSL https://raw.githubusercontent.com/kipavy/Wiki/main/.gitbook/as
 
 ## Manual Installation
 
-
-
 ### Mount your debrid services
 
-We need to setup rclone w/ alldebrid so we can have our files on the server without actually storing them on it. See [https://github.com/itsToggle/plex\_debrid?tab=readme-ov-file#1-open\_file\_folder-mount-your-debrid-services](https://github.com/itsToggle/plex\_debrid?tab=readme-ov-file#1-open\_file\_folder-mount-your-debrid-services)
+We need to setup rclone w/ alldebrid so we can have our files on the server without actually storing them on it. See [https://github.com/itsToggle/plex\_debrid?tab=readme-ov-file#1-open\_file\_folder-mount-your-debrid-services](https://github.com/itsToggle/plex_debrid?tab=readme-ov-file#1-open_file_folder-mount-your-debrid-services)
 
 If you're having issues, here is my personnal rclone mouting command:
 
@@ -64,11 +62,9 @@ Open Plex Web UI to start configuration by opening [http://ipaddress:32400/web](
 You'll need to setup port forwarding on your server to access Plex anywere
 {% endhint %}
 
+### Setup
 
-
-### Setup&#x20;
-
-If you want to access your micro-services (overseerr, riven, prowlarr...) with your domain name, read this: [reverse-proxy.md](reverse-proxy.md "mention")
+If you want to access your micro-services (overseerr, riven, prowlarr...) with your domain name, read this: [reverse-proxy.md](../self-hosting/reverse-proxy.md "mention")
 
 {% hint style="warning" %}
 I don't provide tutorial for setting up jackett with flaresolverr, overseerr and tautulli as it is really simple and optionnal (actually jackett is optionnal but it is very hard to do without it).
@@ -78,7 +74,7 @@ I don't provide tutorial for setting up jackett with flaresolverr, overseerr and
 
 <summary>Depreciated <del>plex_debrid setup</del></summary>
 
-See [https://github.com/itsToggle/plex\_debrid?tab=readme-ov-file#3-page\_facing\_up-setup-plex\_debrid](https://github.com/itsToggle/plex\_debrid?tab=readme-ov-file#3-page\_facing\_up-setup-plex\_debrid)
+See [https://github.com/itsToggle/plex\_debrid?tab=readme-ov-file#3-page\_facing\_up-setup-plex\_debrid](https://github.com/itsToggle/plex_debrid?tab=readme-ov-file#3-page_facing_up-setup-plex_debrid)
 
 ```bash
 docker attach plex_debrid  # Then follow instructions
@@ -367,8 +363,6 @@ For reference, here are the filters I'm using with plex\_debrid:
 ]
 ```
 
-
-
 </details>
 
 ## Troobleshooting
@@ -378,8 +372,6 @@ If you're having issues with rclone container, you can try the following command
 ```bash
 fusermount -u /mnt/mountpoint
 ```
-
-
 
 [^1]: Enable Restore on AC/Power Loss in BIOS Power Management to have the server to boot automatically when plug is turned on. Useful if there is a power outage.
 

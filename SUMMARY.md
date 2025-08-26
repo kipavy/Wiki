@@ -42,11 +42,14 @@
   * [UV](python/uv.md)
   * [Tips & Tricks](python/tips-and-tricks.md)
 
+## 🖥️ Self-hosting
+
+* [Reverse Proxy](self-hosting/reverse-proxy.md)
+* [Forward Port on Oracle Free Tier](self-hosting/forward-port-on-oracle-free-tier.md)
+
 ## 🎬 PlexMediaServer
 
 * [Installation](plexmediaserver/installation.md)
-* [Reverse Proxy](plexmediaserver/reverse-proxy.md)
-* [Forward Port on Oracle Free Tier](plexmediaserver/forward-port-on-oracle-free-tier.md)
 
 ## 💻 Awesome Tools
 
