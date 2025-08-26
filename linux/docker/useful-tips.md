@@ -77,3 +77,15 @@ If fonts are missing in your app, it may be necessary to install fonts, on alpin
 ```bash
 apk add font-noto font-noto-cjk font-noto-emoji
 ```
+
+### Get container IP from service name
+
+```bash
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker compose ps -q <service_name>)
+```
+
+### Get container IP from id or name
+
+```bash
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_name_or_id>
+```
