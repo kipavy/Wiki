@@ -53,6 +53,7 @@
 
 ## 💻 Awesome Tools
 
+* [Everything](awesome-tools/everything.md)
 * [Medicat](awesome-tools/medicat.md)
 
 ## 😎 Awesome Sites
