@@ -11,7 +11,7 @@ A reverse proxy is a server that sits between your client devices and your backe
 
 ### Choosing a reverse proxy server
 
-You could use [Caddy](https://github.com/caddyserver/caddy) or [NPM](https://nginxproxymanager.com/) but [Traefik](https://doc.traefik.io/traefik/) is my personal favorite, here are a few advantages of Traefik:
+You could use [Caddy](https://github.com/caddyserver/caddy) or [NPM](https://nginxproxymanager.com/) but [Traefik](https://doc.traefik.io/traefik/) is my personal favorite (Im currently looking at [Dokploy](https://github.com/Dokploy/dokploy) which seems great and really easy to use especially with [https://docs.dokploy.com/docs/core/multi-server](https://docs.dokploy.com/docs/core/multi-server)) , here are a few advantages of Traefik:
 
 * Automatically discovers the right configuration for your services.
 * Built-in Let's Encrypt Integration (HTTPS) (Automatically handles SSL certificate generation and renewal with Let's Encrypt.)
