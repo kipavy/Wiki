@@ -46,6 +46,7 @@
 
 * [Reverse Proxy](self-hosting/reverse-proxy.md)
 * [Forward Port on Oracle Free Tier](self-hosting/forward-port-on-oracle-free-tier.md)
+* [Tips](self-hosting/tips.md)
 
 ## 🎬 PlexMediaServer
 
