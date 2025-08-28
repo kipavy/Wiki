@@ -1,6 +1,6 @@
 # Tips
 
-### Get your Public (external) IP from terminal:
+### Get your Public IP (external) from terminal:
 
 ```bash
 curl https://ipinfo.io/ip
