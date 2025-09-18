@@ -17,7 +17,7 @@ description: >-
 For any PC to be able to detect the SSD as bootable, the SSD must include an esp - efi partition (300mo fat32), which is how the bios detects the SSD as a boot option.
 {% endhint %}
 
-1. Prepare a bootable Ubuntu USB or any linux (I recommend [Kubuntu](https://kubuntu.org/getkubuntu/)). If you have a fast USB Drive >64 GB, I recommend to install [Medicat](../../awesome-tools/medicat.md).
+1. Prepare a bootable Ubuntu USB or any linux (I recommend [CachyOS](https://cachyos.org/) or [Kubuntu](https://kubuntu.org/getkubuntu/)) or ). If you have a fast USB Drive >64 GB, I recommend to install [Medicat](../../awesome-tools/medicat.md).
 2. Boot on USB (use safe graphics if it crashes)
 3. Start linux install, when asked, select custom partitioning
 4.  Here are the partitions you need to create on your external Drive:
