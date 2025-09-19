@@ -57,13 +57,6 @@
 * [Everything](awesome-tools/everything.md)
 * [Medicat](awesome-tools/medicat.md)
 
-## 😎 Awesome Sites
-
-* [⭐ FMHY](https://fmhy.net/)
-* [👓 Github Awesome](https://github.com/sindresorhus/awesome)
-* [QuickRef](https://quickref.me/)
-* [Wiki IT Stephane Robert](https://blog.stephane-robert.info/docs/)
-
 ## ✍️ TODO
 
 * [R\&T](todo/r-and-t.md)
