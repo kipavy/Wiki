@@ -89,3 +89,9 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(do
 ```bash
 docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_name_or_id>
 ```
+
+### Get volume mount folder
+
+```bash
+docker volume inspect -f '{{ .Mountpoint }}' <volume_name>
+```
