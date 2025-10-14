@@ -7,10 +7,6 @@
 * [Basics](linux/basics.md)
 * [Useful Commands](linux/useful-commands.md)
 * [SSH](linux/ssh.md)
-* [Linux with Windows](linux/linux-with-windows/README.md)
-  * [WSL](linux/linux-with-windows/wsl.md)
-  * [Linux on Portable SSD](linux/linux-with-windows/linux-on-portable-ssd.md)
-* [Ubuntu Startup Script](linux/quickstartup-script.md)
 * [Customize Terminal](linux/customize-terminal/README.md)
   * [Best Shell](linux/customize-terminal/best-shell.md)
   * [Change Bash Colors](linux/customize-terminal/change-bash-colors.md)
@@ -25,6 +21,9 @@
 ## Windows
 
 * [Useful tools](windows/useful-tools.md)
+* [Linux with Windows](windows/linux-with-windows/README.md)
+  * [WSL](windows/linux-with-windows/wsl.md)
+  * [Linux on Portable SSD](windows/linux-with-windows/linux-on-portable-ssd.md)
 
 ***
 
