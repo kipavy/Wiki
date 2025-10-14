@@ -2,6 +2,10 @@
 
 * [👋 Welcome](README.md)
 
+## Windows
+
+* [Useful tools](windows/useful-tools.md)
+
 ## 🐧 Linux
 
 * [Basics](linux/basics.md)
