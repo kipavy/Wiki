@@ -1,16 +1,16 @@
 # Useful tools
 
-### UniGetUI: The Graphical Interface for your package managers
+### [UniGetUI: The Graphical Interface for your package managers](https://www.marticliment.com/unigetui/)
 
-[https://www.marticliment.com/unigetui/](https://www.marticliment.com/unigetui/)
+
 
 ```powershell
 winget install --id=MartiCliment.UniGetUI  -e
 ```
 
-### Mount SSH Host as Network Drive
+### [Everything: Locate files and folders instantly](../awesome-tools/everything.md)
 
-[https://github.com/winfsp/sshfs-win](https://github.com/winfsp/sshfs-win)
+### [SSHFS-Win: Mount SSH Host as Network Drive](https://github.com/winfsp/sshfs-win)
 
 ```powershell
 winget install SSHFS-Win.SSHFS-Win
