@@ -2,10 +2,6 @@
 
 * [👋 Welcome](README.md)
 
-## Windows
-
-* [Useful tools](windows/useful-tools.md)
-
 ## 🐧 Linux
 
 * [Basics](linux/basics.md)
@@ -25,6 +21,10 @@
   * [Tips & Tricks](linux/docker/useful-tips.md)
   * [Easy Monitoring](linux/docker/easy-monitoring.md)
   * [Examples of use](linux/docker/examples-of-use.md)
+
+## Windows
+
+* [Useful tools](windows/useful-tools.md)
 
 ***
 

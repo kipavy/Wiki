@@ -1,6 +1,6 @@
 ---
-icon: square-terminal
 description: Setup SSH authentication on a Linux server from Linux/Windows
+icon: square-terminal
 ---
 
 # SSH
@@ -11,9 +11,13 @@ description: Setup SSH authentication on a Linux server from Linux/Windows
 ssh-keygen
 ```
 
-### Copy SSH Key to Remote Linux Device <a href="#copy-ssh-key-to-remote-linux-device" id="copy-ssh-key-to-remote-linux-device"></a>
+### Copy Public Key to Remote Linux Host <a href="#copy-ssh-key-to-remote-linux-device" id="copy-ssh-key-to-remote-linux-device"></a>
 
 #### From Linux:
+
+{% hint style="info" %}
+To connect via SSH key, you must put your **Public Key** in the remote server's `~/.ssh/authorized_keys` file (requiring initial access like physical or password ssh). Your **Private Key** is your secret proof of identity and must **never** leave your local machine.
+{% endhint %}
 
 <pre class="language-bash"><code class="lang-bash">ssh-copy-id &#x3C;user>@<a data-footnote-ref href="#user-content-fn-1">&#x3C;hostname></a> # -p &#x3C;port-number> (optional)
 </code></pre>
