@@ -113,8 +113,8 @@ tar -xvf path/to/archive.tar.gz
 
 #### Unzip from web
 
-```
-curl -sL https://ex.fr/file.tar.gz | tar xzf -
+```bash
+curl -sL https://ex.fr/file.tar.gz | tar xzvf -
 ```
 
 [^1]: can change depending on OS language
