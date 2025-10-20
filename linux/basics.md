@@ -111,6 +111,12 @@ tar -czvf path/to/target.tar.gz path/to/dir
 tar -xvf path/to/archive.tar.gz
 ```
 
+#### Unzip from web
+
+```
+curl -sL https://ex.fr/file.tar.gz | tar xzf -
+```
+
 [^1]: can change depending on OS language
 
 [^2]: Same as:
