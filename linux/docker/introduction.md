@@ -19,8 +19,10 @@ sudo groupadd docker ; sudo usermod -aG docker $USER
 ## Basics
 
 ```bash
-docker run -d -p 8080:80 --name whoami-demo traefik/whoami
+docker run -d -p 8080:80 --name 2048-game alexwhen/docker-2048
 ```
+
+Open [http://localhost:8080](http://localhost:8080/)
 
 ### [Mounting](https://docs.docker.com/storage/bind-mounts/)
 
