@@ -33,6 +33,18 @@ bla bla
 EOF
 ```
 
+#### Alt method for fish shell
+
+```bash
+echo '
+bla bla
+...
+bla bla
+' >> file
+```
+
+replace '>>' with '>' for overwrite.
+
 ### Create Desktop shortcut
 
 #### For Scripts/Programs:
