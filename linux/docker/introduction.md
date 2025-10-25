@@ -16,6 +16,8 @@ paru -S --noconfirm docker docker-compose docker-buildx
 sudo groupadd docker ; sudo usermod -aG docker $USER
 ```
 
+Log out and log back in so that your group membership is re-evaluated.
+
 ## Basics
 
 ```bash
