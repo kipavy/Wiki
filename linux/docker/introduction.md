@@ -2,22 +2,29 @@
 
 ## Installation
 
-<pre class="language-bash" data-full-width="false"><code class="lang-bash"><a data-footnote-ref href="#user-content-fn-1">sudo groupadd docker ; sudo usermod -aG docker $USER</a>
-</code></pre>
+### Most Linux Distros
 
 [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 
-## Basics
+<pre class="language-bash" data-full-width="false"><code class="lang-bash"><a data-footnote-ref href="#user-content-fn-1">sudo groupadd docker ; sudo usermod -aG docker $USER</a>
+</code></pre>
 
-Here we launch a container named "test" in "detached interactive terminal" so that it runs in the background, and we mount the local pagesweb folder in the /usr/usr/share/nginx container folder in read-only mode, finally using the official nginx image:
+### Arch Based Distros
 
 ```bash
-docker run —name test -dit -p 8080:80 -v ~/pagesweb:/usr/usr/share/nginx/html:ro nginx
+paru -S --noconfirm docker docker-compose docker-buildx
+sudo groupadd docker ; sudo usermod -aG docker $USER
+```
+
+## Basics
+
+```bash
+docker run -d -p 8080:80 --name whoami-demo traefik/whoami
 ```
 
 ### [Mounting](https://docs.docker.com/storage/bind-mounts/)
 
-\-v src[^2]:dest[^3]:ro[^4]  OR  --mount type=tmpfs[^5],src=folder1,dst=folder2
+-v src[^2]:dest[^3]:ro[^4] OR --mount type=tmpfs[^5],src=folder1,dst=folder2
 
 ## [Dockerfile](https://docs.docker.com/reference/dockerfile/)
 
@@ -120,15 +127,11 @@ and run:
 
 ### Examples
 
-
-
 ### [Basic commands](https://docs.docker.com/reference/cli/docker/compose/)
 
 * Run Docker Compose file: <mark style="color:red;">`docker compose up -d`</mark>
 * Start all services: <mark style="color:red;">`docker compose up`</mark>
 * Stop all services: <mark style="color:red;">`docker compose down`</mark>
-
-
 
 [^1]: If you don't do this before install you may have permissions issues with docker
 
