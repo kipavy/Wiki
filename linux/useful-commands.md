@@ -29,7 +29,6 @@ You can also configure an alias to make it a synonym for apt:
 
 ```bash
 # FOR FISH
-alias -s apt 'pac'
 echo '
 function sudo
     if functions -q $argv[1]
@@ -40,6 +39,7 @@ function sudo
     end
 end
 ' > ~/.config/fish/functions/sudo.fish
+alias -s apt 'pac'
 ```
 
 ```bash
