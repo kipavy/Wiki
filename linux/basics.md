@@ -33,7 +33,7 @@ bla bla
 EOF
 ```
 
-#### Alt method for fish shell
+Alt method for fish shell
 
 ```bash
 echo '
