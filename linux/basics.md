@@ -4,7 +4,7 @@
 
 #### single line:
 
-```
+```bash
 echo "hello world" > file  # “create/overwrite” operation
 echo "hello world 2" >> file  # concatenate (append)
 ```
