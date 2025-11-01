@@ -24,31 +24,23 @@ Personnaly I chose NFS because it was the most performant option (see benchmarks
 Open a Admin Powershell and paste this in:
 
 ```powershell
-# Enable NFS client features
+Write-Host "Enabling NFS client features..."
 Enable-WindowsOptionalFeature -Online -FeatureName ServicesForNFS-ClientOnly, ClientForNFS-Infrastructure -NoRestart
 
-# Registry path for NFS client defaults
-$regPath = "HKLM:\SOFTWARE\Microsoft\ClientForNFS\CurrentVersion\Default"
+$regPath = 'HKLM:\SOFTWARE\Microsoft\ClientForNFS\CurrentVersion\Default'
 
-# Create key if it doesn't exist
-if (-not (Test-Path $regPath)) {
-    New-Item -Path $regPath -Force | Out-Null
-}
+nfsadmin client stop
+Set-ItemProperty -Path $regPath -Name 'AnonymousUID' -Type DWord -Value 0
+Set-ItemProperty -Path $regPath -Name 'AnonymousGID' -Type DWord -Value 0
+nfsadmin client start
+nfsadmin client localhost config fileaccess=755 SecFlavors=+sys -krb5 -krb5i
 
-# Configure anonymous UID/GID (0 = root)
-Set-ItemProperty -Path $regPath -Name "AnonymousUid" -Value 0 -Type DWord
-Set-ItemProperty -Path $regPath -Name "AnonymousGid" -Value 0 -Type DWord
-
-# Confirm values
+Write-Host "`nVerifying registry values..."
 Get-ItemProperty -Path $regPath | Select-Object AnonymousUid, AnonymousGid
 
-# Restart NFS client service for settings to apply
-Write-Host "Restarting NFS Client service..."
-Restart-Service -Name NfsClnt -ErrorAction SilentlyContinue
-
-# Display status
+Write-Host "`nNFS client status:"
 Get-Service -Name NfsClnt
-Write-Host "`n✅ NFS client is enabled and configured."
+Write-Host "`n✅ NFS client successfully enabled and configured."
 
 ```
 {% endtab %}
