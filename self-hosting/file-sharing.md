@@ -21,7 +21,7 @@ Personnaly I chose NFS because it was the most performant option (see benchmarks
 
 {% tabs %}
 {% tab title="EASY WAY (Recommended)" %}
-Open a Admin Powershell and paste this in:
+Open an **Admin** Powershell and paste this in:
 
 ```powershell
 Write-Host "Enabling NFS client features..."
