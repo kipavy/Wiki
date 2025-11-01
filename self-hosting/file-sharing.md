@@ -8,6 +8,10 @@ This tutorial only covers NFS but there are other file sharing methods like SSHF
 
 Personnaly I chose NFS because it was the most performant option (see benchmarks below). Moreover, I use Tailscale for external access, so using SSHFS would have resulted in double encryption. Though SSHFS could be a good choice because it needs no server config, if you're interested in using SSHFS, the server can be any machine that has SSH server (and for windows clients, check out [#sshfs-win-mount-ssh-host-as-network-drive](../windows/useful-tools.md#sshfs-win-mount-ssh-host-as-network-drive "mention")).
 
+{% embed url="https://blog.ja-ke.tech/2019/08/27/nas-performance-sshfs-nfs-smb.html" %}
+
+***
+
 ## NFS Server
 
 1. Create <mark style="color:yellow;">**Privileged**</mark> Cockpit LXC [https://community-scripts.github.io/ProxmoxVE/scripts?id=cockpit](https://community-scripts.github.io/ProxmoxVE/scripts?id=cockpit)
