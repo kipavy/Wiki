@@ -86,4 +86,44 @@ mount -o anon \\192.168.1.90\YOUR\PATH V:
 
 ### Linux NFS Client
 
-TODO
+1. Install NFS package
+
+{% tabs %}
+{% tab title="Debian/Ubuntu" %}
+```bash
+sudo apt update
+sudo apt install nfs-common
+```
+{% endtab %}
+
+{% tab title="Arch Linux/Manjaro" %}
+```bash
+sudo pacman -S nfs-utils
+sudo systemctl enable --now nfs-client.target
+```
+{% endtab %}
+
+{% tab title="Fedora/CentOS/RHEL" %}
+```bash
+sudo dnf install nfs-utils
+```
+{% endtab %}
+{% endtabs %}
+
+2. Ouvrez le fichier `/etc/fstab`
+
+```bash
+sudo nano /etc/fstab
+```
+
+3. Ajoutez la ligne suivante à la fin du fichier, en remplaçant l'adresse IP et les chemins :
+
+```
+192.168.1.90:/srv/nfs_share /mnt/nfs_share nfs defaults,noatime,x-systemd.automount,x-systemd.device-timeout=10 0 0
+```
+
+4. Testez le montage sans redémarrer :
+
+```bash
+sudo mount -a
+```
