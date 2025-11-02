@@ -14,8 +14,8 @@ Personnaly I chose NFS because it was the most performant option (see benchmarks
 
 ## NFS Server
 
-1. Create <mark style="color:yellow;">**Privileged**</mark> Cockpit LXC [https://community-scripts.github.io/ProxmoxVE/scripts?id=cockpit](https://community-scripts.github.io/ProxmoxVE/scripts?id=cockpit)
-2. Once you're logged it into Cockpit dashboard ([https://192.168.1.90:9090/file-sharing](https://192.168.1.90:9090/file-sharing)), Create an NFS Share (don't create in on '/')
+1. Create <mark style="color:yellow;">**Privileged**</mark> Cockpit LXC (during setup, say yes to 45drives plugin): [https://community-scripts.github.io/ProxmoxVE/scripts?id=cockpit](https://community-scripts.github.io/ProxmoxVE/scripts?id=cockpit)
+2. Once you're logged it into Cockpit dashboard ([https://192.168.1.90:9090/file-sharing](https://192.168.1.90:9090/file-sharing)), Create an NFS Share (don't create in on '/') (make sure the permissions are ok).
 
 ## NFS Client
 
@@ -137,5 +137,6 @@ sudo nano /etc/fstab
 5. Testez le montage sans redémarrer :
 
 ```bash
+sudo systemctl daemon-reload
 sudo mount -a
 ```
