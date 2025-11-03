@@ -1,4 +1,12 @@
-# Monitor
+---
+description: >-
+  Tutorial to setup Scrutiny HDD Monitoring & Alerting Dashboard on Proxmox
+  (really useful for RAID setups)
+---
+
+# HDD Monitoring Proxmox
+
+## Scrutiny setup
 
 ### Web+DB
 
@@ -14,7 +22,7 @@ must be on proxmox host since LXCs don't have access to S.M.A.R.T data (it may b
 #!/bin/bash
 
 # CHANGE ME
-API_ENDPOINT="http://192.168.1.xx:8081"
+API_ENDPOINT="http://192.168.1.xx:8080"
 
 
 ############# Scrutiny Collector ###################
@@ -62,3 +70,9 @@ EOF
 systemctl enable --now scrutiny.timer
 systemctl status scrutiny.timer
 ```
+
+You'll now have access to Scrutiny Dashboard on [http://192.168.1.xx:8080](http://192.168.1.xx:8080/)
+
+### Configuring Alerting
+
+Scrutiny supports webhook alerting, we'll set up discord alerting

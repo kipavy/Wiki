@@ -47,7 +47,7 @@
 
 ## 🖥️ Self-hosting
 
-* [Monitor](self-hosting/monitor.md)
+* [HDD Monitoring Proxmox](self-hosting/hdd-monitoring-proxmox.md)
 * [File Sharing](self-hosting/file-sharing.md)
 * [Reverse Proxy](self-hosting/reverse-proxy.md)
 * [Forward Port on Oracle Free Tier](self-hosting/forward-port-on-oracle-free-tier.md)
