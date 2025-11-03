@@ -17,13 +17,8 @@ must be on proxmox host since LXCs don't have access to S.M.A.R.T data (it may b
 API_ENDPOINT="http://192.168.1.xx:8081"
 
 
-####################################
-# Install Scrutiny Collector
-
-# Installing dependencies
+############# Scrutiny Collector ###################
 apt install -y smartmontools
-
-# Define variables
 INSTALL_DIR="/opt/scrutiny"
 BIN_DIR="$INSTALL_DIR/bin"
 LATEST_RELEASE_URL="https://github.com/AnalogJ/scrutiny/releases/latest/download/scrutiny-collector-metrics-linux-amd64"
@@ -32,9 +27,7 @@ mkdir -p $BIN_DIR
 curl -L $LATEST_RELEASE_URL -o $BIN_DIR/scrutiny-collector-metrics-linux-amd64
 chmod +x $BIN_DIR/scrutiny-collector-metrics-linux-amd64
 
-#####################################
-# Install Scrutiny Service
-
+############## Scrutiny Service ####################
 mkdir -p /root/scrutiny
 cat << EOF > /root/scrutiny/scrutiny.sh
 #!/bin/bash
