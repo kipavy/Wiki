@@ -73,12 +73,13 @@ Description="Timer for the scrutiny.service"
 [Timer]
 Unit=scrutiny.service
 OnBootSec=5min
-OnUnitActiveSec=15min
+OnUnitActiveSec=12h
 
 [Install]
 WantedBy=timers.target
 EOF
 
+systemctl daemon-reload
 systemctl enable --now scrutiny.timer
 systemctl status scrutiny.timer
 ```
