@@ -47,6 +47,7 @@
 
 ## 🖥️ Self-hosting
 
+* [Tailscale Funnel](self-hosting/tailscale-funnel.md)
 * [HDD Monitoring Proxmox](self-hosting/hdd-monitoring-proxmox.md)
 * [File Sharing](self-hosting/file-sharing.md)
 * [Reverse Proxy](self-hosting/reverse-proxy.md)
