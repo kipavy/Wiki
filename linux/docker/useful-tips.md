@@ -16,7 +16,7 @@ docker rm -f $(docker ps -aq)
 
 It is possible to build an image directly inside docker compose.
 
-<pre class="language-docker"><code class="lang-docker">udf:
+<pre class="language-yaml"><code class="lang-yaml">udf:
     build: https://github.com/kipavy/tradingview-udf-binance-node.git
     restart: always
 <strong>    ports:
@@ -25,8 +25,24 @@ It is possible to build an image directly inside docker compose.
 
 Even better, you can specify a branch, example for dev branch:
 
-```docker
+{% hint style="warning" %}
+Keep the .git before the # or this syntax may not work
+{% endhint %}
+
+```yaml
 build: https://github.com/kipavy/tradingview-udf-binance-node.git#dev
+```
+
+You can also specify a custom Dockerfile name using context:
+
+```yaml
+services:
+  web:
+    build:
+      # build context: where to look for Dockerfile, as seen it can also be a distant URL
+      context: ./app
+      # Custom Dockerfile name, relative to the context directory
+      dockerfile: Dockerfile.dev
 ```
 
 ***
