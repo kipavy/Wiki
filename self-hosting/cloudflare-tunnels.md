@@ -2,7 +2,7 @@
 
 This has some benefits over tailcale funnels, you can proxy not only on localhost and you can use your own domains.
 
-1. Insall cloudflared https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared
+1. Insall cloudflared [https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared](https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared)
 2. &#x20;Log in to cloudflare account:
 
 ```
