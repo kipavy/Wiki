@@ -1,5 +1,12 @@
 # Cloudflare Tunnels
 
+Following this may be even easier\
+[https://gist.github.com/CharlesGodwin/5dfd1948235d0aa2b03c17c457d1d883#set-up-my-tunnel-using-the-web-ui](https://gist.github.com/CharlesGodwin/5dfd1948235d0aa2b03c17c457d1d883#set-up-my-tunnel-using-the-web-ui)
+
+[https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/get-started/create-remote-tunnel/](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/get-started/create-remote-tunnel/)
+
+
+
 This has some benefits over tailcale funnels, you can proxy not only on localhost and you can use your own domains.
 
 1. Insall cloudflared [https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared](https://community-scripts.github.io/ProxmoxVE/scripts?id=cloudflared)
