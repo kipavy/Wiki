@@ -48,6 +48,7 @@
 ## 🖥️ Self-hosting
 
 * [SSH Web Tailscale](self-hosting/ssh-web-tailscale.md)
+* [Cloudflare Tunnels](self-hosting/cloudflare-tunnels.md)
 * [Tailscale Funnel](self-hosting/tailscale-funnel.md)
 * [HDD Monitoring Proxmox](self-hosting/hdd-monitoring-proxmox.md)
 * [File Sharing](self-hosting/file-sharing.md)
