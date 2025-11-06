@@ -47,13 +47,15 @@
 
 ## 🖥️ Self-hosting
 
-* [SSH Web Tailscale](self-hosting/ssh-web-tailscale.md)
-* [Cloudflare Tunnels](self-hosting/cloudflare-tunnels.md)
-* [Tailscale Funnel](self-hosting/tailscale-funnel.md)
+* [Remote Access](self-hosting/remote-access/README.md)
+  * [Cloudflare Tunnels](self-hosting/remote-access/cloudflare-tunnels.md)
+  * [Tailscale](self-hosting/remote-access/tailscale/README.md)
+    * [Tailscale Funnel](self-hosting/remote-access/tailscale/tailscale-funnel.md)
+    * [SSH Web Tailscale](self-hosting/remote-access/tailscale/ssh-web-tailscale.md)
+  * [Reverse Proxy](self-hosting/remote-access/reverse-proxy.md)
+  * [Forward Port on Oracle Free Tier](self-hosting/remote-access/forward-port-on-oracle-free-tier.md)
 * [HDD Monitoring Proxmox](self-hosting/hdd-monitoring-proxmox.md)
 * [File Sharing](self-hosting/file-sharing.md)
-* [Reverse Proxy](self-hosting/reverse-proxy.md)
-* [Forward Port on Oracle Free Tier](self-hosting/forward-port-on-oracle-free-tier.md)
 * [Tips](self-hosting/tips.md)
 
 ## 🎬 PlexMediaServer

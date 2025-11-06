@@ -2,7 +2,7 @@
 
 Ouvrir le port dans l’interface Oracle>VNIC>Security List
 
-<figure><img src="../.gitbook/assets/Untitled.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Untitled.png" alt=""><figcaption></figcaption></figure>
 
 ```bash
 sudo apt purge ufw
