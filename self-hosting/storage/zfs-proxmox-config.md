@@ -49,7 +49,7 @@ usermod -aG nas_shares $USER  # or whatever user needs to access data
 ### Add disk to an existing pool
 
 {% hint style="success" %}
-Use stable disk identifiers (e.g., `/dev/disk/by-id/...`) for all commands.
+Use stable disk identifiers (e.g., `/dev/disk/by-id/...`) for all commands. You can see your disks ids by using `ls -l /dev/disk/by-id/`
 {% endhint %}
 
 #### Increase Redundancy: From 1 Disk to a Mirror (RAID 1)
