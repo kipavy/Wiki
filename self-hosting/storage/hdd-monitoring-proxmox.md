@@ -92,7 +92,7 @@ Scrutiny supports webhook alerting through [Shouttr](https://containrrr.dev/shou
 
 1. Get a discord webhook: create a server and a channel dedicated for Scrutiny
 
-<figure><img src="../.gitbook/assets/{D2761BFF-6926-4CEB-AFBD-08484B05736C}.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/{D2761BFF-6926-4CEB-AFBD-08484B05736C}.png" alt=""><figcaption></figcaption></figure>
 
 2. Create config/scrutiny.yaml based [example.scrutiny.yaml](https://github.com/AnalogJ/scrutiny/blob/master/example.scrutiny.yaml#L61-L85) with discord webhook matching [shouttr's url format](https://containrrr.dev/shoutrrr/v0.8/services/discord/#url_format).
 3. You can try to trigger an alert with
