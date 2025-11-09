@@ -2,9 +2,7 @@
 
 {% embed url="https://blog.kye.dev/proxmox-zfs-mounts" %}
 
-1. créer le pool par l'interface proxmox
-
-
+1. Create ZFS pool in Proxmox UI : `pve > disks > ZFS > Create ZFS`
 
 ### Create ZFS Datasets
 
@@ -26,6 +24,8 @@ zfs list
 
 {% embed url="https://blog.kye.dev/proxmox-zfs-mounts" %}
 
+#### Proxmox setup (done once)
+
 ```bash
 groupadd -g 110000 nas_shares
 useradd nas -u 101000 -g 110000 -m -s /bin/bash
@@ -33,13 +33,17 @@ chown -R nas:nas_shares /tank/immich/
 chown -R nas:nas_shares /tank/other_dataset/
 ```
 
+#### Bind Mount Dataset to LXC
+
 ```bash
-pct set 105 -mp0 /pool/dataset,mp=/mnt/media_root
+pct set 105 -mp0 /pool/dataset,mp=/mnt/media_root  # or whatever mount path
 ```
 
-```
+#### In LXC, adding nas\_shares group
+
+```bash
 groupadd -g 10000 nas_shares
-usermod -aG nas_shares
+usermod -aG nas_shares $USER  # or whatever user needs to access data
 ```
 
 ### Add disk to an existing pool
