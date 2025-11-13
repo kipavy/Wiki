@@ -50,6 +50,8 @@
 * [Remote Access](self-hosting/remote-access/README.md)
   * [Cloudflare Tunnels](self-hosting/remote-access/cloudflare-tunnels.md)
   * [Tailscale](self-hosting/remote-access/tailscale/README.md)
+    * [Split DNS](self-hosting/remote-access/tailscale/split-dns.md)
+    * [Tailscale Subnet routers](self-hosting/remote-access/tailscale/tailscale-subnet-routers.md)
     * [Tailscale Funnel](self-hosting/remote-access/tailscale/tailscale-funnel.md)
     * [SSH Web Tailscale](self-hosting/remote-access/tailscale/ssh-web-tailscale.md)
   * [Reverse Proxy](self-hosting/remote-access/reverse-proxy.md)
@@ -71,7 +73,6 @@
 
 ## ✍️ TODO
 
-* [Tailscale Subnet routers](todo/tailscale-subnet-routers.md)
 * [Parsec when it's blocked](todo/parsec-when-its-blocked.md)
 * [R\&T](todo/r-and-t.md)
 * [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)

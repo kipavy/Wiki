@@ -8,14 +8,17 @@ description: >-
 
 {% embed url="https://tailscale.com/kb/1223/funnel" %}
 
-Tailscale Funnel offers simple, secure local service exposure via its Zero-Trust VPN, while a Reverse Proxy provides complete control over routing, performance, and public security.&#x20;
+Tailscale Funnel offers simple, secure local service exposure via its Zero-Trust VPN, while a Reverse Proxy provides complete control over routing, performance, and public security. It's really useful for apps that you need to be public and that asks your server IP only one time like Immich.
 
-* Ease of use, one command, instant public HTTPS
+<mark style="color:$primary;">**Pros:**</mark>
+
+* <mark style="color:$primary;">Ease of use, one command, instant public HTTPS</mark>
 * No port forwarding needed
 
-It's really useful for apps that you need to be public and that asks your server IP only one time like Immich.
+[<mark style="color:$danger;">**Cons:**</mark>](https://tailscale.com/kb/1223/funnel#requirements-and-limitations)
 
-The major downside for me is that it can't be used with CNAME at the moment (see [https://github.com/tailscale/tailscale/issues/11563](https://github.com/tailscale/tailscale/issues/11563) )
+* Can only proxy on localhost (need tailcale installed on each LXC)
+* The major downside for me is that it <mark style="color:$danger;">can't be used with CNAME (custom domain)</mark> at the moment (see [https://github.com/tailscale/tailscale/issues/11563](https://github.com/tailscale/tailscale/issues/11563) )
 
 ### Setup for Proxmox
 
