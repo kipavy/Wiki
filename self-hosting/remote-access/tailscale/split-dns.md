@@ -25,12 +25,12 @@ When you enable Tailscale's Split DNS, you create a sophisticated networking env
 1. Create Adguard Home LXC (or [Pi-Hole](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole) if you prefer) [https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard](https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard). <mark style="color:$warning;">**Setup is on port 3000 and after that, dashboard is on port 80**</mark>
 2. Create your Reverse Proxy in another LXC, for simplicity, we'll go [https://community-scripts.github.io/ProxmoxVE/scripts?id=npmplus](https://community-scripts.github.io/ProxmoxVE/scripts?id=npmplus)
 3. Enable Split DNS in [https://login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns) for `yourdomain.fr` to points to your local Adguard LXC IP
-4. Go to Adguard Dashboard > Filters > DNS Rewrites. Add 2 entries like this pointing towards NPM LXC IP:
+4. Go to `Adguard Dashboard > Filters > DNS Rewrites`. Add 2 entries like this pointing towards NPM LXC IP:
 
 <figure><img src="../../../.gitbook/assets/{81BFF974-02F9-4193-9378-6889377AD018}.png" alt=""><figcaption></figcaption></figure>
 
-5. In NPM > TLS Certificates. Add your 2 certificates (1 for `*.yourdomain.fr` and another for `yourdomain.fr)`. You only need to buy a domain if you want public access (it's useful for apps like immich or nextcloud where you want to be able to sync 24/24 for example). If you have nought your domain you can just use Let's Encrypt in NPM, but if you want to go local-only (free) domain, you'll need to generate a self-signed cert, check [#using-a-local-only-unpurchased-domain](split-dns.md#using-a-local-only-unpurchased-domain "mention").
-6. NPM > Proxy Hosts. Add your each services.
+5. In `NPM > TLS Certificates`. Add your 2 certificates (1 for `*.yourdomain.fr` and another for `yourdomain.fr)`. You only need to buy a domain if you want public access (it's useful for apps like immich or nextcloud where you want to be able to sync 24/24 for example). If you have bought your domain you can just use Let's Encrypt in NPM, but if you want to go local-only (free) domain, you'll need to generate a self-signed cert, check [#using-a-local-only-unpurchased-domain](split-dns.md#using-a-local-only-unpurchased-domain "mention").
+6. `NPM > Proxy Hosts`. Add your each services.
 
 {% hint style="warning" %}
 A lot of apps need Websocket enabled in NPM
