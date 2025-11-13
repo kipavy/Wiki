@@ -28,7 +28,7 @@ When you enable Tailscale's Split DNS, you create a sophisticated networking env
 
 <div data-full-width="false"><figure><img src="../../../.gitbook/assets/{7710A00D-09F2-420C-B486-C747CEB05417}.png" alt="" width="319"><figcaption></figcaption></figure></div>
 
-1. Go to `Adguard Dashboard > Filters > DNS Rewrites`. Add 2 entries like this pointing towards NPM LXC IP:
+4. Go to `Adguard Dashboard > Filters > DNS Rewrites`. Add 2 entries like this pointing towards NPM LXC IP:
 
 <figure><img src="../../../.gitbook/assets/{81BFF974-02F9-4193-9378-6889377AD018}.png" alt=""><figcaption></figcaption></figure>
 
