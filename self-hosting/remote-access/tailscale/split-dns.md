@@ -7,25 +7,52 @@ description: >-
 
 # Split DNS
 
-All you queries will work as usual, as if you wouldn't have tailscale enabled, only the requests for your domain will use your adguard local DNS (when tailscale is enabled), removing the need to buy a domain (except if you need a public app, like immich, that's useful for 24/24 sync, without having to enable tailscale). It also lets you use your domain for private apps such as adguard.yourdomain.fr which you obviously don't want to expose to internet.
+### Understanding Split DNS
 
+{% embed url="https://tailscale.com/learn/why-split-dns" %}
 
+Tailscale's Split DNS feature is incredibly powerful for home lab users, allowing you to seamlessly integrate your private network with your local DNS resolver (like AdGuard Home or Pi-hole). This guide walks you through setting up a custom domain for your local services, choosing between using a purchased domain or a local-only domain.
 
-You can use any domain you want without buying it, this will require local DNS rewrites for all your domains/subdomains. In this case you need to generate your own SSL certificate as any public ssl cert provider won't be able to see your domain (because it doesn't exist outsite your network). This may generate errors on your browser because its a self-signed certificate, you can bypass this by double clicking the .cert
+When you enable Tailscale's Split DNS, you create a sophisticated networking environment:
 
+* **Default Behavior:** All standard, non-homelab queries (e.g., browsing Google, checking news) continue to use your device's normal public DNS servers. Your internet experience remains unchanged.
+* **Split Behavior (Local Domain):** Queries specifically directed to the domain you've configured in Tailscale (e.g., `*.yourdomain.fr`) are **redirected** to your local DNS resolver (like AdGuard Home or Pi-hole) running on your Tailnet.
 
+**The Key Benefit:** This allows you to use clean, memorable hostnames like `adguard.yourdomain.fr` for internal applications, even if they aren't publicly exposed. The DNS resolution happens locally, removing the dependency on external DNS.
 
-If you have bought a domain name, you don't need to generate your certificate, NPM can do it for you. To avoid creating requesting another cert for each subdomain you can ask a cert for \*.YOURDOMAIN.FR and reuse this for each proxy.
+### How to setup in Proxmox
 
-{% hint style="warning" %}
-Adguard Home: \*.yourdomain.fr is not covering yourdomain.fr. You need 2 rules
-{% endhint %}
+1. Create Adguard Home LXC (or [Pi-Hole](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole) if you prefer) [https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard](https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard). <mark style="color:$warning;">**Setup is on port 3000 and after that, dashboard is on port 80**</mark>
+2. Create your Reverse Proxy in another LXC, for simplicity, we'll go [https://community-scripts.github.io/ProxmoxVE/scripts?id=npmplus](https://community-scripts.github.io/ProxmoxVE/scripts?id=npmplus)
+3. Enable Split DNS in [https://login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns) for `yourdomain.fr` to points to your local Adguard LXC IP
+4. Go to Adguard Dashboard > Filters > DNS Rewrites. Add 2 entries like this pointing towards NPM LXC IP:
+
+<figure><img src="../../../.gitbook/assets/{81BFF974-02F9-4193-9378-6889377AD018}.png" alt=""><figcaption></figcaption></figure>
+
+5. In NPM > TLS Certificates. Add your 2 certificates (1 for `*.yourdomain.fr` and another for `yourdomain.fr)`. You only need to buy a domain if you want public access (it's useful for apps like immich or nextcloud where you want to be able to sync 24/24 for example). If you have nought your domain you can just use Let's Encrypt in NPM, but if you want to go local-only (free) domain, you'll need to generate a self-signed cert, check [#using-a-local-only-unpurchased-domain](split-dns.md#using-a-local-only-unpurchased-domain "mention").
+6. NPM > Proxy Hosts. Add your each services.
 
 {% hint style="warning" %}
 A lot of apps need Websocket enabled in NPM
 {% endhint %}
 
-### Script to generate HTTPS cert valid for 100 years
+
+
+***
+
+### Using a Local-Only (Unpurchased) Domain
+
+You can use any domain name you like (e.g., `myhomelab.local`) without purchasing it, but this requires manual handling of TLS/SSL certificates.
+
+#### The Self-Signed Certificate Challenge
+
+Since public certificate authorities (CAs) cannot see or verify a domain that exists only on your local network, you **must** generate a self-signed certificate.
+
+When using a self-signed certificate, your browser will display security warnings. To eliminate these warnings (and enable modern security features like HTTP/2), <mark style="color:$warning;">**you need to manually install and trust the generated**</mark><mark style="color:$warning;">**&#x20;**</mark><mark style="color:$warning;">**`.crt`**</mark><mark style="color:$warning;">**&#x20;**</mark><mark style="color:$warning;">**file on every device you use**</mark> <mark style="color:$warning;"></mark><mark style="color:$warning;">(on windows just double click it and add it to "trust certificates" store).</mark>
+
+#### Script to Generate a Wildcard Self-Signed Certificate
+
+This script generates a certificate valid for 100 years (36,500 days) for a wildcard domain (`*.YOURDOMAIN.FR`) and the root domain (`YOURDOMAIN.FR`).
 
 {% code fullWidth="false" %}
 ```bash
@@ -40,6 +67,4 @@ openssl req -x509 -nodes -days 36500 -newkey rsa:2048 \
 ```
 {% endcode %}
 
-you'll need to install the .cert on your computer, on windows just double click it and add it to "trust certificates" store.\
-I dont use dokploy for proxy/https cause I couldnt find how to use my custom cert and NPMplus works great and easy to setup.
-
+You can then add it to NPM, and if you have bought a domain name, you don't need to generate your certificate, NPM can do it for you. To avoid creating requesting another cert for each subdomain you can ask a cert for \*.YOURDOMAIN.FR and reuse this for each proxy.
