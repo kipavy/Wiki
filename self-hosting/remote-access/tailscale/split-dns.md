@@ -24,8 +24,11 @@ When you enable Tailscale's Split DNS, you create a sophisticated networking env
 
 1. Create Adguard Home LXC (or [Pi-Hole](https://community-scripts.github.io/ProxmoxVE/scripts?id=pihole) if you prefer) [https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard](https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard). <mark style="color:$warning;">**Setup is on port 3000 and after that, dashboard is on port 80**</mark>
 2. Create your Reverse Proxy in another LXC, for simplicity, we'll go [https://community-scripts.github.io/ProxmoxVE/scripts?id=npmplus](https://community-scripts.github.io/ProxmoxVE/scripts?id=npmplus)
-3. Enable Split DNS in [https://login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns) for `yourdomain.fr` to points to your local Adguard LXC IP
-4. Go to `Adguard Dashboard > Filters > DNS Rewrites`. Add 2 entries like this pointing towards NPM LXC IP:
+3. Enable Split DNS in [https://login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns) for `yourdomain.fr` to points to your local Adguard LXC IP (e.g: 192.168.1.110). To do this click on Add a nameserver > Custom:
+
+<div data-full-width="false"><figure><img src="../../../.gitbook/assets/{7710A00D-09F2-420C-B486-C747CEB05417}.png" alt="" width="319"><figcaption></figcaption></figure></div>
+
+1. Go to `Adguard Dashboard > Filters > DNS Rewrites`. Add 2 entries like this pointing towards NPM LXC IP:
 
 <figure><img src="../../../.gitbook/assets/{81BFF974-02F9-4193-9378-6889377AD018}.png" alt=""><figcaption></figcaption></figure>
 
