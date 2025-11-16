@@ -67,6 +67,15 @@ to save ressources I figured out a way to have PBS only ON when backupping and O
 
 (on proxmox host: cronjob at specified backup hour to start LXC)
 
+Starts PBS 1m before scheduled backup job:
+
+```bash
+59 20 * * * /usr/sbin/pct start 105 >> /var/log/pbs-autostart.log 2>&1
+```
+
 (in PBS LXC, Service to shutdown when no backup tasks are running)
+
+```bash
+```
 {% endstep %}
 {% endstepper %}
