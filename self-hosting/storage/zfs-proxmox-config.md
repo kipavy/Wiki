@@ -20,6 +20,31 @@ zfs create tank/immich  # zfs create POOL/DATASET
 zfs list
 ```
 
+### Renaming datasets/snapshots
+
+```bash
+zfs rename pool1/data pool1/archive # Renaming dataset
+zfs rename pool1/data@yesterday pool1/data@backup-2025-05-10  # Renaming snapshot
+```
+
+### Migrating ZFS
+
+#### Creating snapshot
+
+```bash
+zfs snapshot -r pool/dataset@migration
+```
+
+#### Sending snapshot
+
+```bash
+zfs send -R pool/dataset@migration | zfs receive -F newpool/dataset
+```
+
+{% hint style="info" %}
+You can also migrate whole ZFS pool by just not specifying any /dataset. E.g: `zfs snapshot -r pool@migration` ...&#x20;
+{% endhint %}
+
 ### Access ZFS dataset in LXCs
 
 {% embed url="https://blog.kye.dev/proxmox-zfs-mounts" %}
