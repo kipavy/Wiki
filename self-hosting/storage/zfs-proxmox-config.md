@@ -1,4 +1,8 @@
-# 💾 ZFS Proxmox Config
+---
+icon: server
+---
+
+# ZFS Proxmox Config
 
 {% embed url="https://blog.kye.dev/proxmox-zfs-mounts" %}
 
