@@ -120,6 +120,10 @@ systemctl enable --now pbs-auto-shutdown.timer
 
 echo "✅ Service d'arrêt sécurisé configuré dans le LXC."
 ```
+
+useful link if your PBS is on another server:
+
+{% embed url="https://www.apalrd.net/posts/2024/pbs_hibernate/" %}
 {% endstep %}
 
 {% step %}
@@ -152,18 +156,17 @@ For manual `/etc` backup, you can just use this [script](https://community-scrip
 {% step %}
 ## LXCs/VMs Backup
 
-{% embed url="https://www.apalrd.net/posts/2024/pbs_hibernate/" %}
-
-back in PVE, datacenter > storage > add PBS (use the newly created user, copy findergprint from PBS UI (see video)
+1. back in PVE, datacenter > storage > add PBS (use the newly created user, copy findergprint from PBS UI, you can get it by running this command in PBS LXC shell or in PBS UI (see video).
 
 ```shellscript
-PBS_LXC_ID="105"
-/usr/sbin/pct exec "$PBS_LXC_ID" -- bash -c "proxmox-backup-manager cert info | grep Fingerprint | cut -d ' ' -f 3"
+proxmox-backup-manager cert info | grep Fingerprint | cut -d ' ' -f 3
 ```
 
-create backup job (with PBS as storage)
+2. create backup job (with PBS as storage)
 
-Creating Backup job in PVE <mark style="color:$danger;">TODO</mark>
+Video tutorial:
+
+{% embed url="https://youtu.be/sOUgzPocqFM?si=p6gQJ1TtyydbH52W&t=940" %}
 {% endstep %}
 {% endstepper %}
 
