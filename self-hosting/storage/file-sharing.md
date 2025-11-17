@@ -95,7 +95,7 @@ mount -o anon \\192.168.1.90\YOUR\PATH V:
 
 {% tabs %}
 {% tab title="Debian/Ubuntu" %}
-```bash
+```shellscript
 sudo apt update
 sudo apt install nfs-common
 ```
@@ -117,27 +117,27 @@ sudo dnf install nfs-utils
 
 2. Créez votre point de montage
 
-```bash
+```shellscript
 sudo mkdir -p /mnt/nfs_share
 ```
 
 3. Ouvrez le fichier `/etc/fstab`
 
-```bash
+```shellscript
 sudo nano /etc/fstab
 ```
 
 4. Ajoutez la ligne suivante à la fin du fichier, en remplaçant l'adresse IP et les chemins :
 
 {% code overflow="wrap" %}
-```
+```shellscript
 192.168.1.90:/srv/nfs_share /mnt/nfs_share nfs defaults,noatime,x-systemd.automount,x-systemd.device-timeout=10 0 0
 ```
 {% endcode %}
 
 5. Testez le montage sans redémarrer :
 
-```bash
+```shellscript
 sudo systemctl daemon-reload
 sudo mount -a
 ```

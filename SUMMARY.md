@@ -60,7 +60,7 @@
   * [HDD Monitoring Proxmox](self-hosting/storage/hdd-monitoring-proxmox.md)
   * [ZFS Proxmox Config](self-hosting/storage/zfs-proxmox-config.md)
   * [📁 File Sharing](self-hosting/storage/file-sharing.md)
-  * [💾 Proxmox Backup Server](self-hosting/storage/proxmox-backup-server.md)
+  * [💾 Proxmox Backup](self-hosting/storage/proxmox-backup.md)
 * [Tips](self-hosting/tips.md)
 
 ## 🎬 PlexMediaServer
