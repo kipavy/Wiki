@@ -156,7 +156,7 @@ For manual `/etc` backup, you can just use this [script](https://community-scrip
 {% step %}
 ## LXCs/VMs Backup
 
-1. back in PVE, datacenter > storage > add PBS (use the newly created user, copy findergprint from PBS UI, you can get it by running this command in PBS LXC shell or in PBS UI (see video).
+1. back in PVE, datacenter > storage > add PBS (use the newly created user, you can get fingerprint by running this command in PBS LXC shell or in just get it in PBS UI (see video).
 
 ```shellscript
 proxmox-backup-manager cert info | grep Fingerprint | cut -d ' ' -f 3
