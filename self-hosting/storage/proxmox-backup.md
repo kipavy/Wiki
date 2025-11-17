@@ -29,22 +29,18 @@ We'll need PBS to backup both host config and LXCs/VMs.
 
 1. Just use this [script](https://community-scripts.github.io/ProxmoxVE/scripts?id=proxmox-backup-server) to add PBS LXC (during installation, select PRIVILEGED LXC, it will be easier)
 2. I recommend you then run [PBS Post-Install Script](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pbs-install) in PBS LXC Console.
+3. set root password `passwd root`
 
 ### Configuring PBS
 
-ADD BIND MOUNT TO ZFS
+1. Add bind mount to ZFS in PBS LXC, refer to[#bind-mount-dataset-to-lxc](zfs-proxmox-config.md#bind-mount-dataset-to-lxc "mention"), you don't need to handle the uid/gid part because PBS is Privileged LXC
+2. login to PBS ip:8007 (using root and the password you set in the previous step)
+3. Create new datastore with "Backing Path" to our ZFS dataset bind mount
+4. (optionnal) options > check verify new snapshots
 
-* CONFIGURE DATASTORE INSIDE PBS
-*   set root password `passwd root`
-
-    login root to ip:8007
-
-    Create new datastore with backing path to our ZFS dataset bind mount
-
-    options > check verify new snapshots
 * (optionnal) Create a dedicated backup user on PBS with user permissions: /datastore, role: DatastoreAdmin
 
-
+Video tutorial:
 
 {% embed url="https://youtu.be/sOUgzPocqFM?si=DXe0_ZeRhhbFCbAw&t=660" %}
 
@@ -58,15 +54,72 @@ PBS doesnt use much resrouces when idle but I just don't like having it always t
 
 Starts PBS 1m before scheduled backup job:
 
-```shellscript
-59 20 * * * /usr/sbin/pct start 105 >> /var/log/pbs-autostart.log 2>&1
-```
+<pre class="language-shellscript"><code class="lang-shellscript"><strong>59 20 * * * /usr/sbin/pct start 105 >> /var/log/pbs-autostart.log 2>&#x26;1
+</strong></code></pre>
+
+{% hint style="warning" %}
+Here I schedule the start at 20h59 because my backup jobs (see: [#proxmox-host-backup](proxmox-backup.md#proxmox-host-backup "mention") and [#lxcs-vms-backup](proxmox-backup.md#lxcs-vms-backup "mention")) are scheduled on 21h00.
+{% endhint %}
 
 #### On PBS LXC:
 
-Shutdown only when no backup/prune tasks are running:
+Copy, paste this script in PBS LXC Shell, it will create a systemd service that will automatically shutdown 5m after the last backup/prune jobs:
 
-<mark style="color:$danger;">TODO</mark>
+```shellscript
+#!/bin/bash
+apt update > /dev/null 2>&1 && apt install -y jq > /dev/null 2>&1
+
+echo \"Création du script de vérification...\"
+cat > /usr/local/sbin/pbs-auto-shutdown.sh <<EOF
+#!/bin/bash
+RUNNING_TASKS=$(proxmox-backup-manager task list --output-format json | jq 'length')
+
+if [ "$RUNNING_TASKS" -eq 0 ]; then
+    echo "$(date): Aucune tâche PBS. Attente de 2 minutes..."
+    sleep 120
+    RUNNING_TASKS=$(proxmox-backup-manager task list --output-format json | jq 'length')
+    
+    if [ "$RUNNING_TASKS" -eq 0 ]; then
+        echo "$(date): Extinction sécurisée."
+        shutdown now
+    else
+        echo "$(date): Tâche apparue. Surveillance continue."
+    fi
+else
+    echo "$(date): Tâches en cours détectées ($RUNNING_TASKS). Le LXC reste allumé."
+fi
+EOF
+
+chmod +x /usr/local/sbin/pbs-auto-shutdown.sh
+
+cat > /etc/systemd/system/pbs-auto-shutdown.service <<EOF
+[Unit]
+Description=Proxmox Backup Server Auto Shutdown Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/pbs-auto-shutdown.sh
+EOF
+
+cat > /etc/systemd/system/pbs-auto-shutdown.timer <<EOF
+[Unit]
+Description=Run PBS Auto Shutdown Service every 5 minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target
+EOF
+
+# Démarrage du service d'arrêt dans le LXC
+systemctl daemon-reload
+systemctl enable --now pbs-auto-shutdown.timer
+
+echo "✅ Service d'arrêt sécurisé configuré dans le LXC."
+```
 {% endstep %}
 
 {% step %}
@@ -87,7 +140,7 @@ Then, add it to pve crontab, open pve shell > `crontab -e:`
 
 {% code overflow="wrap" %}
 ```shellscript
-59 20 * * * PBS_PASSWORD='root_password' /usr/bin/proxmox-backup-client backup root.pxar:/etc --repository root@pam@192.168.1.105:backup --backup-id $(hostname) >/dev/null 2>&1
+00 21 * * * PBS_PASSWORD='root_password' /usr/bin/proxmox-backup-client backup root.pxar:/etc --repository root@pam@192.168.1.105:backup --backup-id $(hostname) >/dev/null 2>&1
 ```
 {% endcode %}
 
@@ -97,7 +150,7 @@ For manual `/etc` backup, you can just use this [script](https://community-scrip
 {% endstep %}
 
 {% step %}
-## LXCs/VMs Backup w/ PBS
+## LXCs/VMs Backup
 
 {% embed url="https://www.apalrd.net/posts/2024/pbs_hibernate/" %}
 

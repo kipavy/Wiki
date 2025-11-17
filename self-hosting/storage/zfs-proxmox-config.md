@@ -14,19 +14,19 @@ Datasets in ZFS allow for organizing and structuring data within ZFS. You can cr
 
 to create 'immich' dataset in 'tank' ZFS pool:
 
-```bash
+```shellscript
 zfs create tank/immich  # zfs create POOL/DATASET
 ```
 
 ### List ZFS pools/datasets
 
-```bash
+```shellscript
 zfs list
 ```
 
 ### Renaming datasets/snapshots
 
-```bash
+```shellscript
 zfs rename pool1/data pool1/archive # Renaming dataset
 zfs rename pool1/data@yesterday pool1/data@backup-2025-05-10  # Renaming snapshot
 ```
@@ -35,13 +35,13 @@ zfs rename pool1/data@yesterday pool1/data@backup-2025-05-10  # Renaming snapsho
 
 #### Creating snapshot
 
-```bash
+```shellscript
 zfs snapshot -r pool/dataset@migration
 ```
 
 #### Sending snapshot
 
-```bash
+```shellscript
 zfs send -R pool/dataset@migration | zfs receive -F newpool/dataset
 ```
 
@@ -55,7 +55,7 @@ You can also migrate whole ZFS pool by just not specifying any /dataset. E.g: `z
 
 #### Proxmox setup (done once)
 
-```bash
+```shellscript
 groupadd -g 110000 nas_shares
 useradd nas -u 101000 -g 110000 -m -s /bin/bash
 chown -R nas:nas_shares /tank/immich/
@@ -64,13 +64,13 @@ chown -R nas:nas_shares /tank/other_dataset/
 
 #### Bind Mount Dataset to LXC
 
-```bash
+```shellscript
 pct set 105 -mp0 /pool/dataset,mp=/mnt/media_root  # or whatever mount path
 ```
 
 #### In LXC, adding nas\_shares group
 
-```bash
+```shellscript
 groupadd -g 10000 nas_shares
 usermod -aG nas_shares $USER  # or whatever user needs to access data
 ```
@@ -85,13 +85,13 @@ Use stable disk identifiers (e.g., `/dev/disk/by-id/...`) for all commands. You 
 
 Adds `<new_disk>` to duplicate the data from `<existing_disk>`.
 
-```bash
+```shellscript
 zpool attach <POOL> <EXISTING_DISK_ID> <NEW_DISK_ID>
 ```
 
 Example:
 
-```bash
+```shellscript
 zpool attach rpool /dev/disk/by-id/wwn-0x5000c500c2f8832c /dev/disk/by-id/wwn-0x5000c500c2f8832d
 ```
 
@@ -105,6 +105,6 @@ zpool attach rpool /dev/disk/by-id/wwn-0x5000c500c2f8832c /dev/disk/by-id/wwn-0x
 
 #### Verification after Adding
 
-```bash
+```shellscript
 zpool status <pool_name>
 ```

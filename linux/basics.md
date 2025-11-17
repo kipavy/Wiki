@@ -11,6 +11,10 @@ echo "hello world 2" >> file  # concatenate (append)
 
 #### Multiple lines:
 
+{% hint style="success" %}
+Use quotation marks around 'EOF' to prevent variables and commands from expanding.
+{% endhint %}
+
 create/overwrite
 
 {% code fullWidth="false" %}
