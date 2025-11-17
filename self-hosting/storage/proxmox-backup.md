@@ -33,7 +33,7 @@ We'll need PBS to backup both host config and LXCs/VMs.
 
 ### Configuring PBS
 
-1. Add bind mount to ZFS in PBS LXC, refer to[#bind-mount-dataset-to-lxc](zfs-proxmox-config.md#bind-mount-dataset-to-lxc "mention"), you don't need to handle the uid/gid part because PBS is Privileged LXC
+1. Add bind mount to ZFS in PBS LXC, refer to [#bind-mount-dataset-to-lxc](zfs-proxmox-config.md#bind-mount-dataset-to-lxc "mention"), you don't need to handle the uid/gid part because PBS is Privileged LXC
 2. login to PBS ip:8007 (using root and the password you set in the previous step)
 3. Create new datastore with "Backing Path" to our ZFS dataset bind mount
 4. (optionnal) options > check verify new snapshots
