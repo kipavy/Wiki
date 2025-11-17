@@ -83,6 +83,7 @@ net use V: \\nfs\192.168.1.90\srv\nfs_share /PERSISTENT:YES
 3. Create a `.bat` file with
 
 ```powershell
+@echo off
 mount -o anon \\192.168.1.90\YOUR\PATH V:
 ```
 
