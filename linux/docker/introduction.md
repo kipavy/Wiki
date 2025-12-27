@@ -6,8 +6,11 @@
 
 [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
 
-<pre class="language-bash" data-full-width="false"><code class="lang-bash"><a data-footnote-ref href="#user-content-fn-1">sudo groupadd docker ; sudo usermod -aG docker $USER</a>
-</code></pre>
+```shellscript
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+newgrp docker
+```
 
 ### Arch Based Distros
 
@@ -26,7 +29,7 @@ docker run -it --rm docker/doodle
 
 ### [Mounting](https://docs.docker.com/storage/bind-mounts/)
 
--v src[^2]:dest[^3]:ro[^4] OR --mount type=tmpfs[^5],src=folder1,dst=folder2
+-v src[^1]:dest[^2]:ro[^3] OR --mount type=tmpfs[^4],src=folder1,dst=folder2
 
 ## [Dockerfile](https://docs.docker.com/reference/dockerfile/)
 
@@ -74,7 +77,7 @@ Be Careful: Each Docker Volume/Network used need to be created in the compose fi
 
 <pre class="language-yaml"><code class="lang-yaml">services:
   # MARIADB
-  <a data-footnote-ref href="#user-content-fn-6">db</a>:
+  <a data-footnote-ref href="#user-content-fn-5">db</a>:
     image: mariadb:latest
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 1
@@ -124,7 +127,7 @@ networks:
 
 and run:
 
-<pre class="language-bash" data-full-width="false"><code class="lang-bash">docker compose up <a data-footnote-ref href="#user-content-fn-7">-d</a>
+<pre class="language-bash" data-full-width="false"><code class="lang-bash">docker compose up <a data-footnote-ref href="#user-content-fn-6">-d</a>
 </code></pre>
 
 ### Examples
@@ -135,16 +138,14 @@ and run:
 * Start all services: <mark style="color:red;">`docker compose up`</mark>
 * Stop all services: <mark style="color:red;">`docker compose down`</mark>
 
-[^1]: If you don't do this before install you may have permissions issues with docker
+[^1]: Src folder path or docker volume name
 
-[^2]: Src folder path or docker volume name
+[^2]: Destination folder, inside container
 
-[^3]: Destination folder, inside container
+[^3]: Read-Only
 
-[^4]: Read-Only
+[^4]: optional
 
-[^5]: optional
+[^5]: hostname of container, can be used thanks to docker dns service
 
-[^6]: hostname of container, can be used thanks to docker dns service
-
-[^7]: (Optionnal) Detached mode: Run containers in the background
+[^6]: (Optionnal) Detached mode: Run containers in the background
