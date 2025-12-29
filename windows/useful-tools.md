@@ -1,5 +1,7 @@
 # Useful tools
 
+### [Massegrave: MS Activation Scripts](https://massgrave.dev/)
+
 ### [UniGetUI: The Graphical Interface for your package managers](https://www.marticliment.com/unigetui/)
 
 ```powershell
