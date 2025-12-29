@@ -1,5 +1,11 @@
 # Introduction
 
+## What it is
+
+* 100s [https://youtu.be/Gjnup-PuquQ](https://youtu.be/Gjnup-PuquQ)
+* 5m [https://youtu.be/\_dfLOzuIg2o](https://youtu.be/_dfLOzuIg2o)
+* 10m [https://youtu.be/DQdB7wFEygo](https://youtu.be/DQdB7wFEygo)
+
 ## Installation
 
 ### Most Linux Distros
