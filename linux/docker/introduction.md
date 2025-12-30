@@ -1,10 +1,22 @@
 # Introduction
 
-## What it is
+## Useful Links
+
+### Videos
 
 * 100s [https://youtu.be/Gjnup-PuquQ](https://youtu.be/Gjnup-PuquQ)
 * 5m [https://youtu.be/\_dfLOzuIg2o](https://youtu.be/_dfLOzuIg2o)
 * 10m [https://youtu.be/DQdB7wFEygo](https://youtu.be/DQdB7wFEygo)
+
+### Websites
+
+[https://average.joe.dev/awesome-docker/](https://average.joe.dev/awesome-docker/)
+
+[https://awesome-docker-compose.com/](https://awesome-docker-compose.com/)
+
+[https://compose.ajnart.dev/](https://compose.ajnart.dev/)
+
+[https://nuxx.io/](https://nuxx.io/)
 
 ## Installation
 
