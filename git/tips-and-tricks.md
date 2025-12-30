@@ -54,8 +54,46 @@ The following command will not push X last commit(s):
 git push origin HEAD~X:branch-name 
 ```
 
+### Renaming branches
+
+```bash
+git push <remote> <src>:<dst>
+```
+
+you can list your remotes with `git remote -v` but most of the time it's `origin`    &#x20;
+
+#### Deleting branch
+
+```bash
+git push origin --delete branch
+```
+
+or
+
+```bash
+git push origin :branch
+```
+
+#### Set upstream
+
+It tells Git: _“When I push this local branch, also record that it should track that remote branch.”_
+
+<pre class="language-bash"><code class="lang-bash">git push <a data-footnote-ref href="#user-content-fn-4">-u</a> origin testing
+</code></pre>
+
+Git will set your local `testing` branch’s **upstream** to `origin/testing`
+
+This is the same as:
+
+<pre class="language-bash"><code class="lang-bash">git push <a data-footnote-ref href="#user-content-fn-4">-u</a> origin testing:testing
+</code></pre>
+
+&#x20;&#x20;
+
 [^1]: `--no-edit` is useful when you want to amend a commit **without changing its commit message**.
 
 [^2]: `--amend` is used to replace a commit
 
 [^3]: Use `--force-with-lease` instead of `-f` (--force) to avoid overwriting others' work by accident
+
+[^4]: \--set-upstream
