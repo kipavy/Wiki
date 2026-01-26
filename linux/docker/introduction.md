@@ -1,6 +1,95 @@
 # Introduction
 
-## Useful Links
+## What is it ?
+
+```mermaid
+block-beta
+  columns 1
+  
+  block:Container
+    Label1["<b>🐳 THE DOCKER CONTAINER</b><br/>(Everything needed to run)"]
+    style Label1 fill:none,stroke:none,color:#fff
+    
+    block:Inside
+        columns 3
+        Code["📜 Source Code<br/>(index.js)"]
+        Runtime["⚙️ Runtime<br/>(Node.js v20)"]
+        OS["🐧 Tiny OS<br/>(Alpine Linux)"]
+    end
+  end
+
+  %% Dark Blue Container Wrapper
+  style Container fill:#0f172a,stroke:#38bdf8,stroke-width:3px,color:#fff
+  
+  %% Inner dashed box
+  style Inside fill:#1e293b,stroke:#94a3b8,stroke-dasharray: 5 5
+  
+  %% Component Blocks (Dark variants)
+  style Code fill:#064e3b,stroke:#34d399,color:#fff
+  style Runtime fill:#451a03,stroke:#fbbf24,color:#fff
+  style OS fill:#0c4a6e,stroke:#38bdf8,color:#fff
+```
+
+```mermaid
+flowchart TB
+    %% --- Dark Mode Styling ---
+    classDef app fill:#334155,stroke:#94a3b8,color:#fff,stroke-width:1px;
+    classDef heavy fill:#7f1d1d,stroke:#f87171,color:#fff,stroke-width:2px;
+    classDef light fill:#064e3b,stroke:#34d399,color:#fff,stroke-width:2px;
+    classDef infra fill:#1e293b,stroke:#475569,color:#fff,stroke-width:1px;
+
+    %% --- VIRTUAL MACHINES ---
+    subgraph VM_Group ["❌ Virtual Machines (Duplicated Resources)"]
+        direction TB
+        
+        subgraph VM1 ["VM 1"]
+            A1["App A"]:::app
+            G1["Guest OS (GBs)"]:::heavy
+            A1 --> G1
+        end
+
+        subgraph VM2 ["VM 2"]
+            A2["App B"]:::app
+            G2["Guest OS (GBs)"]:::heavy
+            A2 --> G2
+        end
+        
+        Hyper["Hypervisor"]:::infra
+        G1 --> Hyper
+        G2 --> Hyper
+        
+        Hardware1["Infrastructure"]:::infra
+        Hyper --> Hardware1
+    end
+
+    %% --- DOCKER CONTAINERS ---
+    subgraph Docker_Group ["✅ Docker Containers (Shared Resources)"]
+        direction TB
+        
+        subgraph C1 ["Container 1"]
+            D1["App A"]:::app
+        end
+
+        subgraph C2 ["Container 2"]
+            D2["App B"]:::app
+        end
+        
+        Engine["🐳 Docker Engine"]:::light
+        D1 --> Engine
+        D2 --> Engine
+        
+        Hardware2["Infrastructure"]:::infra
+        Engine --> Hardware2
+    end
+
+    %% --- Subgraph Backgrounds ---
+    style VM_Group fill:#171717,stroke:#525252,color:#fff
+    style Docker_Group fill:#0f172a,stroke:#1e40af,color:#fff
+    style VM1 fill:none,stroke:none,color:#fff
+    style VM2 fill:none,stroke:none,color:#fff
+    style C1 fill:none,stroke:none,color:#fff
+    style C2 fill:none,stroke:none,color:#fff
+```
 
 ### Videos
 

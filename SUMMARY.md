@@ -2,6 +2,27 @@
 
 * [👋 Welcome](README.md)
 
+## Web Development
+
+* [🏭 Architecture & Planning](web-development/architecture-and-planning/README.md)
+  * [Architectural Patterns](web-development/architecture-and-planning/architectural-patterns/README.md)
+    * [SPA vs. MPA](web-development/architecture-and-planning/architectural-patterns/spa-vs.-mpa.md)
+    * [Rendering Strategies](web-development/architecture-and-planning/architectural-patterns/rendering-strategies.md)
+    * [Monolith vs. Microservices](web-development/architecture-and-planning/architectural-patterns/monolith-vs.-microservices.md)
+    * [Communication](web-development/architecture-and-planning/architectural-patterns/communication.md)
+    * [MVC](web-development/architecture-and-planning/architectural-patterns/mvc.md)
+  * [Choosing the Stack](web-development/architecture-and-planning/choosing-the-stack.md)
+  * [Project Lifecycle](web-development/architecture-and-planning/project-lifecycle.md)
+* [⚙️ Environment & Setup](web-development/environment-and-setup/README.md)
+  * [Git Workflows](git/git-workflows.md)
+  * [📦 Package Managers](web-development/environment-and-setup/package-managers.md)
+  * [🚀 Quickstart](web-development/environment-and-setup/quickstart.md)
+* [🎨 Frontend](web-development/frontend.md)
+* [🧱 Backend](web-development/backend/README.md)
+  * [API Design](web-development/backend/api-design.md)
+  * [Code Architecture](web-development/backend/code-architecture.md)
+* [🚀 Deployment & DevOps](web-development/deployment-and-devops.md)
+
 ## 🐧 Linux
 
 * [Basics](linux/basics.md)
@@ -33,6 +54,7 @@
   * [GUI on Codespace](vs-code/gui-on-codespace.md)
   * [Nice Extensions](vs-code/nice-extensions.md)
 * [Git](git/README.md)
+  * [Git Workflows](git/git-workflows.md)
   * [SSH Keys & PAT](git/github-ssh-access-for-private-repo.md)
   * [Updating fork](git/updating-fork.md)
   * [Creating a mirror of a repo](git/creating-a-mirror-of-a-repo.md)
@@ -74,6 +96,6 @@
 
 ## ✍️ TODO
 
+* [Page 1](todo/page-1.md)
 * [Parsec when it's blocked](todo/parsec-when-its-blocked.md)
 * [R\&T](todo/r-and-t.md)
-* [React + NodeJS + Express Website](todo/react-+-nodejs-+-express-website.md)

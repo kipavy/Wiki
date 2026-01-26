@@ -1,6 +1,69 @@
 # Reverse Proxy
 
-<figure><img src="../../.gitbook/assets/{29D74013-3A85-483D-B2C6-0877B20AB73E}.png" alt=""><figcaption></figcaption></figure>
+```mermaid
+flowchart LR
+    %% --- Styles (Dark Mode) ---
+    classDef user fill:#fff,stroke:none,color:#000;
+    classDef proxy fill:#f59e0b,stroke:#b45309,color:#fff,stroke-width:2px;
+    classDef server fill:#1e293b,stroke:#94a3b8,color:#fff,stroke-width:2px;
+    classDef private fill:#0f172a,stroke:#334155,stroke-dasharray: 5 5,color:#fff;
+
+    %% --- PUBLIC SIDE ---
+    User((User)):::user
+    Internet((☁️ Internet)):::user
+
+    %% --- THE GAP ---
+    User -- "https://mysite.com" --> Internet
+    Internet -- "Public IP: 1.2.3.4" --> Proxy
+
+    %% --- PRIVATE SIDE ---
+    subgraph Internal ["🔒 Private Network (Hidden)"]
+        direction TB
+        Proxy["🚧 Reverse Proxy<br/>(Nginx / Caddy)"]:::proxy
+        
+        App["application-v1"]:::server
+        DB[("Database")]:::server
+        
+        Proxy -- "Forward to<br/>localhost:3000" --> App
+        App --- DB
+    end
+
+    %% --- Styling ---
+    style Internal fill:#020617,stroke:#1e293b,color:#fff
+```
+
+```mermaid
+flowchart LR
+    %% --- Styles ---
+    classDef req fill:#3b82f6,stroke:#1d4ed8,color:#fff;
+    classDef proxy fill:#f59e0b,stroke:#b45309,color:#fff,stroke-width:2px;
+    classDef node fill:#22c55e,stroke:#15803d,color:#fff;
+    classDef py fill:#eab308,stroke:#a16207,color:#fff;
+
+    %% --- INPUT ---
+    Traffic["🚦 Incoming Traffic"]:::req
+    
+    %% --- THE PROXY ---
+    Proxy["🚧 Reverse Proxy"]:::proxy
+    Traffic --> Proxy
+
+    %% --- ROUTING RULES ---
+    subgraph Services ["Internal Apps"]
+        direction TB
+        
+        Frontend["Frontend (React)<br/>Port: 3000"]:::node
+        Backend["Backend (Python)<br/>Port: 8000"]:::py
+        OldApp["Legacy App<br/>Port: 8080"]:::node
+    end
+
+    %% --- LOGIC ---
+    Proxy -- "mysite.com" --> Frontend
+    Proxy -- "api.mysite.com" --> Backend
+    Proxy -- "mysite.com/old" --> OldApp
+
+    %% --- Styling ---
+    style Services fill:none,stroke:none
+```
 
 ### **Why Use a Reverse Proxy?**
 
