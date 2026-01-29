@@ -81,4 +81,17 @@ fuck
 sudo apt autoremove
 ```
 
+#### Clear shell history
+
+```shellscript
+history -c && history -w
+```
+
+and for powershell:
+
+```powershell
+Clear-History
+Remove-Item (Get-PSReadLineOption).HistorySavePath -ErrorAction SilentlyContinue
+```
+
 [^1]: login shell: it will reload \~/.bashrc ...

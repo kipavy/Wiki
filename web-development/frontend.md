@@ -1,15 +1,13 @@
 # 🎨 Frontend
 
-lenis, locomotive scroll
-
-### Design Softwares
-
-#### Components Libraries
+### JS Packages
 
 * [21st.dev](https://21st.dev)
 * [tailwindcss.com](https://tailwindcss.com)
+* [https://github.com/darkroomengineering/lenis](https://github.com/darkroomengineering/lenis)
+* [https://github.com/locomotivemtl/locomotive-scroll](https://github.com/locomotivemtl/locomotive-scroll)
 
-#### Apps
+### Design Softwares
 
 * [figma.com](https://figma.com)
 * [penpot.app](https://penpot.app)

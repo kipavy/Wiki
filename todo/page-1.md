@@ -12,4 +12,13 @@
 
 
 
+Self host:
+
+hugging face: new space -> Docker Blank
+
+Create Dockerfile with EXPOSE 7860 (make sure your app uses port 7860)\
+[https://\<username>-\<space\_name>.hf.space/](https://albertoricoco-jackett.hf.space/UI/Dashboard)
+
+
+
 New group: Network (move Self host in Network)

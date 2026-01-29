@@ -13,14 +13,14 @@
     * [MVC](web-development/architecture-and-planning/architectural-patterns/mvc.md)
   * [Choosing the Stack](web-development/architecture-and-planning/choosing-the-stack.md)
   * [Project Lifecycle](web-development/architecture-and-planning/project-lifecycle.md)
-* [⚙️ Environment & Setup](web-development/environment-and-setup/README.md)
-  * [Git Workflows](git/git-workflows.md)
-  * [📦 Package Managers](web-development/environment-and-setup/package-managers.md)
-  * [🚀 Quickstart](web-development/environment-and-setup/quickstart.md)
 * [🎨 Frontend](web-development/frontend.md)
 * [🧱 Backend](web-development/backend/README.md)
   * [API Design](web-development/backend/api-design.md)
   * [Code Architecture](web-development/backend/code-architecture.md)
+* [⚙️ Environment & Setup](web-development/environment-and-setup/README.md)
+  * [Git Workflows](git/git-workflows.md)
+  * [📦 Package Managers](web-development/environment-and-setup/package-managers.md)
+  * [🚀 Quickstart](web-development/environment-and-setup/quickstart.md)
 * [🚀 Deployment & DevOps](web-development/deployment-and-devops.md)
 
 ## 🐧 Linux

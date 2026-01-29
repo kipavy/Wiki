@@ -1,8 +1,12 @@
 # 🚀 Quickstart
 
+#### The Frontend (React + TypeScript)
+
 {% embed url="https://github.com/vitejs/awesome-vite#templates" %}
 
-#### The Frontend (React + TypeScript)
+{% embed url="https://github.com/wtchnm/Vitamin" %}
+
+{% embed url="https://github.com/lzm0x219/template-vite-react" %}
 
 ```shellscript
 pnpm create vite my-app --template react-ts

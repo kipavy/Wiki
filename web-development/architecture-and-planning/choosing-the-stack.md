@@ -1,33 +1,5 @@
 # Choosing the Stack
 
-* **The Big 3:** React, Vue, Angular (pros/cons).
-* **Backend choices:** Node.js, Python, Go, Rust.
-* **Database:** SQL (Postgres/MySQL) vs. NoSQL (Mongo/Firebase).
-* Write a "Decision Matrix" page here: How to choose based on project scale.
-
-```mermaid
-graph TD
-    Start(["🚀 START: What is your main goal?"])
-    
-    %% Branch 1: Employment
-    Start -->|Get Hired / Career| Job["I want a Job"]
-    Job -->|"Most Openings"| React["<b>React + Node.js</b><br/>(The Industry Standard)"]
-    Job -->|"Corporate / Bank"| Angular["<b>Angular + Java/C#</b><br/>(Enterprise)"]
-
-    %% Branch 2: Startup/Indie
-    Start -->|"Build a Startup / MVP"| Speed["I need Speed"]
-    Speed -->|"I know JS"| Next["<b>Next.js + Supabase</b><br/>(Modern Fullstack)"]
-    Speed -->|"I want 'Batteries Included'"| Laravel["<b>Laravel (PHP)</b><br/>(The Solo Dev King)"]
-
-    %% Branch 3: Learning
-    Start -->|"Just Learning"| Learn["I am a Beginner"]
-    Learn --> Basics["<b>Vanilla HTML/CSS/JS</b><br/>(Master the basics first!)"]
-    
-    style React fill:#e6f7ff,stroke:#00f,stroke-width:2px
-    style Next fill:#fffbe6,stroke:#f60,stroke-width:2px
-    style Laravel fill:#fff5f5,stroke:#f00,stroke-width:2px
-```
-
 ### 1. The Core Decision: Database First
 
 This is often the most rigid part of your stack. Changing your database later is much harder than changing a frontend framework.
@@ -132,29 +104,4 @@ graph TD
 
 express.js, django ?
 
-tailwind?
-
 ORM Prisma/Drizzle?
-
-```mermaid
-flowchart LR
-    subgraph Setup ["1. The Scaffolding"]
-        CLI[npm create vite] -- "Scaffolds" --> App[React/Vue App]
-    end
-
-    subgraph Dev ["2. Development"]
-        Vite[⚡ Vite Server] -- "Serves" --> Browser
-        Vite -- "Hot Reload (HMR)" --> Browser
-    end
-
-    subgraph Test ["3. Testing"]
-        Vitest[🧪 Vitest] -- "Reuses Config" --> Vite
-        Vitest -- "Simulates DOM" --> HappyDom[happy-dom]
-    end
-
-    App --> Vite
-    App --> Vitest
-    
-    style Vite fill:#fffbe6,stroke:#f60,stroke-width:2px
-    style Vitest fill:#e6f7ff,stroke:#00f,stroke-width:2px
-```
