@@ -172,3 +172,33 @@ Video tutorial:
 ## Restore method
 
 if the server goes down entirely, we'll need to install a new Proxmox AND create PBS LXC manually again and link the existing datastore... <mark style="color:$danger;">TODO</mark>
+
+1. Re-install PVE from ISO
+2. Import existing ZFS pool
+
+```shellscript
+zpool import -f pool_name
+```
+
+3. Recreate PBS + Datastore [#setting-up-pbs](proxmox-backup.md#setting-up-pbs "mention")
+
+or&#x20;
+
+```shellscript
+pct restore <NOUVEL_ID> /chemin/vers/votre/datastore/ct/ID-LXC/DATE/index.json.fidx --storage local-lvm
+```
+
+3. Restore PBS Backup
+
+
+
+
+
+
+
+
+
+
+
+
+
