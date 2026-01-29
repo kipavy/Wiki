@@ -69,7 +69,7 @@ Copy, paste this script in PBS LXC Shell, it will create a systemd service that 
 apt update > /dev/null 2>&1 && apt install -y jq > /dev/null 2>&1
 
 echo \"Création du script de vérification...\"
-cat > /usr/local/sbin/pbs-auto-shutdown.sh <<EOF
+cat > /usr/local/sbin/pbs-auto-shutdown.sh <<'EOF'
 #!/bin/bash
 RUNNING_TASKS=$(proxmox-backup-manager task list --output-format json | jq 'length')
 

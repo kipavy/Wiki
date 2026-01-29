@@ -9,10 +9,10 @@ echo "hello world" > file  # “create/overwrite” operation
 echo "hello world 2" >> file  # concatenate (append)
 ```
 
-#### Multiple lines:
+#### Multiple lines (Heredoc):
 
 {% hint style="success" %}
-Use quotation marks around 'EOF' to prevent variables and commands from expanding.
+Use quotation marks around the first 'EOF' to prevent variables and commands from expanding.
 {% endhint %}
 
 create/overwrite
