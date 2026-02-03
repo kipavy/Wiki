@@ -31,7 +31,7 @@ docker run --rm -it -p 5173:5173 node:lts-alpine sh -c "apk add git bash curl &&
 
 
 
-QBittorent-nox (qbittorrent web client):
+QBittorent-nox (qbittorrent web client) [https://github.com/qbittorrent/docker-qbittorrent-nox](https://github.com/qbittorrent/docker-qbittorrent-nox):
 
 ```yaml
 services:
