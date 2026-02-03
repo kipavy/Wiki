@@ -31,4 +31,29 @@ docker run --rm -it -p 5173:5173 node:lts-alpine sh -c "apk add git bash curl &&
 
 
 
+QBittorent-nox (qbittorrent web client):
+
+```yaml
+services:
+  qbittorrent-nox:
+    image: qbittorrentofficial/qbittorrent-nox:latest
+    environment:
+      - QBT_WEBUI_PORT=8091
+      - QBT_TORRENTING_PORT=6881
+    ports:
+      - 8091:8091
+      - 6881:6881/tcp
+      - 6881:6881/udp
+    volumes:
+      - qbittorrent-config:/config
+      - qbittorrent-downloads:/downloads
+    restart: unless-stopped
+
+volumes:
+  qbittorrent-config:
+  qbittorrent-downloads:
+```
+
+
+
 New group: Network (move Self host in Network)
