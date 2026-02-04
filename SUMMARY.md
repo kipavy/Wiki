@@ -38,6 +38,7 @@
   * [Tips & Tricks](linux/docker/useful-tips.md)
   * [Easy Monitoring](linux/docker/easy-monitoring.md)
   * [Examples of use](linux/docker/examples-of-use.md)
+* [Kubernetes](linux/kubernetes.md)
 
 ## Windows
 

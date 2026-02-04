@@ -20,7 +20,7 @@ git rebase -i HEAD~2  # Replace 2 with the number of commits you want to go back
 
 It will open text editor, You'll see something like this:
 
-<div align="left"><figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure></div>
+<div align="left"><figure><img src="../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure></div>
 
 find the correct pick \<commit hash> message and replace 'pick' to 'reword'
 

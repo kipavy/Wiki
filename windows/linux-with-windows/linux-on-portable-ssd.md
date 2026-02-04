@@ -40,7 +40,7 @@ For any PC to be able to detect the SSD as bootable, the SSD must include an esp
 
 Here is how it should look like (ntfs if you want to use free remaining space as usb drive):
 
-<figure><img src="../../.gitbook/assets/image (1) (1).png" alt=""><figcaption><p>Here I formatted the free space to NTFS to use the free space as an external Drive in any OS</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1) (1).png" alt=""><figcaption><p>Here I formatted the free space to NTFS to use the free space as an external Drive in any OS</p></figcaption></figure>
 
 9. Continue install normally
 10. Done, now you can boot on your external drive by choosing the right boot option
@@ -137,7 +137,7 @@ if you reinstalled your main OS and your PC won't automatically boot on the SSD 
 1. Go in BIOS and manually boot on your external drive (select the OS manager EFI partition, not the USB Drive entry itself)
 2.  Follow this screenshot to reorder your boot option to ensure ubuntu is first.
 
-    <figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+    <figure><img src="../../.gitbook/assets/image (1) (1) (1) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 3. If it still doesn't work, go in BIOS and set low boot priority to USB so it will first boot on grub and not on the default USB boot option that will lead to a boot loop.
 
 ***
