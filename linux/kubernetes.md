@@ -1,3 +1,7 @@
+---
+icon: dharmachakra
+---
+
 # Kubernetes
 
 {% embed url="https://dev.to/kaustubhyerkade/kubernetes-your-ultimate-cheatsheet-kl6" %}
