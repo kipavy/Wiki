@@ -32,6 +32,20 @@ icon: dharmachakra
 
 {% embed url="https://www.actual4test.com/exam/CKA-questions" %}
 
+#### Commands to remember
+
+```shellscript
+# CONFIG
+sysctl -p  # persist new config
+sysctl --system  # reads new config files
+k cluster-info --kubeconfig /etc/sysctl.d/10-bufferbloat.conf
+cat /etc/kubernetes/manifests/etcd.yaml | grep file
+
+# ALIASES
+alias ke='k explain --recursive'
+export do='--dry-run=client -o yaml'
+```
+
 #### The Exam
 
 {% embed url="https://github.com/techiescamp/linux-foundation-coupon" %}
