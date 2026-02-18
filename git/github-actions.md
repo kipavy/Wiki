@@ -25,3 +25,7 @@ another more complex example with testing requirement: [https://github.com/Slyna
 ### Automate flutter apk release build
 
 [https://github.com/C0gn1to/mobile/blob/master/.github/workflows/build-apk.yml](https://github.com/C0gn1to/mobile/blob/master/.github/workflows/build-apk.yml)
+
+### Automate Chrome .crx build
+
+[https://raw.githubusercontent.com/Jord38/fluxer-theme-inspector/refs/heads/main/.github/workflows/build.yml](https://raw.githubusercontent.com/Jord38/fluxer-theme-inspector/refs/heads/main/.github/workflows/build.yml)
