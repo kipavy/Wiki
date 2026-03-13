@@ -38,6 +38,6 @@ another more complex example with testing requirement: [https://github.com/Slyna
 
 ## Gitlab CI/CD
 
-### Ruff cehck+format -> tests -> build
+### Ruff check+format -> tests -> build
 
 [https://gitlab.com/yoanncure/ontoflow\_core/-/pipelines/2383400648](https://gitlab.com/yoanncure/ontoflow_core/-/pipelines/2383400648)
