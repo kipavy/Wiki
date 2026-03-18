@@ -40,4 +40,10 @@ another more complex example with testing requirement: [https://github.com/Slyna
 
 ### Ruff check+format -> tests -> build
 
-[https://gitlab.com/yoanncure/ontoflow\_core/-/pipelines/2383400648](https://gitlab.com/yoanncure/ontoflow_core/-/pipelines/2383400648)
+using uv image instead of python for faster CI
+
+disabled cache because gitlab runners dont have enough space to install python packages (wow)
+
+Also publish docs site using gitlab pages and zensical
+
+[https://gitlab.com/yoanncure/ontoflow\_core/-/pipelines/2391025651](https://gitlab.com/yoanncure/ontoflow_core/-/pipelines/2391025651)
