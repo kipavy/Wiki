@@ -6,17 +6,23 @@ description: CI/CD Examples
 
 ## Github Actions
 
-### Automate docker image build publish
+### Docker image build publish
 
 [https://github.com/kipavy/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml](https://github.com/kipavy/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml)
 
 another more complex example with testing requirement: [https://github.com/Slynax/dump.fun/actions/runs/13072892669](https://github.com/Slynax/dump.fun/actions/runs/13072892669)
 
-### Automate Pypi releases (test on pre-release, official on releases)
+### Pypi releases (test on pre-release, official on releases)
 
 [https://github.com/CEA-MetroCarac/pyvsnr/tree/main/.github/workflows](https://github.com/CEA-MetroCarac/pyvsnr/tree/main/.github/workflows)
 
-### Automate Github Pages build:
+### Trigger Dokploy deploy by API
+
+really useful to fully configure dokploy automatically by API
+
+[https://github.com/kipavy/roquette/blob/main/.github/workflows/deploy.yml](https://github.com/kipavy/roquette/blob/main/.github/workflows/deploy.yml)
+
+### Github Pages build:
 
 {% tabs %}
 {% tab title="ViteJS" %}
@@ -28,11 +34,11 @@ another more complex example with testing requirement: [https://github.com/Slyna
 {% endtab %}
 {% endtabs %}
 
-### Automate flutter apk release build
+### flutter apk release build
 
 [https://github.com/C0gn1to/mobile/blob/master/.github/workflows/build-apk.yml](https://github.com/C0gn1to/mobile/blob/master/.github/workflows/build-apk.yml)
 
-### Automate Chrome .crx build
+### Chrome .crx build
 
 [https://raw.githubusercontent.com/Jord38/fluxer-theme-inspector/refs/heads/main/.github/workflows/build.yml](https://raw.githubusercontent.com/Jord38/fluxer-theme-inspector/refs/heads/main/.github/workflows/build.yml)
 
