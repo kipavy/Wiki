@@ -88,7 +88,14 @@ This is the same as:
 <pre class="language-bash"><code class="lang-bash">git push <a data-footnote-ref href="#user-content-fn-4">-u</a> origin testing:testing
 </code></pre>
 
-&#x20;&#x20;
+#### Reset History
+
+```shellscript
+git update-ref -d HEAD
+git add -A
+git commit -m "Initial commit"
+git push -f origin main
+```
 
 [^1]: `--no-edit` is useful when you want to amend a commit **without changing its commit message**.
 
