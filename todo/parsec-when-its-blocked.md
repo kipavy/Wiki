@@ -14,18 +14,10 @@ docker run -d \
   -v /path/to/data:/config \
   --shm-size="1gb" \
   --restart unless-stopped \
-  lscr.io/linuxserver/webtop:ubuntu-xfce
+  lscr.io/linuxserver/webtop:ubuntu-xfce-0c4653f4-ls225 \
+  /bin/bash -c "curl -L -o /tmp/parsec.deb https://builds.parsec.app/package/parsec-linux.deb && apt update && apt install -y /tmp/parsec.deb"
 ```
 
 3. On the top right of the terminal, click on previsualize on port 8080
-4. In the VM, open a terminal:
-
-```
-curl -L -o parsec-linux.deb https://builds.parsec.app/package/parsec-linux.deb \
-  && sudo apt update \
-  && sudo apt install -y ./parsec-linux.deb \
-  && sudo dpkg -i ./parsec-linux.deb \
-  && parsecd
-```
-
-1. Set parsec decoder to Software ( Parsec settings > Client > Decoder > Software )
+4. In the VM, open a terminal, run `parsecd`
+5. Set parsec decoder to Software ( Parsec settings > Client > Decoder > Software )
