@@ -62,7 +62,7 @@ git push <remote> <src>:<dst>
 
 you can list your remotes with `git remote -v` but most of the time it's `origin`    &#x20;
 
-#### Deleting branch
+### Deleting branch
 
 ```bash
 git push origin --delete branch
@@ -74,7 +74,7 @@ or
 git push origin :branch
 ```
 
-#### Set upstream
+### Set upstream
 
 It tells Git: _“When I push this local branch, also record that it should track that remote branch.”_
 
@@ -88,13 +88,31 @@ This is the same as:
 <pre class="language-bash"><code class="lang-bash">git push <a data-footnote-ref href="#user-content-fn-4">-u</a> origin testing:testing
 </code></pre>
 
-#### Reset History
+### Reset History
 
 ```shellscript
 git update-ref -d HEAD
 git add -A
 git commit -m "Initial commit"
 git push -f origin main
+```
+
+### Delete files/folders from history
+
+{% hint style="info" %}
+You'll need to install [uv.md](../python/uv.md "mention")
+{% endhint %}
+
+```shellscript
+uvx git-filter-repo --path docs/superpowers --invert-paths --force
+```
+
+This rewrites all commits, `docs/superpowers` folder dissapear from filesystem and from each commit.
+
+If repo has already been pushed to a remote, run:
+
+```bash
+git push origin --force --all
 ```
 
 [^1]: `--no-edit` is useful when you want to amend a commit **without changing its commit message**.
