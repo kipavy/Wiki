@@ -8,9 +8,47 @@ description: CI/CD Examples
 
 ### Docker image build publish
 
-[https://github.com/kipavy/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml](https://github.com/kipavy/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml)
+A minimal workflow that builds on every push to `main` and publishes to GitHub Container Registry (GHCR). No secrets to configure — `GITHUB_TOKEN` is provided automatically:
 
-another more complex example with testing requirement: [https://github.com/Slynax/dump.fun/actions/runs/13072892669](https://github.com/Slynax/dump.fun/actions/runs/13072892669)
+```yaml
+name: Build and push image
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write          # needed to push to GHCR
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest
+```
+
+{% hint style="info" %}
+Push to Docker Hub instead by setting `registry` to `docker.io` (or omitting it) and using `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN` repository secrets for the login step.
+{% endhint %}
+
+Full examples:
+
+* [Simple build/publish](https://github.com/kipavy/debrid-client-proxy/blob/main/.github/workflows/docker-image.yml)
+* [More complex, with a testing requirement](https://github.com/Slynax/dump.fun/actions/runs/13072892669)
 
 ### Pypi releases (test on pre-release, official on releases)
 
