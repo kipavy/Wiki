@@ -10,9 +10,10 @@ If you only learn a handful of Git commands, learn these. Everything else in thi
 
 A commit is a **snapshot** of your files at a point in time. Changes move through three places before they become a commit:
 
-```
-working directory  →  staging area  →  repository
-   (your edits)      (git add)         (git commit)
+```mermaid
+flowchart LR
+    WD["Working Directory<br/><i>your edits</i>"] -->|git add| SA["Staging Area<br/><i>index</i>"]
+    SA -->|git commit| REPO["Repository<br/><i>history</i>"]
 ```
 
 * **Working directory** — the files you're editing right now.
