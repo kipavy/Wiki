@@ -70,6 +70,16 @@
   * [UV](python/uv.md)
   * [Tips & Tricks](python/tips-and-tricks.md)
 
+## 🌐 Networking
+
+* [Networking](networking/README.md)
+  * [Virtual Networking with KVM/QEMU & VDE2](networking/kvm-qemu-vde2.md)
+  * [Building a Linux Router](networking/linux-router.md)
+  * [Packet Capture with tshark](networking/packet-capture-tshark.md)
+  * [Network Troubleshooting](networking/troubleshooting.md)
+  * [DVB & SDR — Broadcast TV Analysis](networking/dvb-sdr.md)
+  * [Asterisk VoIP](networking/asterisk-voip.md)
+
 ## 🖥️ Self-hosting
 
 * [Remote Access](self-hosting/remote-access/README.md)
@@ -101,4 +111,3 @@
 
 * [Page 1](todo/page-1.md)
 * [Parsec when it's blocked](todo/parsec-when-its-blocked.md)
-* [R\&T](todo/r-and-t.md)

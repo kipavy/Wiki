@@ -57,6 +57,30 @@ ssh MyServer
 
 If you use VSCode, it will also detect your SSH Hosts from config file.
 
+### Port Forwarding & Jump Hosts
+
+Forward a local port to a service reachable from the remote host with `-L`. For example, to reach a VNC port (`5900 + N`) running on a server through SSH — see [Accessing a headless VM over VNC](../networking/kvm-qemu-vde2.md#accessing-a-headless-vm-over-vnc):
+
+```bash
+ssh user@server -L 5948:localhost:5948   # local 5948 -> server's 5948
+```
+
+You can also make these forwards permanent in `~/.ssh/config`. A jump host (here `bifrost`) lets you reach machines behind it without retyping long addresses or ports:
+
+```
+Host bifrost
+  HostName 2001:660:5402:2fe:baac:6fff:fe7f:4223
+  Port 8163
+  LocalForward 7004 thorin:22
+  LocalForward 7007 panama7:22
+```
+
+Then `ssh user@bifrost` opens the tunnels, and from there you can `ssh thorin` / `ssh panama7`. To reach a machine behind the jump host directly from elsewhere, forward to its address:
+
+```bash
+ssh user@bifrost -L 7007:10.30.3.4:22   # 10.30.3.4 = target reachable from bifrost
+```
+
 {% hint style="info" %}
 You might encounter an issue with VSCode where it'll ask you everytime the Remote Platform, here's how to fix it
 {% endhint %}
