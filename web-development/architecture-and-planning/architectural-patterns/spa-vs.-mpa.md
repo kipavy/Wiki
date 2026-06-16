@@ -47,6 +47,7 @@ sequenceDiagram
 
 ### Comparison
 
-| **MPA** | Blogs, News Sites, E-commerce (Amazon) | Excellent SEO, Simple to build. | "Clunky" feel, screen flashes white on click. |
+| Type    | Best for                               | Pros                            | Cons                                          |
 | ------- | -------------------------------------- | ------------------------------- | --------------------------------------------- |
+| **MPA** | Blogs, News Sites, E-commerce (Amazon) | Excellent SEO, simple to build. | "Clunky" feel, screen flashes white on click. |
 | **SPA** | Dashboards, Social Networks, SaaS      | Smooth "App-like" feel.         | Harder SEO, heavy initial download.           |

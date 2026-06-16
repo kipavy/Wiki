@@ -26,7 +26,7 @@ flowchart TD
     end
 ```
 
-### SSG (Static Generation
+### SSG (Static Generation)
 
 The work is done once at build time (Gatsby/Astro).
 

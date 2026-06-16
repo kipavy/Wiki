@@ -5,7 +5,7 @@
 * **What is it?** All code (Frontend, API, Background Workers) lives in one repository and deploys together.
 * **✅ Pros:** Easy to debug, easy to deploy, simple local development.
 * **❌ Cons:** If one part breaks, everything breaks. Hard for 50+ developers to work on at once.
-* **Verdicts:** Start here. 90% of apps should be monoliths.
+* **Verdict:** Start here. 90% of apps should be monoliths.
 
 **Microservices**
 
