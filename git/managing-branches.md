@@ -1,5 +1,7 @@
 # Managing Branches
 
+Once you're past a single `main` branch, you'll need to rename branches, point them at the right remote, and clean up the ones you're done with. This page covers those everyday branch chores — locally and on the remote.
+
 ### List branches
 
 ```bash

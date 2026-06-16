@@ -73,7 +73,7 @@ You'll need to install [uv.md](../python/uv.md "mention")
 uvx git-filter-repo --path docs/superpowers --invert-paths --force
 ```
 
-This rewrites all commits, `docs/superpowers` folder dissapear from filesystem and from each commit.
+This rewrites all commits, `docs/superpowers` folder disappears from filesystem and from each commit.
 
 If repo has already been pushed to a remote, run:
 

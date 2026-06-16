@@ -20,7 +20,7 @@ You can see the \<commit-id> where HEAD is with:
 git reset <commit-id>
 ```
 
-For example, here is what you can do if you want to be in the exact same state your collegue was before pushing a commit bbbb on top of a commit aaaa, with his changes in the working tree:
+For example, here is what you can do if you want to be in the exact same state your colleague was before pushing a commit bbbb on top of a commit aaaa, with his changes in the working tree:
 
 ```bash
 git switch --detach bbbb && git reset HEAD~1

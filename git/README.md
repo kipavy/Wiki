@@ -7,8 +7,12 @@ icon: git-alt
 A practical, copy-paste reference for the Git tasks I actually run into — branching, rewriting history, working with remotes, auth, and CI/CD.
 
 {% hint style="info" %}
-New to a topic? Each page leads with _when_ you'd use it, then the commands. Start with **Reset and Switch** to get the mental model of `HEAD`, then dip into whatever you need.
+New to a topic? Each page leads with _when_ you'd use it, then the commands. Start with **Git Basics**, then dip into whatever you need.
 {% endhint %}
+
+### Fundamentals
+
+* [Git Basics](git-basics.md) — the everyday loop (add/commit/push/pull), `.gitignore`, branches, stash, merge vs. rebase, tags.
 
 ### Everyday workflow
 

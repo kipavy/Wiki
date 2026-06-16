@@ -1,5 +1,7 @@
 # Rename/Edit/Squash commit(s)
 
+Use this when a commit is already made (and maybe pushed) but it's wrong: a bad message, the wrong contents, or several messy commits you'd rather collapse into one. All of these **rewrite history**, so the already-pushed commits will need a force push.
+
 {% hint style="warning" %}
 If you want to git push --force on main, you may disable force protection on this branch in repo settings -> branches (e.g: [https://gitlab.com/USER/REPO/-/settings/repository/branch\_rules?branch=main](https://gitlab.com/jeanemar1/test/-/settings/repository/branch_rules?branch=main))
 {% endhint %}

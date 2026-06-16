@@ -1,12 +1,16 @@
 # SSH Keys & PAT
 
-#### PAT (Personnal Access Token)
+#### PAT (Personal Access Token)
 
 In your account settings, you can generate a PAT and then use it like so:
 
 ```bash
 https://<username>:<PAT>@github.com/username/repo.git
 ```
+
+{% hint style="warning" %}
+Putting the PAT in the URL leaks it into your shell history and `.git/config` in plain text. Prefer letting Git store it for you: run `gh auth login` (GitHub CLI), or clone normally and let the credential helper cache it (`git config --global credential.helper manager` on Windows, `osxkeychain` on macOS).
+{% endhint %}
 
 #### SSH Keys
 
