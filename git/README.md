@@ -18,6 +18,7 @@ New to a topic? Each page leads with _when_ you'd use it, then the commands. Sta
 
 * [Git Workflows](git-workflows.md) — Gitflow vs. GitHub Flow vs. Trunk-based, with diagrams.
 * [Managing Branches](managing-branches.md) — rename, set/change upstream, delete local & remote branches.
+* [Git Hooks](git-hooks.md) — run lint/format/tests automatically with `pre-commit` & `pre-push`.
 
 ### Rewriting history
 
