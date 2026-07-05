@@ -23,6 +23,7 @@ Four axes tell you most of what you need:
 
 | Tool | Form | Open source | Model-agnostic | Free to use? |
 | --- | --- | --- | --- | --- |
+| **Claude Code** _(baseline)_ | Terminal + IDE | ❌ proprietary | ➖ Claude only | ⚠️ needs a paid Anthropic plan |
 | **opencode** | Terminal + IDE | ✅ MIT | ✅ any provider | ✅ free models via OpenCode Zen / free keys |
 | **Gemini CLI** | Terminal | ✅ Apache-2.0 | ❌ Gemini | ✅✅ free daily quota with a Google account |
 | **Qwen Code** | Terminal | ✅ Apache-2.0 | ✅ any provider | ✅✅ generous free quota via Qwen login |
@@ -121,6 +122,14 @@ Install from the VS Code Marketplace (search "Cline"). **Standout features:** Pl
 The best-known **AI-first editor** (a VS Code fork), now with a terminal CLI too (`cursor-agent`). It's the odd one out here: **proprietary**, with models **bundled under a subscription** rather than bring-your-own-key.
 
 There's a limited free **Hobby** tier (a small monthly allowance of premium requests); real use is Pro at ~$20/mo and up. **Standout features:** best-in-class tab autocomplete, multi-file Composer, agent mode, and background/cloud agents. **Why it's here:** if you want the most polished single-app experience and don't mind paying, it's hard to beat — just know you're trading openness and model choice for that polish.
+
+---
+
+### A different category: OpenClaw
+
+Worth knowing but **not a coding agent in the same sense** as the tools above. [**OpenClaw**](https://github.com/openclaw/openclaw) is an open-source, self-hosted _gateway_ that connects your everyday chat apps — WhatsApp, Slack, Telegram, Signal, iMessage, Discord and more — to an AI assistant that can browse the web, run shell commands, read/write files and _drive_ coding agents on your behalf. It hatches in a terminal (`openclaw onboard`), but the point is talking to your agent from wherever you already chat, not editing code in your shell.
+
+So it doesn't fit the four axes above — think of it as the layer _in front of_ an agent rather than an alternative to opencode or Aider. If you want a personal assistant reachable from your phone that happens to code, it's the one to look at.
 
 ---
 
