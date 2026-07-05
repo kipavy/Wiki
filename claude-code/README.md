@@ -17,6 +17,7 @@ New here? Read the pages in order: install below, then **Using It Well** for the
 * [CLAUDE.md](claude-md.md) — the project memory file Claude reads on every session. The single highest-leverage thing to set up.
 * [Configuration](configuration.md) — `settings.json`, permissions, hooks, MCP servers, statusline, model choice.
 * [Plugins Worth It](plugins.md) — the plugin/marketplace system, plus a curated list of plugins I actually keep installed.
+* [Other Agents](../ai-agents/other-agents.md) — Claude Code isn't the only game in town. The worthwhile alternatives, including ones with free models.
 
 ### Installing
 
