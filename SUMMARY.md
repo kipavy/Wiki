@@ -55,6 +55,7 @@
   * [Configuration](claude-code/configuration.md)
   * [Plugins Worth It](claude-code/plugins.md)
 * [Other Agents](ai-agents/other-agents.md)
+* [MCP Servers Worth It](ai-agents/mcp-servers.md)
 
 ***
 

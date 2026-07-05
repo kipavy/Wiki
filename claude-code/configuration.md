@@ -74,11 +74,15 @@ Typical uses: auto-format after every edit, run tests when a file changes, block
 **MCP** (Model Context Protocol) lets Claude talk to external systems — databases, GitHub, a browser, your own APIs — through standardized tool servers. Add one with:
 
 ```bash
-claude mcp add github -- npx -y @modelcontextprotocol/server-github
+claude mcp add playwright -- npx @playwright/mcp@latest
 claude mcp list        # see what's connected
 ```
 
 Project-shared servers can also be committed in a `.mcp.json` at the repo root so your team gets them automatically. Many plugins bundle their own MCP servers, so you often get these without configuring anything.
+
+{% hint style="info" %}
+Not sure which to add? See [**MCP Servers Worth It**](../ai-agents/mcp-servers.md) for a short, curated list (Context7, GitHub, Playwright, and more).
+{% endhint %}
 
 ### Statusline
 
