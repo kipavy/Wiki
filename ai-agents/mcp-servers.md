@@ -10,7 +10,25 @@ description: A short, opinionated list of MCP servers that actually earn their p
 Commands below use Claude Code's `claude mcp add`, but MCP is a standard — the same servers work in **opencode**, **Cline**, and most other agents; only the config syntax differs.
 {% endhint %}
 
-Add `--scope user` to any command to make the server available in **every** project instead of just the current one. Check what's connected with `/mcp` inside a session.
+### Getting started in 2 minutes
+
+The whole workflow is four commands:
+
+```bash
+claude mcp add <name> -- <command>   # add a local (stdio) server
+claude mcp list                      # see what's configured
+claude mcp remove <name>             # remove one
+```
+
+```
+/mcp                                 # inside a session: check status & tools
+```
+
+Three things to know:
+
+* **Two flavours.** A **local** server runs on your machine (`-- npx …` / `-- uvx …`); a **remote** one is hosted over HTTP (`--transport http <url>`, usually with an auth header). Each server below shows the right form.
+* **Scope.** By default a server is added to the **current project only**. Add `--scope user` to make it available in **every** project — good for general tools like Context7.
+* **Restart & check.** New servers load on the next session; run `/mcp` to confirm it connected and see the tools it exposes. If a server needs a key, that's where a failed connection usually shows up.
 
 ---
 
