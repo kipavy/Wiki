@@ -47,6 +47,14 @@
   * [WSL](windows/linux-with-windows/wsl.md)
   * [Linux on Portable SSD](windows/linux-with-windows/linux-on-portable-ssd.md)
 
+## 🤖 Claude Code
+
+* [Claude Code](claude-code/README.md)
+  * [Using It Well](claude-code/using-it-well.md)
+  * [CLAUDE.md](claude-code/claude-md.md)
+  * [Configuration](claude-code/configuration.md)
+  * [Plugins Worth It](claude-code/plugins.md)
+
 ***
 
 * [VS Code](vs-code/README.md)
