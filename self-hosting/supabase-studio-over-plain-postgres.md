@@ -247,6 +247,51 @@ zcat backups/last/postgres-latest.sql.gz \
   not "3:47 PM before the bad `DELETE`". Managed providers (Neon, RDS) give PITR +
   replication + failover; a dump cron does not. Size your expectations accordingly.
 
+### Off-host copy to Cloudflare R2 (rclone)
+
+Get the dumps off the box so a dead disk doesn't take the backups with it. R2 talks
+the S3 API, so [`rclone`](https://rclone.org) handles it — no `wrangler` needed.
+
+1. In the Cloudflare dashboard: **R2 → Manage R2 API Tokens → Create API Token**,
+   **Object Read & Write**, scoped to one bucket (e.g. `db-backups`). Note the
+   **Access Key ID**, **Secret Access Key**, and your **Account ID**.
+2. Register the remote (values are yours; keep them out of shell history):
+
+   ```bash
+   rclone config create r2backup s3 provider=Cloudflare \
+     access_key_id=<ACCESS_KEY_ID> \
+     secret_access_key=<SECRET_ACCESS_KEY> \
+     endpoint=https://<ACCOUNT_ID>.r2.cloudflarestorage.com \
+     acl=private
+   # Bucket-scoped tokens can't do the S3 bucket-check call; silence the retry:
+   rclone config update r2backup no_check_bucket true
+   ```
+
+3. Push, and restore straight from R2 when needed:
+
+   ```bash
+   # Upload (‑‑copy-links so the *-latest.sql.gz symlinks upload as real objects)
+   rclone sync ./backups r2backup:<bucket>/supastudio --copy-links
+
+   # Restore directly from R2
+   rclone cat r2backup:<bucket>/supastudio/last/postgres-latest.sql.gz \
+     | zcat | docker exec -i supastudio-db psql -U postgres -d postgres
+   ```
+
+   > `rclone lsd r2backup:` returning **403 AccessDenied is normal** for a
+   > bucket-scoped token — it just can't enumerate buckets. Target it by name.
+
+4. Automate it after each dump — a cron entry (or systemd timer):
+
+   ```cron
+   # 03:30 daily, a bit after the sidecar's @daily dump
+   30 3 * * * cd /path/to/supastudio-lite && rclone sync ./backups r2backup:<bucket>/supastudio --copy-links
+   ```
+
+Verified end to end: sync up, then pull a dump **back** from R2 — valid gzip, real
+`pg_dump` header. It's still snapshots off-host, not PITR — but the disk dying no
+longer means losing the backups.
+
 ## Migrating off Neon.tech (full walkthrough)
 
 Move a real database off a hosted provider (Neon, Supabase cloud, RDS…) into your
