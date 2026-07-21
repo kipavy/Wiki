@@ -1,12 +1,10 @@
-# Supabase Studio over plain Postgres (Neon-like local DB)
+# Supabase Studio over plain Postgres
 
-A lightweight, self-hosted alternative to [Neon.tech](https://neon.tech)'s console:
-just the **Supabase Studio SQL editor + table editor**, pointed at an ordinary
-Postgres container. No auth, Realtime, Storage, Kong, PostgREST, or
-Logflare/analytics — three containers total.
+A lightweight, self-hosted alternative to [Neon.tech](https://neon.tech)'s console: just the **Supabase Studio SQL editor + table editor**, pointed at an ordinary Postgres container. No auth, Realtime, Storage, Kong, PostgREST, or Logflare/analytics — three containers total.
 
-Great when you want a nice web UI over a local Postgres (browsing tables, running
-SQL) without paying for, or being rate-limited by, a hosted provider.
+Great when you want a nice web UI over a local Postgres (browsing tables, running SQL) without paying for, or being rate-limited by, a hosted provider.
+
+<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
 ```mermaid
 flowchart LR
@@ -26,11 +24,7 @@ flowchart LR
 
 ## Why this works without the rest of the stack
 
-The whole Supabase self-hosting stack normally routes Studio → **Kong** → everything.
-But for the **SQL editor and table editor specifically**, Studio talks to
-`postgres-meta` **directly** via `STUDIO_PG_META_URL` — Kong never sat between
-those two. So dropping Kong (and auth/realtime/storage/rest) changes nothing for
-the two features we care about.
+The whole Supabase self-hosting stack normally routes Studio → **Kong** → everything. But for the **SQL editor and table editor specifically**, Studio talks to `postgres-meta` **directly** via `STUDIO_PG_META_URL` — Kong never sat between those two. So dropping Kong (and auth/realtime/storage/rest) changes nothing for the two features we care about.
 
 ## `docker-compose.yml`
 
@@ -222,41 +216,20 @@ Connect apps to the DB at `postgresql://postgres:postgres@localhost:5433/postgre
 
 ## Gotchas (each verified, not guessed)
 
-* **Logflare / analytics health-check.** Older Studio tags hard-depended on the
-  `analytics` (Logflare) service and never went `healthy` in a trimmed stack.
-  Current tags gate it behind **`ENABLED_FEATURES_LOGS_ALL: "false"`** (set above),
-  so the container's health-check (`GET /api/platform/profile`) returns `200`
-  **without** any analytics service, stub, or disabled health-check. Studio reaches
-  `healthy` in ~5–9 s.
-* **No dashboard login.** `DASHBOARD_USERNAME`/`PASSWORD` were enforced by **Kong**,
-  which we dropped. Hitting Studio directly on `:8000` is therefore
-  **unauthenticated** — fine for localhost, but never expose that port to a network
-  without your own reverse-proxy auth in front.
-* **REST/Auth pages are inert.** Anything needing PostgREST/GoTrue (API docs, the
-  Authentication tab) won't work — by design. `SUPABASE_URL` is pointed at `meta`
-  only so Studio doesn't error on a dangling hostname.
-* **Pin tags, never `:latest`.** Studio, meta, and Postgres versions drift; a
-  floating tag will eventually break the health-check wiring above.
+* **Logflare / analytics health-check.** Older Studio tags hard-depended on the `analytics` (Logflare) service and never went `healthy` in a trimmed stack. Current tags gate it behind **`ENABLED_FEATURES_LOGS_ALL: "false"`** (set above), so the container's health-check (`GET /api/platform/profile`) returns `200` **without** any analytics service, stub, or disabled health-check. Studio reaches `healthy` in \~5–9 s.
+* **No dashboard login.** `DASHBOARD_USERNAME`/`PASSWORD` were enforced by **Kong**, which we dropped. Hitting Studio directly on `:8000` is therefore **unauthenticated** — fine for localhost, but never expose that port to a network without your own reverse-proxy auth in front.
+* **REST/Auth pages are inert.** Anything needing PostgREST/GoTrue (API docs, the Authentication tab) won't work — by design. `SUPABASE_URL` is pointed at `meta` only so Studio doesn't error on a dangling hostname.
+* **Pin tags, never `:latest`.** Studio, meta, and Postgres versions drift; a floating tag will eventually break the health-check wiring above.
 
 ## Footprint & "scale to zero"
 
-* **Runtime RAM ≈ 395 MB** (postgres ~64 + meta ~84 + studio ~247; both backup
-  sidecars are single-digit MB, idle between runs). Light.
-* **On disk ≈ 3.1 GB** — dominated by the Studio image (~1.6 GB); meta ~526 MB;
-  backup sidecar ~419 MB; `postgres:17-alpine` ~415 MB; rclone mirror ~97 MB. There
-  is no slim Studio image and no standalone repo to build one from, so ~1.6 GB is
-  the practical floor. *(The optional WAL-G PITR upgrade swaps the alpine DB for the
-  ~747 MB Debian+WAL-G image; the base-backup sidecar reuses that image, ~0 extra.)*
-* **No auto-suspend** like Neon's scale-to-zero. The manual equivalent is
-  `docker compose stop` (frees all RAM, ~5 s to `start` again). You can stop just
-  `studio` + `meta` when idle and keep `postgres` up so apps stay connected.
+* **Runtime RAM ≈ 395 MB** (postgres \~64 + meta \~84 + studio \~247; both backup sidecars are single-digit MB, idle between runs). Light.
+* **On disk ≈ 3.1 GB** — dominated by the Studio image (\~1.6 GB); meta \~526 MB; backup sidecar \~419 MB; `postgres:17-alpine` \~415 MB; rclone mirror \~97 MB. There is no slim Studio image and no standalone repo to build one from, so \~1.6 GB is the practical floor. _(The optional WAL-G PITR upgrade swaps the alpine DB for the \~747 MB Debian+WAL-G image; the base-backup sidecar reuses that image, \~0 extra.)_
+* **No auto-suspend** like Neon's scale-to-zero. The manual equivalent is `docker compose stop` (frees all RAM, \~5 s to `start` again). You can stop just `studio` + `meta` when idle and keep `postgres` up so apps stay connected.
 
 ## Automated backups (the sidecar)
 
-Service `4)` above is [`postgres-backup-local`](https://github.com/prodrigestivill/docker-postgres-backup-local):
-a tiny container that runs `pg_dump` on `SCHEDULE` and keeps a rotated history.
-With `BACKUP_ON_START: "TRUE"` it also dumps once immediately on `up`, so you can
-verify it works without waiting for the schedule.
+Service `4)` above is [`postgres-backup-local`](https://github.com/prodrigestivill/docker-postgres-backup-local): a tiny container that runs `pg_dump` on `SCHEDULE` and keeps a rotated history. With `BACKUP_ON_START: "TRUE"` it also dumps once immediately on `up`, so you can verify it works without waiting for the schedule.
 
 Files land under `./backups`, already rotated for you:
 
@@ -275,79 +248,49 @@ zcat backups/last/postgres-latest.sql.gz \
   | docker exec -i supastudio-db psql -U postgres -d postgres
 ```
 
-> Verified: deleting a table from the live DB and then restoring the dump brought
-> it back with its rows intact.
+> Verified: deleting a table from the live DB and then restoring the dump brought it back with its rows intact.
 
 **Two honest limits — don't mistake this for what Neon gave you:**
 
-* **It's local-only.** The dumps sit on the same disk as the database. If that disk
-  dies, they die with it. To actually be safe, copy `./backups` **off-host** —
-  e.g. `rclone` to Cloudflare R2, or a NAS mount. The sidecar makes the snapshot;
-  getting it off the box is still on you.
-* **It's snapshots, not point-in-time recovery.** You can restore to "last night",
-  not "3:47 PM before the bad `DELETE`". Managed providers (Neon, RDS) give PITR +
-  replication + failover; a dump cron does not. Size your expectations accordingly.
+* **It's local-only.** The dumps sit on the same disk as the database. If that disk dies, they die with it. To actually be safe, copy `./backups` **off-host** — e.g. `rclone` to Cloudflare R2, or a NAS mount. The sidecar makes the snapshot; getting it off the box is still on you.
+* **It's snapshots, not point-in-time recovery.** You can restore to "last night", not "3:47 PM before the bad `DELETE`". Managed providers (Neon, RDS) give PITR + replication + failover; a dump cron does not. Size your expectations accordingly.
 
 ### Off-host copy to Cloudflare R2 — as a sidecar (no host cron)
 
-Get the dumps off the box so a dead disk doesn't take the backups with it. R2 speaks
-the S3 API, so [`rclone`](https://rclone.org) handles it — no `wrangler` needed. And
-because you may not want a host `cron`/`systemd` job, service `5)` above runs the
-mirror **inside compose**: an `rclone` container that syncs `./backups` → R2 every
-`BACKUP_MIRROR_INTERVAL` seconds. It reads its R2 credentials from `.env` as
-`RCLONE_CONFIG_R2BACKUP_*`, so **no host `rclone.conf` is needed**.
+Get the dumps off the box so a dead disk doesn't take the backups with it. R2 speaks the S3 API, so [`rclone`](https://rclone.org) handles it — no `wrangler` needed. And because you may not want a host `cron`/`systemd` job, service `5)` above runs the mirror **inside compose**: an `rclone` container that syncs `./backups` → R2 every `BACKUP_MIRROR_INTERVAL` seconds. It reads its R2 credentials from `.env` as `RCLONE_CONFIG_R2BACKUP_*`, so **no host `rclone.conf` is needed**.
 
-1. Cloudflare dashboard: **R2 → Manage R2 API Tokens → Create API Token**,
-   **Object Read & Write**, scoped to one bucket (e.g. `db-backups`). Put the
-   **Access Key ID**, **Secret Access Key**, and **Account ID** (it's in the S3
-   endpoint URL) into `.env`. Done — `docker compose up -d` starts mirroring.
+1. Cloudflare dashboard: **R2 → Manage R2 API Tokens → Create API Token**, **Object Read & Write**, scoped to one bucket (e.g. `db-backups`). Put the **Access Key ID**, **Secret Access Key**, and **Account ID** (it's in the S3 endpoint URL) into `.env`. Done — `docker compose up -d` starts mirroring.
+2.  Restore straight from R2 when needed (works from any box with the creds):
 
-2. Restore straight from R2 when needed (works from any box with the creds):
-
-   ```bash
-   rclone cat r2backup:<bucket>/supastudio/last/postgres-latest.sql.gz \
-     | zcat | docker exec -i supastudio-db psql -U postgres -d postgres
-   ```
+    ```bash
+    rclone cat r2backup:<bucket>/supastudio/last/postgres-latest.sql.gz \
+      | zcat | docker exec -i supastudio-db psql -U postgres -d postgres
+    ```
 
 **Notes / gotchas (all verified):**
 
-* `NO_CHECK_BUCKET=true` (set in the service) is required for a **bucket-scoped
-  token** — without it every sync throws a spurious `501 NotImplemented` on the S3
-  bucket-check call, then retries. With it, syncs are clean (exit 0).
-* `rclone lsd r2backup:` returning **403 AccessDenied is normal** for a
-  bucket-scoped token — it just can't *enumerate* buckets. Target it by name.
+* `NO_CHECK_BUCKET=true` (set in the service) is required for a **bucket-scoped token** — without it every sync throws a spurious `501 NotImplemented` on the S3 bucket-check call, then retries. With it, syncs are clean (exit 0).
+* `rclone lsd r2backup:` returning **403 AccessDenied is normal** for a bucket-scoped token — it just can't _enumerate_ buckets. Target it by name.
 * `--copy-links` makes the `*-latest.sql.gz` **symlinks** upload as real objects.
-* Verified end to end: the sidecar pushed a marker file to R2, and a dump pulled
-  **back** from R2 was a valid gzip with a real `pg_dump` header.
+* Verified end to end: the sidecar pushed a marker file to R2, and a dump pulled **back** from R2 was a valid gzip with a real `pg_dump` header.
 
-If you'd rather **not** run the mirror container, the equivalent host-side one-liner
-(register the remote once with `rclone config create r2backup s3 provider=Cloudflare
-... no_check_bucket=true`, then) is:
+If you'd rather **not** run the mirror container, the equivalent host-side one-liner (register the remote once with `rclone config create r2backup s3 provider=Cloudflare ... no_check_bucket=true`, then) is:
 
 ```bash
 rclone sync ./backups r2backup:<bucket>/supastudio --copy-links
 ```
 
-Either way it's still **snapshots off-host, not PITR** — but a dead disk no longer
-means losing the backups. For second-granularity recovery instead of daily
-snapshots, see the WAL-G section below.
+Either way it's still **snapshots off-host, not PITR** — but a dead disk no longer means losing the backups. For second-granularity recovery instead of daily snapshots, see the WAL-G section below.
 
 ## Point-in-time recovery with WAL-G (optional upgrade)
 
-The dump sidecar gives you *last night*. **[WAL-G](https://github.com/wal-g/wal-g)**
-gives you *any second*: Postgres continuously ships write-ahead-log segments to R2,
-so you can restore to "3:46:59 PM, just before the bad `DELETE`". This turns your
-**RPO from ~24 h into ~60 s** and is the closest a single box gets to what Neon's
-PITR offered. Keep the dump sidecar too — it's a dead-simple independent fallback.
+The dump sidecar gives you _last night_. [**WAL-G**](https://github.com/wal-g/wal-g) gives you _any second_: Postgres continuously ships write-ahead-log segments to R2, so you can restore to "3:46:59 PM, just before the bad `DELETE`". This turns your **RPO from \~24 h into \~60 s** and is the closest a single box gets to what Neon's PITR offered. Keep the dump sidecar too — it's a dead-simple independent fallback.
 
-It's the advanced tier: a custom image, a few settings, a base-backup sidecar, and
-— non-negotiable — a **tested restore**. At R2 free-tier this costs ~$0 for a small
-DB (WAL + base backups stay well under the 10 GB / 1M-ops free limits).
+It's the advanced tier: a custom image, a few settings, a base-backup sidecar, and — non-negotiable — a **tested restore**. At R2 free-tier this costs \~$0 for a small DB (WAL + base backups stay well under the 10 GB / 1M-ops free limits).
 
 ### 1. Custom Postgres image with WAL-G baked in
 
-WAL-G ships prebuilt **glibc** binaries only, so base off Debian `postgres:17`, not
-alpine. (On **aarch64** use the `aarch64` asset, as below.)
+WAL-G ships prebuilt **glibc** binaries only, so base off Debian `postgres:17`, not alpine. (On **aarch64** use the `aarch64` asset, as below.)
 
 ```dockerfile
 # pg-walg/Dockerfile
@@ -362,8 +305,7 @@ RUN set -eux; apt-get update; apt-get install -y --no-install-recommends curl ca
 
 ### 2. Turn on archiving + add the base-backup sidecar
 
-Shared R2 config as a YAML anchor, the `postgres` service switched to the image with
-archiving flags, and a sidecar that pushes a full base backup on a timer:
+Shared R2 config as a YAML anchor, the `postgres` service switched to the image with archiving flags, and a sidecar that pushes a full base backup on a timer:
 
 ```yaml
 x-walg-env: &walg-env
@@ -428,13 +370,11 @@ BASEBACKUP_INTERVAL=21600
 AWS_REGION=auto
 ```
 
-Verify archiving is live: `psql -c "select archived_count, failed_count from
-pg_stat_archiver;"` — you want `failed_count = 0` and `archived_count` climbing.
+Verify archiving is live: `psql -c "select archived_count, failed_count from pg_stat_archiver;"` — you want `failed_count = 0` and `archived_count` climbing.
 
 ### 3. Restore to a point in time (test this before you trust it!)
 
-Restore into a **throwaway** instance first. Fetch the base backup, point recovery
-at a target, let Postgres replay WAL and promote:
+Restore into a **throwaway** instance first. Fetch the base backup, point recovery at a target, let Postgres replay WAL and promote:
 
 ```bash
 # runs as the postgres user, in a fresh pg-walg container with the R2 env set
@@ -449,35 +389,25 @@ touch "$PGDATA/recovery.signal"
 pg_ctl -D "$PGDATA" -w start
 ```
 
-Tips: `SELECT pg_create_restore_point('label')` before risky operations gives you a
-named target; otherwise use `recovery_target_time`. `wal-g backup-list` shows your
-base backups.
+Tips: `SELECT pg_create_restore_point('label')` before risky operations gives you a named target; otherwise use `recovery_target_time`. `wal-g backup-list` shows your base backups.
 
-> **Verified end to end:** created a row, marked a restore point, dropped the table,
-> then restored — Postgres stopped exactly at the restore point and the table + row
-> came back. RPO in the test was seconds.
+> **Verified end to end:** created a row, marked a restore point, dropped the table, then restored — Postgres stopped exactly at the restore point and the table + row came back. RPO in the test was seconds.
 
 ### The one caveat that matters
 
-**If R2 is unreachable, `archive_command` keeps failing and Postgres retains WAL in
-`pg_wal` until it succeeds — which can fill the disk.** Monitor it:
+**If R2 is unreachable, `archive_command` keeps failing and Postgres retains WAL in `pg_wal` until it succeeds — which can fill the disk.** Monitor it:
 
 ```sql
 SELECT failed_count, last_failed_wal, last_failed_time FROM pg_stat_archiver;
 ```
 
-Alert if `failed_count` climbs or `pg_wal` size grows. This — not RAM/CPU — is the
-real operational cost of WAL archiving.
+Alert if `failed_count` climbs or `pg_wal` size grows. This — not RAM/CPU — is the real operational cost of WAL archiving.
 
 ## Migrating off Neon.tech (full walkthrough)
 
-Move a real database off a hosted provider (Neon, Supabase cloud, RDS…) into your
-local Postgres, end to end. Copy-paste friendly — set the two variables first.
+Move a real database off a hosted provider (Neon, Supabase cloud, RDS…) into your local Postgres, end to end. Copy-paste friendly — set the two variables first.
 
-> You don't need Postgres installed on the host: `pg_dump`/`pg_restore` already
-> live **inside** the `supastudio-db` container, so every command below runs
-> through `docker exec` / `docker compose exec`. That also guarantees the client
-> tools match the local server version.
+> You don't need Postgres installed on the host: `pg_dump`/`pg_restore` already live **inside** the `supastudio-db` container, so every command below runs through `docker exec` / `docker compose exec`. That also guarantees the client tools match the local server version.
 
 ### 0. Set your endpoints
 
@@ -496,8 +426,7 @@ LOCAL_URL="postgres://postgres:postgres@localhost:5433/postgres"
 docker exec -i supastudio-db psql "$NEON_URL" -tAc "show server_version;"
 ```
 
-Your local Postgres major version must be **>= this number**. `postgres:17-alpine`
-covers every current Neon project; if Neon ever reports 18+, bump the image tag.
+Your local Postgres major version must be **>= this number**. `postgres:17-alpine` covers every current Neon project; if Neon ever reports 18+, bump the image tag.
 
 ### 2. Make sure the local stack is up with an EMPTY target DB
 
@@ -521,8 +450,7 @@ docker exec -i supastudio-db pg_dump "$NEON_URL" \
 docker exec -i supastudio-db sh -c 'ls -lh /tmp/neon.dump'   # sanity: non-zero size
 ```
 
-`-Fc` = compressed custom format (lets `pg_restore` parallelise). `--no-owner
---no-acl` drops Neon-specific roles/grants so nothing errors on the local side.
+`-Fc` = compressed custom format (lets `pg_restore` parallelise). `--no-owner --no-acl` drops Neon-specific roles/grants so nothing errors on the local side.
 
 ### 4. Restore into the local container
 
@@ -531,8 +459,7 @@ docker exec -i supastudio-db pg_restore --no-owner --no-acl \
   -d "$LOCAL_URL" /tmp/neon.dump
 ```
 
-Ignore any `role "..." does not exist` / `COMMENT ON EXTENSION` notices — those are
-harmless Neon-isms. Then verify the data landed:
+Ignore any `role "..." does not exist` / `COMMENT ON EXTENSION` notices — those are harmless Neon-isms. Then verify the data landed:
 
 ```bash
 docker exec -i supastudio-db psql "$LOCAL_URL" -c "\dt"
@@ -543,10 +470,7 @@ You can now open **http://localhost:8000** and browse the imported tables in Stu
 
 ### 5. Repoint your application
 
-Change the app's connection string from the Neon URL to the local one **and drop
-`?sslmode=require`** (the local container has no TLS; leaving it on will refuse the
-connection). Postgres client libraries default to `sslmode=prefer`, so no TLS
-param is needed:
+Change the app's connection string from the Neon URL to the local one **and drop `?sslmode=require`** (the local container has no TLS; leaving it on will refuse the connection). Postgres client libraries default to `sslmode=prefer`, so no TLS param is needed:
 
 ```bash
 # before
@@ -555,17 +479,11 @@ DATABASE_URL=postgresql://USER:PW@ep-xxxx.neon.tech/db?sslmode=require
 DATABASE_URL=postgres://postgres:postgres@localhost:5433/postgres
 ```
 
-> If your app runs **inside Docker** on the same host, don't use `localhost` — put
-> it on the same compose network and connect to the service name and internal port
-> instead, e.g. `postgres://postgres:postgres@supastudio-db:5432/postgres`.
+> If your app runs **inside Docker** on the same host, don't use `localhost` — put it on the same compose network and connect to the service name and internal port instead, e.g. `postgres://postgres:postgres@supastudio-db:5432/postgres`.
 
 ### 6. Verify, then decommission Neon
 
-Start the app, hit its health endpoint, exercise a read and a write. If your app
-owns its migrations (sqlx / Prisma / Drizzle / Alembic…), the full dump already
-included the migration-history table, so it will see every migration as **already
-applied** and make no changes. Only once you've confirmed the app is happy on local
-should you delete / pause the Neon project.
+Start the app, hit its health endpoint, exercise a read and a write. If your app owns its migrations (sqlx / Prisma / Drizzle / Alembic…), the full dump already included the migration-history table, so it will see every migration as **already applied** and make no changes. Only once you've confirmed the app is happy on local should you delete / pause the Neon project.
 
 ### 7. (Recommended) Back up your new local DB
 
@@ -579,8 +497,4 @@ docker cp supastudio-db:/tmp/backup-$(date +%F).dump ~/db-backups/
 
 ### Extensions caveat
 
-Stock `postgres:*-alpine` ships only the standard contrib set (`pgcrypto`,
-`uuid-ossp`, `pg_trgm`, `hstore`, …). If your schema uses `pgvector`, `postgis`,
-`pg_cron`, etc., the restore will fail on `CREATE EXTENSION`; use an image that
-bundles them (e.g. `pgvector/pgvector:pg17`) or `supabase/postgres` instead. Note
-`gen_random_uuid()` is **core since PG 13** — it needs no extension.
+Stock `postgres:*-alpine` ships only the standard contrib set (`pgcrypto`, `uuid-ossp`, `pg_trgm`, `hstore`, …). If your schema uses `pgvector`, `postgis`, `pg_cron`, etc., the restore will fail on `CREATE EXTENSION`; use an image that bundles them (e.g. `pgvector/pgvector:pg17`) or `supabase/postgres` instead. Note `gen_random_uuid()` is **core since PG 13** — it needs no extension.
