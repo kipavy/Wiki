@@ -245,7 +245,8 @@ Connect apps to the DB at `postgresql://postgres:postgres@localhost:5433/postgre
 * **On disk ≈ 3.1 GB** — dominated by the Studio image (~1.6 GB); meta ~526 MB;
   backup sidecar ~419 MB; `postgres:17-alpine` ~415 MB; rclone mirror ~97 MB. There
   is no slim Studio image and no standalone repo to build one from, so ~1.6 GB is
-  the practical floor.
+  the practical floor. *(The optional WAL-G PITR upgrade swaps the alpine DB for the
+  ~747 MB Debian+WAL-G image; the base-backup sidecar reuses that image, ~0 extra.)*
 * **No auto-suspend** like Neon's scale-to-zero. The manual equivalent is
   `docker compose stop` (frees all RAM, ~5 s to `start` again). You can stop just
   `studio` + `meta` when idle and keep `postgres` up so apps stay connected.
@@ -328,7 +329,145 @@ rclone sync ./backups r2backup:<bucket>/supastudio --copy-links
 ```
 
 Either way it's still **snapshots off-host, not PITR** — but a dead disk no longer
-means losing the backups.
+means losing the backups. For second-granularity recovery instead of daily
+snapshots, see the WAL-G section below.
+
+## Point-in-time recovery with WAL-G (optional upgrade)
+
+The dump sidecar gives you *last night*. **[WAL-G](https://github.com/wal-g/wal-g)**
+gives you *any second*: Postgres continuously ships write-ahead-log segments to R2,
+so you can restore to "3:46:59 PM, just before the bad `DELETE`". This turns your
+**RPO from ~24 h into ~60 s** and is the closest a single box gets to what Neon's
+PITR offered. Keep the dump sidecar too — it's a dead-simple independent fallback.
+
+It's the advanced tier: a custom image, a few settings, a base-backup sidecar, and
+— non-negotiable — a **tested restore**. At R2 free-tier this costs ~$0 for a small
+DB (WAL + base backups stay well under the 10 GB / 1M-ops free limits).
+
+### 1. Custom Postgres image with WAL-G baked in
+
+WAL-G ships prebuilt **glibc** binaries only, so base off Debian `postgres:17`, not
+alpine. (On **aarch64** use the `aarch64` asset, as below.)
+
+```dockerfile
+# pg-walg/Dockerfile
+FROM postgres:17
+ARG WALG_VERSION=v3.0.8
+ARG WALG_ASSET=wal-g-pg-20.04-aarch64        # 20.04 = oldest glibc, safest. amd64 asset on x86.
+RUN set -eux; apt-get update; apt-get install -y --no-install-recommends curl ca-certificates; \
+    curl -fsSL "https://github.com/wal-g/wal-g/releases/download/${WALG_VERSION}/${WALG_ASSET}.tar.gz" -o /tmp/w.tgz; \
+    tar -xzf /tmp/w.tgz -C /tmp; mv "/tmp/${WALG_ASSET}" /usr/local/bin/wal-g; chmod +x /usr/local/bin/wal-g; \
+    rm /tmp/w.tgz; apt-get purge -y curl; apt-get autoremove -y; rm -rf /var/lib/apt/lists/*; wal-g --version
+```
+
+### 2. Turn on archiving + add the base-backup sidecar
+
+Shared R2 config as a YAML anchor, the `postgres` service switched to the image with
+archiving flags, and a sidecar that pushes a full base backup on a timer:
+
+```yaml
+x-walg-env: &walg-env
+  WALG_S3_PREFIX: ${WALG_S3_PREFIX}                 # s3://<bucket>/walg
+  WALG_COMPRESSION_METHOD: lz4
+  AWS_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+  AWS_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+  AWS_ENDPOINT: ${R2_ENDPOINT}
+  AWS_REGION: ${AWS_REGION:-auto}
+  AWS_S3_FORCE_PATH_STYLE: "true"
+
+services:
+  postgres:
+    image: pg-walg:17-3.0.8
+    build: ./pg-walg
+    environment:
+      <<: *walg-env
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    command:
+      - postgres
+      - -c
+      - wal_level=replica
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_command=wal-g wal-push %p
+      - -c
+      - archive_timeout=60          # force a segment (≈RPO ceiling) every 60s
+    # ...healthcheck/ports/volumes as before...
+
+  base-backup:
+    image: pg-walg:17-3.0.8
+    restart: unless-stopped
+    depends_on: { postgres: { condition: service_healthy } }
+    volumes:
+      - db-data:/var/lib/postgresql/data:ro
+    environment:
+      <<: *walg-env
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      BASEBACKUP_INTERVAL: ${BASEBACKUP_INTERVAL:-21600}   # every 6h
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        sleep 15
+        while true; do
+          echo "[base-backup] $(date -u) pushing...";
+          wal-g backup-push /var/lib/postgresql/data && echo ok || echo "FAILED (WAL still protects you)";
+          sleep "$${BASEBACKUP_INTERVAL}";
+        done
+```
+
+`.env` additions (reuses the same `R2_*` creds as the mirror):
+
+```bash
+WALG_S3_PREFIX=s3://<bucket>/walg
+BASEBACKUP_INTERVAL=21600
+AWS_REGION=auto
+```
+
+Verify archiving is live: `psql -c "select archived_count, failed_count from
+pg_stat_archiver;"` — you want `failed_count = 0` and `archived_count` climbing.
+
+### 3. Restore to a point in time (test this before you trust it!)
+
+Restore into a **throwaway** instance first. Fetch the base backup, point recovery
+at a target, let Postgres replay WAL and promote:
+
+```bash
+# runs as the postgres user, in a fresh pg-walg container with the R2 env set
+export PGDATA=/var/lib/postgresql/data
+wal-g backup-fetch "$PGDATA" LATEST
+cat >> "$PGDATA/postgresql.auto.conf" <<EOF
+restore_command = 'wal-g wal-fetch %f %p'
+recovery_target_time = '2026-07-21 15:46:59+00'   # or recovery_target_name = 'my_restore_point'
+recovery_target_action = 'promote'
+EOF
+touch "$PGDATA/recovery.signal"
+pg_ctl -D "$PGDATA" -w start
+```
+
+Tips: `SELECT pg_create_restore_point('label')` before risky operations gives you a
+named target; otherwise use `recovery_target_time`. `wal-g backup-list` shows your
+base backups.
+
+> **Verified end to end:** created a row, marked a restore point, dropped the table,
+> then restored — Postgres stopped exactly at the restore point and the table + row
+> came back. RPO in the test was seconds.
+
+### The one caveat that matters
+
+**If R2 is unreachable, `archive_command` keeps failing and Postgres retains WAL in
+`pg_wal` until it succeeds — which can fill the disk.** Monitor it:
+
+```sql
+SELECT failed_count, last_failed_wal, last_failed_time FROM pg_stat_archiver;
+```
+
+Alert if `failed_count` climbs or `pg_wal` size grows. This — not RAM/CPU — is the
+real operational cost of WAL archiving.
 
 ## Migrating off Neon.tech (full walkthrough)
 
