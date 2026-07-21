@@ -133,6 +133,38 @@ services:
       BACKUP_KEEP_MONTHS: ${BACKUP_KEEP_MONTHS:-6}
       TZ: ${TZ:-UTC}
 
+  # 5) Off-host mirror sidecar — rclone syncs ./backups -> Cloudflare R2 on a
+  #    schedule, entirely inside compose. No host cron, no docker-socket scheduler.
+  #    Creds come from .env as RCLONE_CONFIG_* so no host rclone.conf is needed.
+  backup-mirror:
+    image: rclone/rclone:1.69
+    container_name: supastudio-backup-mirror
+    restart: unless-stopped
+    depends_on:
+      - backup
+    volumes:
+      - ./backups:/data:ro
+    environment:
+      RCLONE_CONFIG_R2BACKUP_TYPE: s3
+      RCLONE_CONFIG_R2BACKUP_PROVIDER: Cloudflare
+      RCLONE_CONFIG_R2BACKUP_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      RCLONE_CONFIG_R2BACKUP_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      RCLONE_CONFIG_R2BACKUP_ENDPOINT: ${R2_ENDPOINT}
+      RCLONE_CONFIG_R2BACKUP_ACL: private
+      RCLONE_CONFIG_R2BACKUP_NO_CHECK_BUCKET: "true"
+      R2_BUCKET: ${R2_BUCKET}
+      MIRROR_INTERVAL: ${BACKUP_MIRROR_INTERVAL:-86400}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        while true; do
+          echo "[mirror] $(date -u '+%Y-%m-%d %H:%M:%S')Z syncing /data -> r2backup:$${R2_BUCKET}/supastudio";
+          rclone sync /data "r2backup:$${R2_BUCKET}/supastudio" --copy-links --stats-one-line \
+            && echo "[mirror] ok" || echo "[mirror] FAILED (will retry next cycle)";
+          sleep "$${MIRROR_INTERVAL}";
+        done
+
 volumes:
   db-data:
 ```
@@ -170,6 +202,13 @@ BACKUP_KEEP_DAYS=7
 BACKUP_KEEP_WEEKS=4
 BACKUP_KEEP_MONTHS=6
 TZ=Europe/Paris
+
+# ---- Off-host mirror sidecar (rclone -> R2). Keep real creds out of git. ----
+R2_BUCKET=db-backups
+R2_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+R2_ACCESS_KEY_ID=<ACCESS_KEY_ID>
+R2_SECRET_ACCESS_KEY=<SECRET_ACCESS_KEY>
+BACKUP_MIRROR_INTERVAL=86400
 ```
 
 ## Run
@@ -201,11 +240,12 @@ Connect apps to the DB at `postgresql://postgres:postgres@localhost:5433/postgre
 
 ## Footprint & "scale to zero"
 
-* **Runtime RAM ≈ 395 MB** (postgres ~64 + meta ~84 + studio ~247; the backup
-  sidecar is ~2 MB, idle between runs). Light.
-* **On disk ≈ 3.0 GB** — dominated by the Studio image (~1.6 GB); meta ~526 MB;
-  backup sidecar ~419 MB; `postgres:17-alpine` ~415 MB. There is no slim Studio
-  image and no standalone repo to build one from, so ~1.6 GB is the practical floor.
+* **Runtime RAM ≈ 395 MB** (postgres ~64 + meta ~84 + studio ~247; both backup
+  sidecars are single-digit MB, idle between runs). Light.
+* **On disk ≈ 3.1 GB** — dominated by the Studio image (~1.6 GB); meta ~526 MB;
+  backup sidecar ~419 MB; `postgres:17-alpine` ~415 MB; rclone mirror ~97 MB. There
+  is no slim Studio image and no standalone repo to build one from, so ~1.6 GB is
+  the practical floor.
 * **No auto-suspend** like Neon's scale-to-zero. The manual equivalent is
   `docker compose stop` (frees all RAM, ~5 s to `start` again). You can stop just
   `studio` + `meta` when idle and keep `postgres` up so apps stay connected.
@@ -247,50 +287,48 @@ zcat backups/last/postgres-latest.sql.gz \
   not "3:47 PM before the bad `DELETE`". Managed providers (Neon, RDS) give PITR +
   replication + failover; a dump cron does not. Size your expectations accordingly.
 
-### Off-host copy to Cloudflare R2 (rclone)
+### Off-host copy to Cloudflare R2 — as a sidecar (no host cron)
 
-Get the dumps off the box so a dead disk doesn't take the backups with it. R2 talks
-the S3 API, so [`rclone`](https://rclone.org) handles it — no `wrangler` needed.
+Get the dumps off the box so a dead disk doesn't take the backups with it. R2 speaks
+the S3 API, so [`rclone`](https://rclone.org) handles it — no `wrangler` needed. And
+because you may not want a host `cron`/`systemd` job, service `5)` above runs the
+mirror **inside compose**: an `rclone` container that syncs `./backups` → R2 every
+`BACKUP_MIRROR_INTERVAL` seconds. It reads its R2 credentials from `.env` as
+`RCLONE_CONFIG_R2BACKUP_*`, so **no host `rclone.conf` is needed**.
 
-1. In the Cloudflare dashboard: **R2 → Manage R2 API Tokens → Create API Token**,
-   **Object Read & Write**, scoped to one bucket (e.g. `db-backups`). Note the
-   **Access Key ID**, **Secret Access Key**, and your **Account ID**.
-2. Register the remote (values are yours; keep them out of shell history):
+1. Cloudflare dashboard: **R2 → Manage R2 API Tokens → Create API Token**,
+   **Object Read & Write**, scoped to one bucket (e.g. `db-backups`). Put the
+   **Access Key ID**, **Secret Access Key**, and **Account ID** (it's in the S3
+   endpoint URL) into `.env`. Done — `docker compose up -d` starts mirroring.
 
-   ```bash
-   rclone config create r2backup s3 provider=Cloudflare \
-     access_key_id=<ACCESS_KEY_ID> \
-     secret_access_key=<SECRET_ACCESS_KEY> \
-     endpoint=https://<ACCOUNT_ID>.r2.cloudflarestorage.com \
-     acl=private
-   # Bucket-scoped tokens can't do the S3 bucket-check call; silence the retry:
-   rclone config update r2backup no_check_bucket true
-   ```
-
-3. Push, and restore straight from R2 when needed:
+2. Restore straight from R2 when needed (works from any box with the creds):
 
    ```bash
-   # Upload (‑‑copy-links so the *-latest.sql.gz symlinks upload as real objects)
-   rclone sync ./backups r2backup:<bucket>/supastudio --copy-links
-
-   # Restore directly from R2
    rclone cat r2backup:<bucket>/supastudio/last/postgres-latest.sql.gz \
      | zcat | docker exec -i supastudio-db psql -U postgres -d postgres
    ```
 
-   > `rclone lsd r2backup:` returning **403 AccessDenied is normal** for a
-   > bucket-scoped token — it just can't enumerate buckets. Target it by name.
+**Notes / gotchas (all verified):**
 
-4. Automate it after each dump — a cron entry (or systemd timer):
+* `NO_CHECK_BUCKET=true` (set in the service) is required for a **bucket-scoped
+  token** — without it every sync throws a spurious `501 NotImplemented` on the S3
+  bucket-check call, then retries. With it, syncs are clean (exit 0).
+* `rclone lsd r2backup:` returning **403 AccessDenied is normal** for a
+  bucket-scoped token — it just can't *enumerate* buckets. Target it by name.
+* `--copy-links` makes the `*-latest.sql.gz` **symlinks** upload as real objects.
+* Verified end to end: the sidecar pushed a marker file to R2, and a dump pulled
+  **back** from R2 was a valid gzip with a real `pg_dump` header.
 
-   ```cron
-   # 03:30 daily, a bit after the sidecar's @daily dump
-   30 3 * * * cd /path/to/supastudio-lite && rclone sync ./backups r2backup:<bucket>/supastudio --copy-links
-   ```
+If you'd rather **not** run the mirror container, the equivalent host-side one-liner
+(register the remote once with `rclone config create r2backup s3 provider=Cloudflare
+... no_check_bucket=true`, then) is:
 
-Verified end to end: sync up, then pull a dump **back** from R2 — valid gzip, real
-`pg_dump` header. It's still snapshots off-host, not PITR — but the disk dying no
-longer means losing the backups.
+```bash
+rclone sync ./backups r2backup:<bucket>/supastudio --copy-links
+```
+
+Either way it's still **snapshots off-host, not PITR** — but a dead disk no longer
+means losing the backups.
 
 ## Migrating off Neon.tech (full walkthrough)
 
