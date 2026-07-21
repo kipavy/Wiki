@@ -109,6 +109,30 @@ services:
       AUTH_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
 
+  # 4) Nightly backup sidecar — scheduled pg_dump with rotation/retention.
+  #    Writes compressed dumps to ./backups. See "Automated backups" below.
+  backup:
+    image: prodrigestivill/postgres-backup-local:17-alpine
+    container_name: supastudio-backup
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backups:/backups
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SCHEDULE: ${BACKUP_SCHEDULE:-@daily}
+      BACKUP_ON_START: "TRUE"
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-7}
+      BACKUP_KEEP_WEEKS: ${BACKUP_KEEP_WEEKS:-4}
+      BACKUP_KEEP_MONTHS: ${BACKUP_KEEP_MONTHS:-6}
+      TZ: ${TZ:-UTC}
+
 volumes:
   db-data:
 ```
@@ -138,6 +162,14 @@ SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJzZX
 
 # ---- Schemas Studio exposes ----
 PGRST_DB_SCHEMAS=public,graphql_public
+
+# ---- Backup sidecar ----
+# SCHEDULE: @daily / @weekly / @monthly, or 6-field cron (with seconds).
+BACKUP_SCHEDULE=@daily
+BACKUP_KEEP_DAYS=7
+BACKUP_KEEP_WEEKS=4
+BACKUP_KEEP_MONTHS=6
+TZ=Europe/Paris
 ```
 
 ## Run
@@ -169,13 +201,51 @@ Connect apps to the DB at `postgresql://postgres:postgres@localhost:5433/postgre
 
 ## Footprint & "scale to zero"
 
-* **Runtime RAM ≈ 395 MB** (postgres ~64 + meta ~84 + studio ~247). Light.
-* **On disk ≈ 2.6 GB** — dominated by the Studio image (~1.6 GB); meta ~526 MB;
-  `postgres:17-alpine` ~415 MB. There is no slim Studio image and no standalone
-  repo to build one from, so ~1.6 GB is the practical floor.
+* **Runtime RAM ≈ 395 MB** (postgres ~64 + meta ~84 + studio ~247; the backup
+  sidecar is ~2 MB, idle between runs). Light.
+* **On disk ≈ 3.0 GB** — dominated by the Studio image (~1.6 GB); meta ~526 MB;
+  backup sidecar ~419 MB; `postgres:17-alpine` ~415 MB. There is no slim Studio
+  image and no standalone repo to build one from, so ~1.6 GB is the practical floor.
 * **No auto-suspend** like Neon's scale-to-zero. The manual equivalent is
   `docker compose stop` (frees all RAM, ~5 s to `start` again). You can stop just
   `studio` + `meta` when idle and keep `postgres` up so apps stay connected.
+
+## Automated backups (the sidecar)
+
+Service `4)` above is [`postgres-backup-local`](https://github.com/prodrigestivill/docker-postgres-backup-local):
+a tiny container that runs `pg_dump` on `SCHEDULE` and keeps a rotated history.
+With `BACKUP_ON_START: "TRUE"` it also dumps once immediately on `up`, so you can
+verify it works without waiting for the schedule.
+
+Files land under `./backups`, already rotated for you:
+
+```
+backups/
+├── last/     postgres-YYYYMMDD-HHMMSS.sql.gz   # every run
+├── daily/    postgres-YYYYMMDD.sql.gz
+├── weekly/   postgres-YYYYww.sql.gz
+└── monthly/  postgres-YYYYMM.sql.gz            # each dir also has *-latest.sql.gz
+```
+
+**Restoring from a backup** (into a scratch DB first, to check it, then for real):
+
+```bash
+zcat backups/last/postgres-latest.sql.gz \
+  | docker exec -i supastudio-db psql -U postgres -d postgres
+```
+
+> Verified: deleting a table from the live DB and then restoring the dump brought
+> it back with its rows intact.
+
+**Two honest limits — don't mistake this for what Neon gave you:**
+
+* **It's local-only.** The dumps sit on the same disk as the database. If that disk
+  dies, they die with it. To actually be safe, copy `./backups` **off-host** —
+  e.g. `rclone` to Cloudflare R2, or a NAS mount. The sidecar makes the snapshot;
+  getting it off the box is still on you.
+* **It's snapshots, not point-in-time recovery.** You can restore to "last night",
+  not "3:47 PM before the bad `DELETE`". Managed providers (Neon, RDS) give PITR +
+  replication + failover; a dump cron does not. Size your expectations accordingly.
 
 ## Migrating off Neon.tech (full walkthrough)
 
