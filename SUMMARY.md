@@ -106,6 +106,7 @@
   * [ZFS Proxmox Config](self-hosting/storage/zfs-proxmox-config.md)
   * [📁 File Sharing](self-hosting/storage/file-sharing.md)
   * [💾 Proxmox Backup](self-hosting/storage/proxmox-backup.md)
+* [Supabase Studio over plain Postgres](self-hosting/supabase-studio-over-plain-postgres.md)
 * [Tips](self-hosting/tips.md)
 
 ## 🎬 PlexMediaServer
