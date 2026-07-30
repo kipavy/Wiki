@@ -56,5 +56,34 @@ assert_eq '' \
   "$(parse_vdev_leaves tank < "$FIX/degraded-faulted.txt" | grep -E '^(tank|mirror-0)\|' || true)" \
   'pool row and mirror row are never emitted as leaves'
 
+echo
+echo "classify_leaf"
+assert_eq dead    "$(classify_leaf FAULTED  6 98 0 '0:0:0:UNKNOWN')" 'FAULTED is dead'
+assert_eq dead    "$(classify_leaf UNAVAIL  0 0  0 '0:0:0:UNKNOWN')" 'UNAVAIL is dead'
+assert_eq dead    "$(classify_leaf REMOVED  0 0  0 '0:0:0:UNKNOWN')" 'REMOVED is dead'
+assert_eq dead    "$(classify_leaf OFFLINE  0 0  0 '0:0:0:UNKNOWN')" 'OFFLINE is dead'
+assert_eq healthy "$(classify_leaf ONLINE   0 0  0 '0:0:0:PASSED')"  'clean ONLINE is healthy'
+assert_eq dying   "$(classify_leaf ONLINE   0 0  4 '0:0:0:PASSED')"  'cksum errors alone mean dying'
+assert_eq dying   "$(classify_leaf ONLINE   2 0  0 '0:0:0:PASSED')"  'read errors alone mean dying'
+assert_eq dying   "$(classify_leaf ONLINE   0 0  0 '118:0:0:PASSED')" 'reallocated sectors mean dying'
+assert_eq dying   "$(classify_leaf ONLINE   0 0  0 '0:3:0:PASSED')"  'pending sectors mean dying'
+assert_eq dying   "$(classify_leaf ONLINE   0 0  0 '0:0:0:FAILED')"  'SMART overall FAILED means dying'
+assert_eq dying   "$(classify_leaf DEGRADED 0 0  0 '0:0:0:PASSED')"  'DEGRADED leaf is dying, not dead'
+
+echo
+echo "smart_signals"
+export FAKE_SMART_MODE=healthy
+assert_eq '0:0:0:PASSED' "$(SMARTCTL="$HERE/fake-bin/smartctl" smart_signals /dev/disk/by-id/fake)" \
+  'healthy disk reports zero counts'
+export FAKE_SMART_MODE=dying
+assert_eq '118:3:2:PASSED' "$(SMARTCTL="$HERE/fake-bin/smartctl" smart_signals /dev/disk/by-id/fake)" \
+  'dying disk reports reallocated/pending/uncorrect counts'
+export FAKE_SMART_MODE=failing
+assert_eq '0:0:0:FAILED' "$(SMARTCTL="$HERE/fake-bin/smartctl" smart_signals /dev/disk/by-id/fake)" \
+  'overall-health FAILED is captured'
+unset FAKE_SMART_MODE
+assert_eq '0:0:0:UNKNOWN' "$(SMARTCTL=/nonexistent/smartctl smart_signals /dev/disk/by-id/fake)" \
+  'missing smartctl degrades to UNKNOWN instead of failing'
+
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [[ $FAIL -eq 0 ]]

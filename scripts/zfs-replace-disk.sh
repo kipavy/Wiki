@@ -53,6 +53,44 @@ parse_vdev_leaves() {
   '
 }
 
+# --- SMART and classification ---------------------------------------------
+
+# smart_signals <device> -> reallocated:pending:uncorrect:health
+# Never fails: a missing smartctl or unreadable disk yields 0:0:0:UNKNOWN.
+smart_signals() {
+  local dev=$1 out realloc=0 pending=0 uncorr=0 health=UNKNOWN
+  if ! out=$("$SMARTCTL" -H -A "$dev" 2>/dev/null) && [[ -z ${out:-} ]]; then
+    printf '0:0:0:UNKNOWN\n'
+    return 0
+  fi
+  case $out in
+    *"self-assessment test result: PASSED"*) health=PASSED ;;
+    *"self-assessment test result: FAILED"*) health=FAILED ;;
+  esac
+  realloc=$(awk '$1 == 5   { print $NF + 0; exit }' <<<"$out")
+  uncorr=$(awk  '$1 == 187 { print $NF + 0; exit }' <<<"$out")
+  pending=$(awk '$1 == 197 { print $NF + 0; exit }' <<<"$out")
+  printf '%s:%s:%s:%s\n' "${realloc:-0}" "${pending:-0}" "${uncorr:-0}" "$health"
+}
+
+# classify_leaf <state> <read> <write> <cksum> <smart_signals> -> dead|dying|healthy
+classify_leaf() {
+  local state=$1 r=$2 w=$3 c=$4 smart=$5
+  case $state in
+    FAULTED | UNAVAIL | REMOVED | OFFLINE)
+      printf 'dead\n'; return 0 ;;
+  esac
+  local realloc pending uncorr health
+  IFS=: read -r realloc pending uncorr health <<<"$smart"
+  if [[ $state == DEGRADED ]] \
+    || (( r > 0 || w > 0 || c > 0 )) \
+    || (( ${realloc:-0} > 0 || ${pending:-0} > 0 || ${uncorr:-0} > 0 )) \
+    || [[ ${health:-UNKNOWN} == FAILED ]]; then
+    printf 'dying\n'; return 0
+  fi
+  printf 'healthy\n'
+}
+
 main() {
   set -euo pipefail
   die "not implemented yet"
