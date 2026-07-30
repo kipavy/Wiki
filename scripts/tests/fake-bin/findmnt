@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Fake findmnt: prints the root device source from $FAKE_ROOT_SRC.
+echo "${FAKE_ROOT_SRC:-/dev/mapper/pve-root}"
+exit 0

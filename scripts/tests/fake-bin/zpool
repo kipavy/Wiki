@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Fake zpool. `status` prints $FAKE_FIXTURE; `list` answers from env.
+case "${1:-}" in
+  status)
+    cat "${FAKE_FIXTURE:?FAKE_FIXTURE not set}"
+    ;;
+  list)
+    case "$*" in
+      *health*) echo "${FAKE_HEALTH:-DEGRADED}" ;;
+      *)        printf '%s\n' ${FAKE_POOLS:-tank} ;;
+    esac
+    ;;
+  *) echo "fake zpool: $*" ;;
+esac
+exit 0

@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
-# Fake lsblk. Prints child partition names when $FAKE_DISK_STATE=partitioned.
+# Fake lsblk, dispatching on the two call shapes the script uses.
+#
+#   -npso NAME,TYPE <dev>  -> resolve to the backing whole disk ("<dev> disk")
+#   -ln -o NAME <dev>      -> list the device plus any child partitions
+#
+# For the whole-disk query we echo the device back as a "disk", which is what
+# real lsblk does when handed a whole disk already.
+args="$*"
+dev=${!#}
+
+case "$args" in
+  *NAME,TYPE*)
+    printf '%s disk\n' "$dev"
+    exit 0
+    ;;
+esac
+
 case "${FAKE_DISK_STATE:-blank}" in
   partitioned) echo "fake"; echo "fake-part1"; echo "fake-part2" ;;
   *)           echo "fake" ;;
