@@ -1,0 +1,14 @@
+  pool: tank
+ state: DEGRADED
+status: One or more devices could not be used because the label is missing or
+	invalid.
+  scan: none requested
+config:
+
+	NAME                        STATE     READ WRITE CKSUM
+	tank                        DEGRADED     0     0     0
+	  mirror-0                  DEGRADED     0     0     0
+	    wwn-0x5000c500c2f8832c  ONLINE       0     0     0
+	    9823741982374198237     UNAVAIL      0     0     0  was /dev/disk/by-id/wwn-0x5000c500c2f8832d
+
+errors: No known data errors

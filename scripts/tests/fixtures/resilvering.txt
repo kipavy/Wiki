@@ -1,0 +1,17 @@
+  pool: tank
+ state: DEGRADED
+status: One or more devices is currently being resilvered.
+  scan: resilver in progress since Thu Jul 30 11:02:03 2026
+	1.31T / 2.72T scanned at 412M/s, 986G / 2.72T issued at 302M/s
+	984G resilvered, 35.42% done, 01:41:12 to go
+config:
+
+	NAME                          STATE     READ WRITE CKSUM
+	tank                          DEGRADED     0     0     0
+	  mirror-0                    DEGRADED     0     0     0
+	    wwn-0x5000c500c2f8832c    ONLINE       0     0     0
+	    replacing-1               DEGRADED     0     0     0
+	      wwn-0x5000c500c2f8832d  FAULTED      0     0     0  too many errors
+	      wwn-0x5000c500c2f8839f  ONLINE       0     0     0  (resilvering)
+
+errors: No known data errors

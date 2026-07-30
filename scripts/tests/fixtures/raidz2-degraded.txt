@@ -1,0 +1,14 @@
+  pool: tank
+ state: DEGRADED
+  scan: none requested
+config:
+
+	NAME                        STATE     READ WRITE CKSUM
+	tank                        DEGRADED     0     0     0
+	  raidz2-0                  DEGRADED     0     0     0
+	    wwn-0x5000c500c2f88301  ONLINE       0     0     0
+	    wwn-0x5000c500c2f88302  ONLINE       0     0     0
+	    wwn-0x5000c500c2f88303  FAULTED      0     0     0  too many errors
+	    wwn-0x5000c500c2f88304  ONLINE       0     0     0
+
+errors: No known data errors
