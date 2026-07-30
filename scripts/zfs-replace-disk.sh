@@ -25,6 +25,64 @@ log()  { printf '%s\n' "$*"; }
 warn() { printf 'WARNING: %s\n' "$*" >&2; }
 die()  { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
 
+# --- prompts ---------------------------------------------------------------
+# All prompts read /dev/tty, never stdin: under `curl … | bash` the pipe IS
+# stdin, so a plain `read` would consume the script's own source text and
+# silently answer its own prompts. On a script that runs `zpool replace`,
+# that is a data-loss bug.
+
+confirm() { # confirm <prompt>  -> 0 only on y/Y; default is No
+  local prompt=$1 reply=
+  if [[ ! -r /dev/tty ]]; then
+    warn "no tty available; refusing to assume consent for: $prompt"
+    return 1
+  fi
+  printf '%s [y/N] ' "$prompt" > /dev/tty
+  IFS= read -r reply < /dev/tty || return 1
+  [[ $reply == y || $reply == Y ]]
+}
+
+confirm_word() { # confirm_word <word> <prompt>  -> 0 only on exact match
+  local word=$1 prompt=$2 reply=
+  if [[ ! -r /dev/tty ]]; then
+    warn "no tty available; refusing to assume consent for: $prompt"
+    return 1
+  fi
+  printf '%s (type %s to confirm) ' "$prompt" "$word" > /dev/tty
+  IFS= read -r reply < /dev/tty || return 1
+  [[ $reply == "$word" ]]
+}
+
+run_cmd() { # run_cmd <cmd> [args…] — print, confirm, execute
+  printf '> %s\n' "$*"
+  if [[ $DRY_RUN == 1 ]]; then
+    return 0
+  fi
+  confirm "  run it?" || { log "  skipped."; return 1; }
+  "$@"
+}
+
+# --- guards ----------------------------------------------------------------
+
+require_root() {
+  if [[ $DRY_RUN == 1 ]]; then return 0; fi
+  [[ ${EUID:-$(id -u)} -eq 0 ]] || die "must run as root (ZFS commands need it). Try: sudo $0"
+}
+
+check_pool_actionable() { # <pool> <health>
+  local pool=$1 health=$2
+  case $health in
+    DEGRADED | FAULTED) return 0 ;;
+  esac
+  if [[ $FORCE == 1 ]]; then
+    warn "pool '$pool' is $health, continuing because --force was given."
+    return 0
+  fi
+  warn "pool '$pool' is $health — nothing appears to need replacing."
+  warn "Re-run with --force if you intend to replace a disk anyway."
+  return 1
+}
+
 # --- zpool status parsing -------------------------------------------------
 
 # parse_vdev_leaves <pool> < zpool-status-text

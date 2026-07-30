@@ -85,5 +85,67 @@ unset FAKE_SMART_MODE
 assert_eq '0:0:0:UNKNOWN' "$(SMARTCTL=/nonexistent/smartctl smart_signals /dev/disk/by-id/fake)" \
   'missing smartctl degrades to UNKNOWN instead of failing'
 
+echo
+echo "confirm (reads /dev/tty, not stdin)"
+# `script` gives the function a real tty whose input we control.
+tty_answer() { # answer function-call...
+  local answer=$1; shift
+  script -qec "cd '$HERE'; source '$SCRIPT'; $* && echo RC=0 || echo RC=1" /dev/null \
+    <<<"$answer" 2>/dev/null | tr -d '\r' | grep -o 'RC=[01]' | tail -1
+}
+assert_eq 'RC=0' "$(tty_answer y  'confirm "proceed?"')"  'y accepts'
+assert_eq 'RC=0' "$(tty_answer Y  'confirm "proceed?"')"  'Y accepts'
+assert_eq 'RC=1' "$(tty_answer '' 'confirm "proceed?"')"  'bare Enter declines (N is default)'
+assert_eq 'RC=1' "$(tty_answer n  'confirm "proceed?"')"  'n declines'
+assert_eq 'RC=1' "$(tty_answer yes 'confirm "proceed?"')" 'yes is not y — declines'
+
+echo
+echo "confirm does not read stdin (the curl|bash bug)"
+# Model `curl … | bash` exactly: the inner process's STDIN is a pipe full of
+# "y" (as if fed the script's own source text), while /dev/tty is a real pty
+# with no pending input (as if the operator is sitting there, silent).
+# A correct confirm() reads the tty and gets nothing -> RC=1.
+# A naive confirm() reads stdin, eats a "y", and self-approves -> RC=0.
+stdin_pipe_probe() { # stdin_pipe_probe <file-to-source>
+  script -qec "printf 'y\ny\ny\n' | bash -c \"source '$1'; confirm 'proceed?' && echo RC=0 || echo RC=1\"" \
+    /dev/null </dev/null 2>/dev/null | tr -d '\r' | grep -o 'RC=[01]' | tail -1
+}
+assert_eq 'RC=1' "$(stdin_pipe_probe "$SCRIPT")" \
+  'stdin full of y cannot answer a /dev/tty prompt'
+
+# Guard the guard: a deliberately naive confirm() MUST fail the check above,
+# otherwise the test proves nothing.
+MUTANT=$(mktemp)
+cat > "$MUTANT" <<'MUT'
+confirm() { local reply=; printf '%s [y/N] ' "$1"; IFS= read -r reply; [[ $reply == y || $reply == Y ]]; }
+MUT
+assert_eq 'RC=0' "$(stdin_pipe_probe "$MUTANT")" \
+  'mutation check: a stdin-reading confirm() does self-approve (test has teeth)'
+rm -f "$MUTANT"
+
+echo
+echo "confirm_word"
+assert_eq 'RC=0' "$(tty_answer WIPE  'confirm_word WIPE "type WIPE"')" 'exact word accepts'
+assert_eq 'RC=1' "$(tty_answer wipe  'confirm_word WIPE "type WIPE"')" 'wrong case declines'
+assert_eq 'RC=1' "$(tty_answer y     'confirm_word WIPE "type WIPE"')" 'y does not satisfy confirm_word'
+
+echo
+echo "run_cmd dry-run"
+assert_eq '> touch /tmp/zfs-test-should-not-exist' \
+  "$(rm -f /tmp/zfs-test-should-not-exist; DRY_RUN=1 run_cmd touch /tmp/zfs-test-should-not-exist)" \
+  'dry-run prints the command'
+assert_eq 'absent' \
+  "$([[ -e /tmp/zfs-test-should-not-exist ]] && echo present || echo absent)" \
+  'dry-run executes nothing'
+
+echo
+echo "check_pool_actionable"
+assert_eq 'RC=0' "$(FORCE=0 check_pool_actionable tank DEGRADED >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
+  'DEGRADED pool is actionable'
+assert_eq 'RC=1' "$(FORCE=0 check_pool_actionable tank ONLINE >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
+  'healthy pool is refused without --force'
+assert_eq 'RC=0' "$(FORCE=1 check_pool_actionable tank ONLINE >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
+  'healthy pool allowed with FORCE=1'
+
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [[ $FAIL -eq 0 ]]
