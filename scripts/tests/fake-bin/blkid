@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Fake blkid. Exits 0 with output only when the disk carries a signature.
+case "${FAKE_DISK_STATE:-blank}" in
+  partitioned) echo 'PTTYPE="gpt"'; exit 0 ;;
+  filesystem)  echo 'TYPE="ext4"';  exit 0 ;;
+esac
+exit 2

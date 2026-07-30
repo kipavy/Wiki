@@ -149,6 +149,72 @@ classify_leaf() {
   printf 'healthy\n'
 }
 
+# --- disk facts ------------------------------------------------------------
+
+disk_serial() { # <device> -> serial or "unknown"
+  local dev=$1 out serial
+  out=$("$SMARTCTL" -i "$dev" 2>/dev/null) || { printf 'unknown\n'; return 0; }
+  serial=$(awk -F: '/Serial [Nn]umber/ { gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit }' <<<"$out")
+  printf '%s\n' "${serial:-unknown}"
+}
+
+disk_size() { # <device> -> bytes, or 0
+  local dev=$1 bytes
+  bytes=$("$BLOCKDEV" --getsize64 "$dev" 2>/dev/null) || { printf '0\n'; return 0; }
+  printf '%s\n' "${bytes:-0}"
+}
+
+human_size() { # <bytes> -> e.g. 2.7T
+  awk -v b="$1" 'BEGIN {
+    split("B K M G T P", u, " ")
+    i = 1
+    while (b >= 1024 && i < 6) { b /= 1024; i++ }
+    if (i <= 2) printf "%d%s\n", b, u[i]
+    else if (b == int(b)) printf "%d%s\n", b, u[i]
+    else printf "%.1f%s\n", b, u[i]
+  }'
+}
+
+# disk_has_data <device> -> 0 if it carries a partition table, filesystem,
+# or a ZFS label; 1 if it looks blank.
+disk_has_data() {
+  local dev=$1
+  if "$BLKID" "$dev" >/dev/null 2>&1; then
+    return 0
+  fi
+  if [[ $("$LSBLK" -ln -o NAME "$dev" 2>/dev/null | wc -l) -gt 1 ]]; then
+    return 0
+  fi
+  if "$ZDB" -l "$dev" 2>/dev/null | grep -q "^ *name:"; then
+    return 0
+  fi
+  return 1
+}
+
+# validate_replacement <new_dev> <reference_bytes> -> 0 if safe to use
+validate_replacement() {
+  local new=$1 ref=$2 new_bytes
+  new_bytes=$(disk_size "$new")
+  if (( new_bytes == 0 )); then
+    warn "cannot read the size of $new — is it connected?"
+    return 1
+  fi
+  if (( new_bytes < ref )); then
+    warn "$new is $(human_size "$new_bytes"), smaller than the $(human_size "$ref") it must replace."
+    warn "ZFS will refuse this. Use a disk of equal or greater size."
+    return 1
+  fi
+  if disk_has_data "$new"; then
+    warn "$new is not blank — it has a partition table, filesystem, or an old ZFS label."
+    warn "Replacing into it destroys whatever is on it."
+    confirm_word WIPE "  Overwrite $new ($(human_size "$new_bytes"))?" || {
+      log "  aborted."
+      return 1
+    }
+  fi
+  return 0
+}
+
 main() {
   set -euo pipefail
   die "not implemented yet"

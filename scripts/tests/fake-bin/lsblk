@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Fake lsblk. Prints child partition names when $FAKE_DISK_STATE=partitioned.
+case "${FAKE_DISK_STATE:-blank}" in
+  partitioned) echo "fake"; echo "fake-part1"; echo "fake-part2" ;;
+  *)           echo "fake" ;;
+esac
+exit 0

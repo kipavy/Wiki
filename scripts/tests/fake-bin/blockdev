@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Fake blockdev. --getsize64 prints $FAKE_SIZE.
+[[ ${1:-} == --getsize64 ]] && { echo "${FAKE_SIZE:-0}"; exit 0; }
+exit 1

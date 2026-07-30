@@ -147,5 +147,62 @@ assert_eq 'RC=1' "$(FORCE=0 check_pool_actionable tank ONLINE >/dev/null 2>&1 &&
 assert_eq 'RC=0' "$(FORCE=1 check_pool_actionable tank ONLINE >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
   'healthy pool allowed with FORCE=1'
 
+echo
+echo "disk facts"
+FB="$HERE/fake-bin"
+assert_eq 'ZAD1234' \
+  "$(SMARTCTL="$FB/smartctl" FAKE_SERIAL=ZAD1234 disk_serial /dev/disk/by-id/fake)" \
+  'serial comes from smartctl -i'
+assert_eq 'unknown' \
+  "$(SMARTCTL=/nonexistent/smartctl disk_serial /dev/disk/by-id/fake)" \
+  'serial degrades to unknown'
+assert_eq '3000592982016' \
+  "$(BLOCKDEV="$FB/blockdev" FAKE_SIZE=3000592982016 disk_size /dev/disk/by-id/fake)" \
+  'size in bytes from blockdev'
+assert_eq '0' \
+  "$(BLOCKDEV=/nonexistent/blockdev disk_size /dev/disk/by-id/fake)" \
+  'unreadable size is 0'
+assert_eq '2.7T' "$(human_size 3000592982016)" 'human_size formats terabytes'
+assert_eq '512G' "$(human_size 549755813888)"  'human_size formats gigabytes'
+
+echo
+echo "disk_has_data"
+assert_eq 'RC=0' "$(FAKE_DISK_STATE=partitioned BLKID="$FB/blkid" LSBLK="$FB/lsblk" ZDB="$FB/zdb" \
+  disk_has_data /dev/disk/by-id/fake >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
+  'partitioned disk has data'
+assert_eq 'RC=0' "$(FAKE_DISK_STATE=zfs_label BLKID="$FB/blkid" LSBLK="$FB/lsblk" ZDB="$FB/zdb" \
+  disk_has_data /dev/disk/by-id/fake >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
+  'old ZFS label counts as data'
+assert_eq 'RC=1' "$(FAKE_DISK_STATE=blank BLKID="$FB/blkid" LSBLK="$FB/lsblk" ZDB="$FB/zdb" \
+  disk_has_data /dev/disk/by-id/fake >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
+  'blank disk has no data'
+
+echo
+echo "validate_replacement"
+assert_eq 'RC=1' "$(FAKE_DISK_STATE=blank FAKE_SIZE=1000000000000 \
+  BLOCKDEV="$FB/blockdev" BLKID="$FB/blkid" LSBLK="$FB/lsblk" ZDB="$FB/zdb" \
+  validate_replacement /dev/disk/by-id/fake 3000592982016 >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
+  'smaller replacement is rejected'
+assert_eq 'RC=0' "$(FAKE_DISK_STATE=blank FAKE_SIZE=3000592982016 \
+  BLOCKDEV="$FB/blockdev" BLKID="$FB/blkid" LSBLK="$FB/lsblk" ZDB="$FB/zdb" \
+  validate_replacement /dev/disk/by-id/fake 3000592982016 >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
+  'same-size blank replacement is accepted'
+assert_eq 'RC=0' "$(FAKE_DISK_STATE=blank FAKE_SIZE=4000787030016 \
+  BLOCKDEV="$FB/blockdev" BLKID="$FB/blkid" LSBLK="$FB/lsblk" ZDB="$FB/zdb" \
+  validate_replacement /dev/disk/by-id/fake 3000592982016 >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
+  'larger blank replacement is accepted'
+assert_eq 'RC=1' "$(BLOCKDEV=/nonexistent/blockdev BLKID="$FB/blkid" LSBLK="$FB/lsblk" ZDB="$FB/zdb" \
+  validate_replacement /dev/disk/by-id/fake 3000592982016 >/dev/null 2>&1 && echo RC=0 || echo RC=1)" \
+  'unreadable replacement size is rejected'
+# A disk with data needs the literal word WIPE, not a y/N.
+assert_eq 'RC=1' "$(tty_answer y "FAKE_DISK_STATE=partitioned FAKE_SIZE=3000592982016 \
+  BLOCKDEV='$FB/blockdev' BLKID='$FB/blkid' LSBLK='$FB/lsblk' ZDB='$FB/zdb' \
+  validate_replacement /dev/disk/by-id/fake 3000592982016 >/dev/null 2>&1")" \
+  'disk with data: y is not enough'
+assert_eq 'RC=0' "$(tty_answer WIPE "FAKE_DISK_STATE=partitioned FAKE_SIZE=3000592982016 \
+  BLOCKDEV='$FB/blockdev' BLKID='$FB/blkid' LSBLK='$FB/lsblk' ZDB='$FB/zdb' \
+  validate_replacement /dev/disk/by-id/fake 3000592982016 >/dev/null 2>&1")" \
+  'disk with data: WIPE proceeds'
+
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [[ $FAIL -eq 0 ]]

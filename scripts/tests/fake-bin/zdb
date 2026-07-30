@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Fake zdb -l. Reports a ZFS label only when $FAKE_DISK_STATE=zfs_label.
+if [[ ${FAKE_DISK_STATE:-blank} == zfs_label ]]; then
+  echo "------------------------------------"
+  echo "LABEL 0"
+  echo "------------------------------------"
+  echo "    version: 5000"
+  echo "    name: 'oldtank'"
+  exit 0
+fi
+echo "failed to unpack label 0"
+exit 1
