@@ -28,6 +28,22 @@ For reference:
 
 ***
 
+{% hint style="danger" %}
+**The collector binary must match the Web image tag.** The Dokploy template above runs `ghcr.io/analogj/scrutiny:master-web`, but the script below downloads the **stable** `latest` collector. With a `master` web that binary is silently rejected — the collector logs `Device sda has no scrutiny UUID; skipping collection` and **no disk ever shows up**. If you use the `master`/`master-web` web, grab the matching `master` collector binary instead. There's no `master` binary on the releases page, so extract it from the collector image (run this in an LXC that has Docker, then copy it to the host):
+
+{% code overflow="wrap" %}
+```bash
+# inside a Docker LXC (e.g. your docker CT):
+docker create --name tmp-scm ghcr.io/analogj/scrutiny:master-collector
+docker cp tmp-scm:/opt/scrutiny/bin/scrutiny-collector-metrics /root/scm
+docker container rm tmp-scm
+# then, on the PVE host:
+pct pull <docker-ct-id> /root/scm /opt/scrutiny/bin/scrutiny-collector-metrics-linux-amd64
+chmod +x /opt/scrutiny/bin/scrutiny-collector-metrics-linux-amd64
+```
+{% endcode %}
+{% endhint %}
+
 You can just change API\_ENDPOINT in the script to match your Scrutiny Web IP + Port and paste the script in proxmox shell.
 
 ```bash
@@ -85,6 +101,24 @@ systemctl status scrutiny.timer
 ```
 
 You'll now have access to Scrutiny Dashboard on [http://192.168.1.xx:8080](http://192.168.1.xx:8080/)
+
+### After a host reinstall (restore)
+
+{% hint style="warning" %}
+Web + InfluxDB live **in the LXC**, so they come back with your PBS restore — but the **collector lives on the PVE host** and is wiped when you reinstall PVE. Until you re-set it up, Scrutiny keeps showing the **old disks** (historical InfluxDB data) and **never shows the new ones** (nothing is collecting). That's the symptom, not a data-association bug.
+{% endhint %}
+
+1. Re-install the collector on the host — **matching the Web tag** (see the version warning above; for the `master` template, extract the `master` binary).
+2. Run it once to confirm: `/opt/scrutiny/bin/scrutiny-collector-metrics-linux-amd64 run --api-endpoint "$API_ENDPOINT"`. New disks appear immediately.
+3. **Remove ghost disks** (drives you've physically pulled — they never disappear on their own). Either the trash icon in the Web UI, or via the API with the device's WWN (get it from `…/api/summary`):
+
+```bash
+curl -X DELETE http://192.168.1.xx:8087/api/device/0x50XXXXXXXXXXXXXX
+```
+
+{% hint style="info" %}
+Put the collector cron/timer in a host-backed-up location if you can. A systemd unit under `/etc/systemd/system` (like the script above) **is** captured by the `/etc` backup — but the **binary** in `/opt/scrutiny` is not, so you'll still re-fetch it after a bare-metal restore.
+{% endhint %}
 
 ### Configuring Alerting
 
