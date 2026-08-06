@@ -102,6 +102,7 @@
   * [Reverse Proxy](self-hosting/remote-access/reverse-proxy.md)
   * [Forward Port on Oracle Free Tier](self-hosting/remote-access/forward-port-on-oracle-free-tier.md)
 * [Storage](self-hosting/storage/README.md)
+  * [⚙️ Proxmox Post-Install](self-hosting/storage/proxmox-post-install.md)
   * [HDD Monitoring Proxmox](self-hosting/storage/hdd-monitoring-proxmox.md)
   * [ZFS Proxmox Config](self-hosting/storage/zfs-proxmox-config.md)
   * [📁 File Sharing](self-hosting/storage/file-sharing.md)

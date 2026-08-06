@@ -130,22 +130,65 @@ useful link if your PBS is on another server:
 
 ### Automatic (recommended)
 
-replace **--repository** and **PBS\_PASSWORD** according to your PBS config and <mark style="color:$primary;">**execute this once manually just to accept the fingerpint.**</mark>
+{% hint style="danger" %}
+`/etc/pve` is a **FUSE mount** (pmxcfs). `proxmox-backup-client` does **not** descend into it, so a plain `root.pxar:/etc` backup **silently misses your entire cluster config** — `storage.cfg`, `user.cfg`, `jobs.cfg`, all guest configs (`nodes/*/lxc`, `qemu-server`), and `priv/`. During a bare-metal restore that's exactly what you need. **Always back up `/etc/pve` as a second archive** (you'll see `skipping mount point: "pve"` on the first one — that's expected).
+{% endhint %}
+
+First, create a dedicated **API token** on PBS so you don't store a root password. On the PBS LXC shell:
 
 ```shellscript
-PBS_PASSWORD='root_password' /usr/bin/proxmox-backup-client backup \
-    root.pxar:/etc \
-    --repository root@pam@192.168.1.105:backup \
-    --backup-id $(hostname)
+proxmox-backup-manager user generate-token proxmox@pbs host-backup
+proxmox-backup-manager acl update /datastore/backup DatastoreAdmin --auth-id 'proxmox@pbs!host-backup'
 ```
 
-Then, add it to pve crontab, open pve shell > `crontab -e:`
+On PVE, store the token secret (root-only) and create the backup script `/usr/local/bin/pve-etc-backup.sh`:
+
+```shellscript
+echo '<token-secret>' > /root/.pbs-host-token && chmod 600 /root/.pbs-host-token
+```
 
 {% code overflow="wrap" %}
 ```shellscript
-00 21 * * * PBS_PASSWORD='root_password' /usr/bin/proxmox-backup-client backup root.pxar:/etc --repository root@pam@192.168.1.105:backup --backup-id $(hostname) >/dev/null 2>&1
+#!/bin/bash
+set -uo pipefail
+PBS_CT=105                                    # your PBS LXC id
+export PBS_PASSWORD="$(cat /root/.pbs-host-token)"
+export PBS_FINGERPRINT='<pbs-fingerprint>'    # proxmox-backup-manager cert info | grep -i fingerprint
+REPO='proxmox@pbs!host-backup@192.168.1.105:backup'
+
+# make sure the PBS LXC is up (needed if you use the auto-shutdown trick above)
+if [ "$(pct status $PBS_CT 2>/dev/null)" != "status: running" ]; then
+    pct start $PBS_CT || true
+    for i in $(seq 1 30); do
+        pct exec $PBS_CT -- systemctl is-active proxmox-backup-proxy 2>/dev/null | grep -q '^active' && break
+        sleep 2
+    done
+fi
+
+exec /usr/bin/proxmox-backup-client backup \
+    etc.pxar:/etc \
+    pve.pxar:/etc/pve \
+    --backup-id "$(hostname)" \
+    --repository "$REPO"
 ```
 {% endcode %}
+
+```shellscript
+chmod 700 /usr/local/bin/pve-etc-backup.sh
+/usr/local/bin/pve-etc-backup.sh   # run once to test + accept fingerprint
+```
+
+Then add it to the PVE crontab (`crontab -e`), a couple of minutes **before** your guest backup job so PBS is already running:
+
+{% code overflow="wrap" %}
+```shellscript
+58 20 * * * /usr/local/bin/pve-etc-backup.sh >> /var/log/pve-etc-backup.log 2>&1
+```
+{% endcode %}
+
+{% hint style="info" %}
+The backup group is owned by whoever first created it. If you get `backup owner check failed`, the group belongs to a different user/token — either keep using that same identity, or `proxmox-backup-client snapshot forget` the old group and let the token recreate it.
+{% endhint %}
 
 ### Manual
 
@@ -172,31 +215,86 @@ Video tutorial:
 ## Restore method
 
 {% hint style="info" %}
-Since we used PBS on the same server we still need to set up PBS again, which is the only downside I see to this approach. Though this is pretty easy and quick.
+Typical trigger: the **system SSD dies** (I/O errors everywhere, `ls`/`df` return `Input/output error`, `/proc/mounts` shows the root ext4 as `emergency_ro`). Your guests and data live on the **ZFS pool**, which is a separate device — it's safe. You're only rebuilding the OS disk.
 {% endhint %}
 
-1. Re-install PVE from ISO
-2. Import existing ZFS pool
+{% hint style="info" %}
+Because PBS runs on the **same** server, you have a chicken-and-egg problem: you can't restore anything until a PBS is serving the datastore. The fix: run a **temporary PBS on the host** to serve the existing datastore, restore everything (including the PBS LXC itself), then remove the temporary PBS.
+{% endhint %}
+
+{% hint style="danger" %}
+The old `pct restore … index.json.fidx --storage local-lvm` trick **no longer works** on PVE 9 / PBS 4. That index format is gone and `pct restore` treats the path as a vzdump archive (`This does not look like a tar archive`). Use the method below.
+{% endhint %}
+
+### 1. Reinstall PVE
+
+Reinstall PVE from ISO onto the (new) system disk. **At the "Target Harddisk" step, select ONLY the system disk** — never a ZFS layout that spans your data-pool disks, or you'll wipe them. Safest: physically unplug the pool disks during install. Then switch to no-subscription repos → [proxmox-post-install.md](proxmox-post-install.md "mention").
+
+### 2. Import your ZFS pool
+
+Reconnect the pool disks (powered off), boot, then:
 
 ```shellscript
-zpool import -f pool_name
+zpool import -f tank
 ```
 
-3.
+### 3. Run a temporary PBS on the host
+
+The datastore already exists on `tank`; we only need a PBS process to serve it.
+
+{% code overflow="wrap" %}
+```shellscript
+echo 'deb [signed-by=/usr/share/keyrings/proxmox-archive-keyring.gpg] http://download.proxmox.com/debian/pbs trixie pbs-no-subscription' > /etc/apt/sources.list.d/pbs.list
+apt update && apt install -y proxmox-backup-server
+
+chown backup:backup /tank/backup                                        # datastore root must be owned by the 'backup' user
+proxmox-backup-manager datastore create backup /tank/backup --reuse-datastore true   # ADOPT it, don't recreate
+```
+{% endcode %}
+
+### 4. Add it as PVE storage and restore the guests
+
+```shellscript
+FP=$(proxmox-backup-manager cert info | grep -i fingerprint | grep -oiE '([0-9a-f]{2}:){31}[0-9a-f]{2}')
+pvesm add pbs pbs-local --datastore backup --server 127.0.0.1 \
+    --username root@pam --password '<your-root-pw>' --fingerprint "$FP" --content backup
+
+pvesm list pbs-local                                   # find the snapshot dates
+pct restore 105 pbs-local:backup/ct/105/<DATE> --storage local-lvm
+# repeat for every CT/VM (use qmrestore for VMs)
+```
 
 {% hint style="warning" %}
-Make sure to not use same ID for this temporary PBS LXC otherwise I guess it'll restore itself during backup and crash, don't try this
+If your new system disk is **smaller** than the old one, `local-lvm` may be too small for big guests — restore those onto the ZFS pool instead: `pct restore 104 pbs-local:backup/ct/104/<DATE> --storage tank`. Data on **bind-mounts** (e.g. `/tank/immich`) is _not_ in the backups; it stays on the pool and is just re-linked when the guest starts.
 {% endhint %}
 
-You can restore PBS like this:
+### 5. Hand over to the real PBS LXC, remove the temporary one
+
+{% hint style="danger" %}
+Two PBS must **never** serve the same datastore at once. Stop the host PBS **before** starting the PBS LXC.
+{% endhint %}
 
 ```shellscript
-pct restore 999 /your_zfs_pool/datastore/ct/ID-LXC/DATE/index.json.fidx --storage local-lvm
+systemctl disable --now proxmox-backup-proxy proxmox-backup
+pvesm remove pbs-local
+apt purge -y proxmox-backup-server && apt autoremove --purge -y
+pct start 105        # the restored PBS LXC takes over
 ```
 
-or you can recreate it and its Datastore manually [#setting-up-pbs](proxmox-backup.md#setting-up-pbs "mention")
+Re-add PBS as PVE storage, this time pointing at the LXC (`192.168.1.105`) with an API token — see [#lxcs-vms-backup](proxmox-backup.md#lxcs-vms-backup "mention"). The original `proxmox@pbs` password lived in `/etc/pve/priv` (lost), so just generate a fresh token in the LXC.
 
-4. Restore PBS Backup from PBS GUI
+### 6. Restore /etc
+
+With PBS back, restore the host config to a **staging dir** and cherry-pick — never blindly overwrite a running `/etc/pve`:
+
+{% code overflow="wrap" %}
+```shellscript
+proxmox-backup-client restore host/pve/<DATE> pve.pxar /root/pve-old --repository 'proxmox@pbs!host-backup@192.168.1.105:backup'
+proxmox-backup-client restore host/pve/<DATE> etc.pxar /root/etc-old --repository 'proxmox@pbs!host-backup@192.168.1.105:backup'
+```
+{% endcode %}
+
+Guest configs come back automatically with the guest restores in step 4, so from `/etc` you usually only need bits like `user.cfg`, firewall rules, or custom files under `/etc` proper.
 
 
 
