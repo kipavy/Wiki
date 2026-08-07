@@ -16,6 +16,7 @@ New here? Read the pages in order: install below, then **Using It Well** for the
 * [Using It Well](using-it-well.md) — the workflow habits that actually matter: plan first, keep tasks small, `/clear` often, let it verify itself.
 * [CLAUDE.md](claude-md.md) — the project memory file Claude reads on every session. The single highest-leverage thing to set up.
 * [Configuration](configuration.md) — `settings.json`, permissions, hooks, MCP servers, statusline, model choice.
+* [Community MCP Servers on Windows](mcp-community-servers-windows.md) — gotchas wiring up unofficial MCP servers, worked through with a Leboncoin + Vinted example.
 * [Plugins Worth It](plugins.md) — the plugin/marketplace system, plus a curated list of plugins I actually keep installed.
 * [Other Agents](../ai-agents/other-agents.md) — Claude Code isn't the only game in town. The worthwhile alternatives, including ones with free models.
 

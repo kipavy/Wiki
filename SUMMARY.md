@@ -53,6 +53,7 @@
   * [Using It Well](claude-code/using-it-well.md)
   * [CLAUDE.md](claude-code/claude-md.md)
   * [Configuration](claude-code/configuration.md)
+  * [Community MCP Servers on Windows](claude-code/mcp-community-servers-windows.md)
   * [Plugins Worth It](claude-code/plugins.md)
 * [Other Agents](ai-agents/other-agents.md)
 * [MCP Servers Worth It](ai-agents/mcp-servers.md)

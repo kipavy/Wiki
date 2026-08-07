@@ -30,6 +30,10 @@ Three things to know:
 * **Scope.** By default a server is added to the **current project only**. Add `--scope user` to make it available in **every** project — good for general tools like Context7.
 * **Restart & check.** New servers load on the next session; run `/mcp` to confirm it connected and see the tools it exposes. If a server needs a key, that's where a failed connection usually shows up.
 
+{% hint style="info" %}
+Wiring up an **unofficial/community** server (not one of the polished ones below) instead of an official one? See [**Community MCP Servers on Windows**](../claude-code/mcp-community-servers-windows.md) for gotchas around `npx -p`, Windows `.cmd` shims, and scope-by-cwd.
+{% endhint %}
+
 ---
 
 ### Context7
