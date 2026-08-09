@@ -85,10 +85,18 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-ser
    or brainstorm some if the user wants ideas. A city name has no natural set of
    discrete choices, so ask it as a plain question in your reply rather than via a
    tool that requires 2+ concrete options (e.g. AskUserQuestion rejects a
-   single-option/free-text-only question). Unless the user says otherwise, assume
-   the default objective from the Overview (high yield + fastest/easiest resale +
-   least storage/handling hassle) and say so explicitly, so they can correct it if
-   they'd rather optimize for raw margin alone.
+   single-option/free-text-only question). **Also ask whether shipped/delivered
+   listings are acceptable, not just local pickup** — this changes both the search
+   scope and the math: accepting delivery opens up Vinted nationally and Leboncoin
+   listings outside the pickup radius, but every shipped purchase carries buyer-side
+   platform fees + real shipping cost that must be netted from the margin (see step 5
+   for the fee formulas) — a deal that looks great on the listed price can shrink
+   substantially once landed cost is computed. Local in-person pickup, by contrast,
+   costs next to nothing in fees. If the user hasn't said, default to pickup-only and
+   say so explicitly. Unless the user says otherwise, assume the default objective
+   from the Overview (high yield + fastest/easiest resale + least storage/handling
+   hassle) and say so explicitly, so they can correct it if they'd rather optimize
+   for raw margin alone.
 
 2. **Brainstorm categories** when the user wants ideas rather than naming items.
    Favor categories with a documented resale market (you can name a ballpark price),
@@ -147,6 +155,25 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-ser
      a sharp divergence means outliers are dragging one of them, so manually skim a sample
      of titles and exclude non-full-item listings before trusting the number. Without both
      anchors a subagent's "good deal" verdict is a guess, not an analysis.
+   - **Net out platform fees on any shipped transaction** — the listed price is not the
+     landed cost. Confirmed rates (verify live, these change): Vinted charges the
+     *buyer* a Buyer Protection fee of **0,70€ + 5% of the item price**, added on top
+     of the item price and shipping; Leboncoin charges the *buyer* a Transaction
+     sécurisée fee of **0,70€ + 5% when shipped**, or a flat **0,99€ when picked up
+     in person** (remise en main propre). Both platforms charge private sellers €0
+     commission on a standard sale (Vinted only starts charging the *seller* if the
+     account gets reclassified "Vinted Pro" past a volume threshold — worth a
+     one-line caveat if the user plans high-volume flipping, not for occasional
+     deals). Real shipping cost on top: roughly €3-7 for a small/light Vinted parcel,
+     €10-15 for a standard Leboncoin colis. So: **when you (the buyer) acquire a
+     shipped item**, landed cost = listed price + (0,70€ + 5%×price) + shipping —
+     confirmed in testing, a €100 item landed at ~€111 once both were added, and a
+     fixed €0,70 fee bites much harder proportionally on cheap items. **When you
+     (the seller) resell**, you keep the full listed price — the buyer absorbs the
+     fee on that side, so only the acquisition side needs the correction. In-person
+     pickup transactions (either side) carry no meaningful fee (€0-0,99) — this is
+     another reason to prefer local Leboncoin listings over shipped ones when the
+     margin is thin.
    - Flag category-specific risk factors (undisclosed battery health on e-bikes/power
      tools is the single biggest hidden cost — a suspiciously cheap battery-powered item
      is usually a dead-battery trap, not a bargain; missing box/case on collectibles
@@ -250,6 +277,12 @@ and the recommended priority order given the yield/speed/storage trade-off.
   publish date — confirmed in testing: a "cheap" Steam Deck and a "cheap" Switch Lite
   were listings from 2021-2023, almost certainly long sold. An old stale listing at a low
   price isn't a bargain, it's noise; check freshness before ranking on price.
+- Computing margin from the listed price alone on a shipped purchase, ignoring buyer-side
+  platform fees — confirmed in testing: a €100 Vinted item landed at ~€111 once the
+  0,70€+5% Buyer Protection fee and real shipping were added, shrinking the margin by
+  ~10%. Not asking upfront whether the user accepts delivery at all compounds this: it
+  either wastes search budget on shipped listings they won't use, or silently overstates
+  every margin that should have had fees netted out.
 
 ## Quick Reference — Tools
 
