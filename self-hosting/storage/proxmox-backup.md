@@ -60,6 +60,24 @@ Starts PBS 1m before scheduled backup job:
 Here I schedule the start at 20h59 because my backup jobs (see: [#proxmox-host-backup](proxmox-backup.md#proxmox-host-backup "mention") and [#lxcs-vms-backup](proxmox-backup.md#lxcs-vms-backup "mention")) are scheduled on 21h00.
 {% endhint %}
 
+{% hint style="danger" %}
+**If you'd rather use a vzdump job's "Hook Script" field** (Datacenter > Backup > job > Advanced) instead of a fixed-time cron, don't guess the phase name. Per-guest hookscripts (`pct`/`qm set -hookscript`) use `pre-start`/`post-start`/`pre-stop`/`post-stop`, so `pre-backup` *looks* like the right phase for a backup job hook — **it doesn't exist for job-level hookscripts and will silently never fire.** The real phases (see `PVE::VZDump::run_hook_script` in `/usr/share/perl5/PVE/VZDump.pm`) are `job-init`, `job-start`, `job-end`, `job-abort`, `backup-start`, `backup-end`, `backup-abort`, `log-end`, `pre-stop`, `post-stop`, `pre-restart`, `post-restart`. Storage activation happens right after `job-init`, so **`job-init` is the only phase that reliably starts PBS in time**:
+
+```shellscript
+#!/bin/bash
+if [ "$1" == "job-init" ]; then
+    /usr/sbin/pct start 105 2>/dev/null || true
+    for i in $(seq 1 30); do
+        pct exec 105 -- systemctl is-active proxmox-backup-proxy 2>/dev/null | grep -q '^active' && break
+        sleep 2
+    done
+fi
+exit 0
+```
+
+Register it on the job: `/etc/pve/jobs.cfg` → add `script /path/to/this-script.sh` under the `vzdump:` block (or set it from the job's Advanced tab in the UI). A hook script silently doing nothing produces no error of its own — the failure only shows up later as `could not activate storage 'pbs-backup': ... No route to host`, which is easy to misread as a networking problem.
+{% endhint %}
+
 #### On PBS LXC:
 
 Copy, paste this script in PBS LXC Shell, it will create a systemd service that will automatically shutdown 5m after the last backup/prune jobs:
@@ -151,6 +169,7 @@ echo '<token-secret>' > /root/.pbs-host-token && chmod 600 /root/.pbs-host-token
 ```shellscript
 #!/bin/bash
 set -uo pipefail
+export PATH="/usr/sbin:/usr/bin:/sbin:/bin:$PATH"    # cron's default PATH lacks /usr/sbin, see hint below
 PBS_CT=105                                    # your PBS LXC id
 export PBS_PASSWORD="$(cat /root/.pbs-host-token)"
 export PBS_FINGERPRINT='<pbs-fingerprint>'    # proxmox-backup-manager cert info | grep -i fingerprint
@@ -173,6 +192,10 @@ exec /usr/bin/proxmox-backup-client backup \
 ```
 {% endcode %}
 
+{% hint style="danger" %}
+**Cron runs scripts with a minimal `PATH`** (typically just `/usr/bin:/bin`), which does **not** include `/usr/sbin` — where `pct`, `pvesm`, and most Proxmox binaries live. Without the explicit `export PATH=...` above (or full paths like `/usr/sbin/pct`), every `pct` call in a cron script silently fails with `pct: command not found`. Because the script has `set -uo pipefail` but not `-e`, and `pct start ... || true` swallows the failure, **the script keeps running and fails much later** with a confusing PBS connection error, while the real cause (`command not found`) is buried a dozen lines up in the log. Test the script by running it directly first — that inherits your interactive shell's full `PATH` and will hide this bug — then verify it also works when invoked exactly as cron would (`env -i PATH=/usr/bin:/bin /usr/local/bin/pve-etc-backup.sh`).
+{% endhint %}
+
 ```shellscript
 chmod 700 /usr/local/bin/pve-etc-backup.sh
 /usr/local/bin/pve-etc-backup.sh   # run once to test + accept fingerprint
@@ -187,7 +210,7 @@ Then add it to the PVE crontab (`crontab -e`), a couple of minutes **before** yo
 {% endcode %}
 
 {% hint style="info" %}
-The backup group is owned by whoever first created it. If you get `backup owner check failed`, the group belongs to a different user/token — either keep using that same identity, or `proxmox-backup-client snapshot forget` the old group and let the token recreate it.
+The backup group is owned by whoever first created it. If you get `backup owner check failed`, the group belongs to a different user/token — either keep using that same identity, or reassign ownership (see [#fixing-backup-owner-check-failed](proxmox-backup.md#fixing-backup-owner-check-failed "mention")). Avoid `proxmox-backup-client snapshot forget` unless you're OK losing that group's snapshot history — it only works around the mismatch by discarding the old group so the new identity can recreate it from scratch.
 {% endhint %}
 
 ### Manual
@@ -267,6 +290,37 @@ pct restore 105 pbs-local:backup/ct/105/<DATE> --storage local-lvm
 {% hint style="warning" %}
 If your new system disk is **smaller** than the old one, `local-lvm` may be too small for big guests — restore those onto the ZFS pool instead: `pct restore 104 pbs-local:backup/ct/104/<DATE> --storage tank`. Data on **bind-mounts** (e.g. `/tank/immich`) is _not_ in the backups; it stays on the pool and is just re-linked when the guest starts.
 {% endhint %}
+
+### Fixing "backup owner check failed"
+
+{% hint style="danger" %}
+Once you re-add PBS as PVE storage (step 4 above, or step 5 below) using a **freshly generated token**, your first scheduled backup after the restore will fail for every guest with `Error: backup owner check failed (your-new-token != proxmox@pbs)`. The pre-existing backup groups on the datastore are still owned by whatever identity created them originally (often the bare user `proxmox@pbs`, if the old storage used password auth instead of a token) — a brand new token/user is a *different* identity as far as PBS ownership is concerned, even though it's the same physical datastore and the same PVE storage name. **This silently breaks every nightly backup until fixed** — check for it explicitly after any restore, don't assume backups are running just because the job is scheduled and PBS is reachable.
+{% endhint %}
+
+Reassign ownership of the existing groups to your new token instead of discarding their history. There's no CLI command for this (the web UI's "Change Owner" button on Datastore > Content calls it under the hood) — the same call also works from any host that can reach PBS, e.g. from the PVE host itself:
+
+{% code overflow="wrap" %}
+```shellscript
+# run from PVE host, or from inside the PBS LXC — either works
+TOKEN="$(cat /root/.pbs-host-token)"     # or whichever identity currently owns the datastore
+for id in 100 101 102 103 104 105 106 107; do    # your guest IDs
+  curl -sk -X POST \
+    -H "Authorization: PBSAPIToken=proxmox@pbs!host-backup:$TOKEN" \
+    --data-urlencode 'backup-type=ct' \
+    --data-urlencode "backup-id=$id" \
+    --data-urlencode 'new-owner=proxmox@pbs!pve-restore' \
+    'https://192.168.1.105:8007/api2/json/admin/datastore/backup/change-owner'
+done
+```
+{% endcode %}
+
+Notes:
+
+* The HTTP header is **`PBSAPIToken`**, not `PVEAPIToken` (that prefix is for PVE's own API and returns a plain-text `authentication failed` here — easy to mix up since it's the same token you use for PVE storage).
+* Method is **POST**, not PUT.
+* The calling identity needs `Datastore.Modify` on the group (`DatastoreAdmin` role covers it).
+* Verify with `GET /api2/json/admin/datastore/backup/groups` (same auth header) — check the `owner` field per group.
+* This preserves every existing snapshot for that group; nothing is deleted.
 
 ### 5. Hand over to the real PBS LXC, remove the temporary one
 
