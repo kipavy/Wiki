@@ -223,7 +223,17 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-ser
    high = mis-parsed or wrong category) instead of folding them into the ranked list.
 
 8. **Warn on delivery**: listings can sell between research and follow-up — tell the
-   user to confirm availability before traveling.
+   user to confirm availability before traveling. **Neither MCP server can message a
+   seller** — no send-message tool exists on either `mcp__leboncoin__*` or
+   `mcp__vinted__*` (verified: their full tool lists only cover search/detail/seller-
+   profile lookups), and the Leboncoin server runs without an authenticated cookie
+   (`check_config` reports `cookie.configured: false`) behind Datadome anti-bot
+   protection, so even a hypothetical message tool couldn't post as the user's
+   identity without a real login session. If the user wants availability confirmed,
+   either have them message the seller directly, or — only with their explicit
+   go-ahead, since it sends a message under their identity to a third party — offer
+   to drive their already-logged-in Chrome session via `claude-in-chrome` to open the
+   listing and send one.
 
 ## Output Format
 
@@ -283,6 +293,17 @@ and the recommended priority order given the yield/speed/storage trade-off.
   ~10%. Not asking upfront whether the user accepts delivery at all compounds this: it
   either wastes search budget on shipped listings they won't use, or silently overstates
   every margin that should have had fees netted out.
+- Pricing a listing against its product *family* instead of its exact variant — confirmed
+  in testing: a "Steam Deck 512GB" listing was anchored against the Steam Deck **OLED**
+  512GB retail price, but Valve sells 512GB in both LCD and OLED, at meaningfully
+  different retail/resale values; the listing turned out to be the cheaper LCD model,
+  which inflated the estimated margin. Confirm the specific variant (screen tech,
+  storage tier, generation) from the title/description/photo before anchoring price —
+  don't assume the highest-value variant just because a search term matches broadly.
+- Assuming a messaging tool exists, or offering to "contact the seller," without checking
+  the MCP server's actual tool list first — neither `mcp__leboncoin__*` nor
+  `mcp__vinted__*` can send messages (search/detail/seller-lookup only), and Leboncoin's
+  server has no authenticated session anyway. Verify capabilities before promising them.
 
 ## Quick Reference — Tools
 
