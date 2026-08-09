@@ -172,7 +172,20 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-ser
      and `medianPrice` roughly agree — close agreement means the panel is probably clean;
      a sharp divergence means outliers are dragging one of them, so manually skim a sample
      of titles and exclude non-full-item listings before trusting the number. Without both
-     anchors a subagent's "good deal" verdict is a guess, not an analysis.
+     anchors a subagent's "good deal" verdict is a guess, not an analysis. **Source
+     anchor (b) from genuine peer-to-peer listings** (Vinted/Leboncoin private
+     sellers), never from professional refurbisher "reprise"/reconditioned prices
+     (Recommerce, Certideal, Back Market) — those run systematically higher because
+     they bundle a warranty and certification the P2P buyer isn't paying for.
+     Confirmed in testing: a Samsung Galaxy S22's real Vinted P2P median (190€, from
+     manually filtered comps) sat well below the "reconditionné" floor (276-400€)
+     that had been used as the anchor, erasing an assumed 40-80€ margin entirely once
+     checked against real private-listing prices. Also check whether a **successor
+     model has already launched** — an outgoing generation depreciates faster than
+     "previous flagship" pricing assumptions suggest (confirmed in testing: Apple
+     Watch Ultra 2 comps ran ~400€ used once Ultra 3 had shipped, well under the
+     650€ purchase price being evaluated, despite Ultra 2 still felt like a current
+     flagship on paper).
    - **Net out platform fees on any shipped transaction** — the listed price is not the
      landed cost. Confirmed rates (verify live, these change): Vinted charges the
      *buyer* a Buyer Protection fee of **0,70€ + 5% of the item price**, added on top
@@ -305,6 +318,16 @@ and the recommended priority order given the yield/speed/storage trade-off.
   publish date — confirmed in testing: a "cheap" Steam Deck and a "cheap" Switch Lite
   were listings from 2021-2023, almost certainly long sold. An old stale listing at a low
   price isn't a bargain, it's noise; check freshness before ranking on price.
+- Anchoring the used-market comp on professional refurbisher reprise/reconditioned prices
+  instead of genuine peer-to-peer listings — confirmed in testing: a Samsung Galaxy S22's
+  real Vinted P2P median (190€) sat well below the "reconditionné" price used as an
+  anchor (276-400€), turning an assumed 40-80€ margin into a wash. Always source the
+  resale-market anchor from actual private-seller listings on the platform you're
+  reselling on, not a warrantied refurbisher's price.
+- Not checking whether a successor model already exists before anchoring on "previous
+  flagship" pricing — an outgoing generation (e.g. Apple Watch Ultra 2 once Ultra 3
+  launched) depreciates faster than it looks on paper; a quick check of the current
+  lineup before pricing prevents overstating what the older generation still fetches.
 - Computing margin from the listed price alone on a shipped purchase, ignoring buyer-side
   platform fees — confirmed in testing: a €100 Vinted item landed at ~€111 once the
   0,70€+5% Buyer Protection fee and real shipping were added, shrinking the margin by
