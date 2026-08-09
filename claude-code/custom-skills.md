@@ -4,6 +4,24 @@ description: Backup copies of personal Claude Code skills (~/.claude/skills/), s
 
 # Custom Skills
 
+## Prompt: Install Skills From This Page
+
+Paste this into a fresh agent session (new machine, new profile, or just want to pick
+up newer skills) to have it read this page and offer them to you as a menu:
+
+````
+Fetch https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/custom-skills and
+list every skill documented on it (name + one-line description). Present them to me as
+a numbered menu and ask which ones I want — don't install anything without my explicit
+selection, and don't assume I want all of them. For each skill I pick: create
+~/.claude/skills/<name>/SKILL.md (or your runtime's equivalent personal-skills
+directory) with the exact SKILL.md content from that skill's code block on the page,
+verbatim — don't paraphrase or "improve" it. Then run any Setup steps documented for
+that skill (e.g. installing an MCP server), asking for confirmation before installing
+anything or changing system state. Once done, tell me which skills are ready and that I
+need to restart the session (or start a new one) for them to load.
+````
+
 Claude Code "skills" are just markdown files under `~/.claude/skills/<name>/SKILL.md`
 (project-scoped skills live in `.claude/skills/` inside a repo instead). Nothing syncs
 that folder anywhere by default, and there's no dedicated backup/restore SaaS for them
