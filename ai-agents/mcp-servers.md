@@ -23,7 +23,10 @@ tools I'd want everywhere vs. project-local). Run `claude mcp list` first so you
 re-add a server that's already configured. These commands register real credentials
 and give the agent new capabilities, so show me each command before running it. Once
 done, tell me to restart the session (or run `/mcp`) to confirm each new server
-connected.
+connected. This page only covers official/polished servers — if I also want unofficial
+community ones (e.g. Leboncoin, Vinted), separately fetch
+https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-servers-windows
+and offer those the same way.
 ````
 
 **MCP** (Model Context Protocol) lets an agent talk to external systems — docs, browsers, GitHub, databases — through standard tool servers. See [Configuration → MCP servers](../claude-code/configuration.md#mcp-servers-give-claude-new-tools) for how they plug in. There are hundreds out there; this page is deliberately **short** — only the handful I've found genuinely pull their weight.

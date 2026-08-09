@@ -4,6 +4,25 @@ description: Gotchas when wiring up third-party (non-official) MCP servers on Wi
 
 # Community MCP Servers on Windows
 
+## Prompt: Install Servers From This Page
+
+Paste this into a fresh agent session to have it read this page and offer the worked-example community servers as a menu:
+
+````
+Fetch https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-servers-windows
+and list every "Worked example" server documented on it (name + one-line description of
+what it's for). Present them as a numbered menu and ask which ones I want — don't
+install anything without my explicit selection. For each one I pick, run its exact
+install commands from the page (`npm install -g` / `git clone` + build, then
+`claude mcp add`), applying the four gotchas listed at the top of the page as needed
+(skip `npx -p`, point `node` at the real entry file rather than the `.cmd` shim, add
+`-s user` unless I say I want it project-scoped only, and tell me it won't be usable
+until I restart the session). These are unofficial, community-maintained packages that
+scrape/automate third-party sites — show me each command before running it, and don't
+install anything beyond what I selected. Once done, tell me to restart the session (or
+run `/mcp`) to confirm each server connected.
+````
+
 The [MCP Servers Worth It](../ai-agents/mcp-servers.md) list covers the polished, official servers. Sometimes what you need is a random community package instead — there's no official Leboncoin or Vinted MCP server, for instance, but people have built and published unofficial ones. These work fine, but expect more friction than `claude mcp add playwright -- npx @playwright/mcp@latest`. Four gotchas showed up wiring up two of them on Windows; all four are generic enough to bite with any community server.
 
 {% hint style="warning" %}
