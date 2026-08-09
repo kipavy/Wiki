@@ -317,3 +317,129 @@ and the recommended priority order given the yield/speed/storage trade-off.
 | `mcp__vinted__compare_prices` | Cross-country price comparison for one item |
 | `WebSearch` | Current new/retail price for a shortlisted model — grounds the margin calc in reality |
 ````
+
+## analyzing-disk-space-windows
+
+Surveys a Windows drive to find what's actually consuming space (top-level folders,
+then one level deeper into whichever come back largest), classifies findings by
+cleanup mechanism (regenerable cache vs. recoverable trash vs. real user files vs.
+system-protected), and requires explicit per-category confirmation before deleting
+anything. Written from a real cleanup session (2026-08-09) that freed ~49 GB on
+this machine — the "Common Mistakes" section captures gotchas hit live: reparse-point
+double-counting, `Get-ChildItem -Recurse` aborting mid-pipeline on a Win32 exception,
+`Test-Path -Force` not existing in Windows PowerShell 5.1, and `Clear-RecycleBin`
+exceeding a default command timeout on tens of GB.
+
+Restore path: `~/.claude/skills/analyzing-disk-space-windows/SKILL.md`
+
+````markdown
+---
+name: analyzing-disk-space-windows
+description: Use when the user wants to find what's consuming disk space on a Windows machine and identify safe things to delete or clean up — low free space, "libérer de l'espace disque", "mon disque C est plein", "clean up disk C". Windows/PowerShell-specific; for Linux/macOS use du/ncdu instead.
+---
+
+# Analyzing Disk Space (Windows)
+
+## Overview
+
+Two-phase approach: (1) survey top-level and per-user folder sizes with PowerShell to
+find where the space actually is, without deleting anything, (2) classify what's found
+by cleanup mechanism — regenerable cache, recoverable trash, real user files, or
+system-protected — and get explicit per-category confirmation before deleting.
+
+## When to Use
+
+- User wants to free disk space on Windows / low free space warnings
+- Explicitly NOT for Linux/macOS — use `du`/`ncdu` there instead, this skill's commands
+  are Windows PowerShell-specific
+
+## Core Rule: Never Delete Without Confirmation
+
+State findings first, categorized by risk, and ask which categories to act on — even
+if the user's original request already said "find things to delete," that phrasing
+is a request to *survey*, not a blanket pre-approval to delete. Confirm per category
+(corbeille / caches dev / gros fichiers utilisateur / etc.), not once for everything,
+since risk varies wildly across categories — emptying the Recycle Bin is zero-risk,
+deleting a stranger's-looking folder in Downloads is not.
+
+## Workflow
+
+1. **Get the overall picture first:**
+   ```powershell
+   Get-PSDrive C | Select-Object @{N='UsedGB';E={[math]::Round($_.Used/1GB,2)}},@{N='FreeGB';E={[math]::Round($_.Free/1GB,2)}}
+   ```
+
+2. **Survey top-level folders**, sizing each recursively. Exclude reparse points
+   (junctions like `C:\Users\All Users` → `ProgramData`, or WSL/OneDrive mount points)
+   to avoid double-counting and pipeline aborts:
+   ```powershell
+   Get-ChildItem C:\ -Force -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+       $size = (Get-ChildItem $_.FullName -Recurse -Force -ErrorAction SilentlyContinue -Attributes !ReparsePoint |
+           Measure-Object -Property Length -Sum -ErrorAction SilentlyContinue).Sum
+       [PSCustomObject]@{Name=$_.FullName; SizeGB=[math]::Round($size/1GB,2)}
+   } | Sort-Object SizeGB -Descending | Format-Table -AutoSize
+   ```
+   Repeat one level deeper into whichever folders come back largest (typically
+   `C:\Users\<user>`, then `AppData\Local`, then `Downloads`) until you've located the
+   actual heavy items, not just a heavy parent folder.
+
+3. **Check well-known space hogs directly** rather than waiting for them to surface —
+   some sit behind reparse points or take long to enumerate:
+   - `C:\$Recycle.Bin` — often huge, always safe to empty
+   - `<user>\AppData\Local\Temp`, `npm-cache`, `pnpm`, `go-build`, `ms-playwright`, `Package Cache`
+   - `<user>\Downloads` — sort by size and `LastWriteTime`; old installers/ISOs are common
+   - `C:\Windows\WinSxS` — component store, real but not casually cleanable (needs
+     `DISM /StartComponentCleanup` as admin, modest gains of ~1-3 GB)
+   - `C:\Windows.old`, `C:\Windows\SoftwareDistribution\Download` — leftover Windows Update files
+   - Browser cache subfolders (`...\User Data\Default\Cache`, `Service Worker\CacheStorage`)
+     — clear via the browser's own settings while it's running, not raw file deletion
+   - `hiberfil.sys` / `pagefile.sys` / `swapfile.sys` — system-managed, usually
+     inaccessible even with `-Force`; don't try to delete manually
+
+4. **Classify findings by cleanup mechanism**, since that determines both risk and the
+   right command:
+
+   | Category | Example | How to clean |
+   |---|---|---|
+   | Regenerable cache | npm/pnpm/go-build/Playwright, Temp | The tool's own clean command (`npm cache clean --force`, `pnpm store prune`, `go clean -cache`) — safer than raw deletion since the tool knows what's locked/in-use |
+   | Recoverable trash | Recycle Bin | `Clear-RecycleBin -DriveLetter C -Force` |
+   | Real user files | Downloads, Documents | List with size + date, let the user pick — never assume "old" means "unwanted" |
+   | Browser-managed cache | Brave/Chrome/Edge cache folders | Clear via browser settings, not file deletion |
+   | System-protected | WinSxS, `Windows\Installer`, pagefile | Leave alone or use the OS-native tool (DISM, Disk Cleanup) — not manual `Remove-Item` |
+
+5. **Present a sorted table** (size, category, suggested action), ask which categories
+   to act on, then execute only the confirmed ones. Re-check free space afterward and
+   report the actual delta, not the sum of estimates.
+
+## Common Mistakes
+
+- Summing `C:\Users` (or any tree containing junctions) without excluding reparse
+  points → wildly wrong totals (e.g. `C:\Users\All Users` is a junction to
+  `ProgramData`; counting it double-counts, and some junctions loop back on themselves).
+- Running `Get-ChildItem -Recurse` over the whole drive in one shot → slow, and one
+  Win32 exception partway through can abort the entire pipeline before `Sort-Object`
+  emits anything, silently returning zero results instead of a partial list. Scope to
+  one subtree at a time instead.
+- `Test-Path -Force` doesn't exist in Windows PowerShell 5.1 (only `Get-Item -Force`
+  does) — checking a protected file like `hiberfil.sys` needs
+  `Get-Item $path -Force -ErrorAction Stop` wrapped in try/catch, not `Test-Path -Force`.
+- Deleting a running browser's cache folder directly instead of using its "clear
+  browsing data" setting — can corrupt profile state or fail silently on locked files.
+- `Clear-RecycleBin` on tens of GB can exceed a default command timeout — run it in
+  the background and expect it to take a while; a timeout is not the same as failure.
+- Treating "I found large files" as license to delete them — confirm per category, and
+  flag ambiguous personal content (e.g. large unlabeled media files) for the user's own
+  judgment instead of acting on it.
+
+## Quick Reference — Commands
+
+| Goal | Command |
+|---|---|
+| Drive free/used space | `Get-PSDrive C \| Select-Object Used,Free` |
+| Folder size, no reparse points | `(Get-ChildItem $path -Recurse -Force -Attributes !ReparsePoint \| Measure-Object Length -Sum).Sum` |
+| Empty recycle bin | `Clear-RecycleBin -DriveLetter C -Force` |
+| npm cache | `npm cache clean --force` |
+| pnpm store | `pnpm store prune` |
+| Go build cache | `go clean -cache` |
+| Component store cleanup (admin) | `Dism.exe /Online /Cleanup-Image /StartComponentCleanup` |
+````
