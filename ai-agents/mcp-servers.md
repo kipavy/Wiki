@@ -4,6 +4,28 @@ description: A short, opinionated list of MCP servers that actually earn their p
 
 # MCP Servers Worth It
 
+## Prompt: Install Servers From This Page
+
+Paste this into a fresh agent session (new machine, new profile, or just want to pick
+up newer additions) to have it read this page and offer the servers to you as a menu:
+
+````
+Fetch https://kipavy.gitbook.io/it-wiki/ai-coding-agents/mcp-servers and list every MCP
+server documented on it (name + one-line "use it for" description). Present them to me
+as a numbered menu and ask which ones I want — don't install anything without my
+explicit selection, and don't assume I want all of them (read the "How they fit
+together" section and flag any overlapping pairs, e.g. Playwright vs. Chrome DevTools,
+Serena vs. graphify, so I don't add both by accident). For each server I pick, use the
+exact `claude mcp add` command shown on the page (adjust for your runtime's CLI if
+you're not Claude Code) — ask me for any required API key/token first, never invent
+or reuse one from elsewhere, and confirm the scope (`--scope user` for general-purpose
+tools I'd want everywhere vs. project-local). Run `claude mcp list` first so you don't
+re-add a server that's already configured. These commands register real credentials
+and give the agent new capabilities, so show me each command before running it. Once
+done, tell me to restart the session (or run `/mcp`) to confirm each new server
+connected.
+````
+
 **MCP** (Model Context Protocol) lets an agent talk to external systems — docs, browsers, GitHub, databases — through standard tool servers. See [Configuration → MCP servers](../claude-code/configuration.md#mcp-servers-give-claude-new-tools) for how they plug in. There are hundreds out there; this page is deliberately **short** — only the handful I've found genuinely pull their weight.
 
 {% hint style="info" %}
