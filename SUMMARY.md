@@ -55,6 +55,7 @@
   * [Configuration](claude-code/configuration.md)
   * [Community MCP Servers on Windows](claude-code/mcp-community-servers-windows.md)
   * [Plugins Worth It](claude-code/plugins.md)
+  * [Custom Skills](claude-code/custom-skills.md)
 * [Other Agents](ai-agents/other-agents.md)
 * [MCP Servers Worth It](ai-agents/mcp-servers.md)
 
