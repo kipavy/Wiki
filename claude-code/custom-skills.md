@@ -79,12 +79,16 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-ser
 
 ## Workflow
 
-1. **Clarify constraints first** (ask, don't assume): pickup radius/city, storage
-   space, budget, categories of interest — or brainstorm some if the user wants
-   ideas. Unless the user says otherwise, assume the default objective from the
-   Overview (high yield + fastest/easiest resale + least storage/handling hassle)
-   and say so explicitly, so they can correct it if they'd rather optimize for raw
-   margin alone.
+1. **Clarify constraints first** (ask, don't assume): pickup radius **and the exact
+   city/commune name** (the radius alone isn't searchable — you need the city to
+   resolve a department/geo filter), storage space, budget, categories of interest —
+   or brainstorm some if the user wants ideas. A city name has no natural set of
+   discrete choices, so ask it as a plain question in your reply rather than via a
+   tool that requires 2+ concrete options (e.g. AskUserQuestion rejects a
+   single-option/free-text-only question). Unless the user says otherwise, assume
+   the default objective from the Overview (high yield + fastest/easiest resale +
+   least storage/handling hassle) and say so explicitly, so they can correct it if
+   they'd rather optimize for raw margin alone.
 
 2. **Brainstorm categories** when the user wants ideas rather than naming items.
    Favor categories with a documented resale market (you can name a ballpark price),
@@ -98,10 +102,20 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-ser
      that drowns real deals.
 
 4. **Search geo-filtered and in parallel**:
-   - Leboncoin: `mcp__leboncoin__batch_search_listings` with `departments`/`zipcodes`
-     set to the pickup area, `sortBy: "price"`, `sortOrder: "asc"`, and a **modest
-     limit (~15-20) per query** — larger batches blow the tool's output cap and get
-     dumped to a file.
+   - Leboncoin: `mcp__leboncoin__batch_search_listings` with `departments` set to the
+     pickup area, `ownerType: "private"` (drops pro/shop resellers up front),
+     `sortBy: "price"`, `sortOrder: "asc"`, and a **modest limit (~15-20) per query**
+     — larger batches blow the tool's output cap and get dumped to a file.
+     **`zipcodes` is confirmed broken as of 2026-08**: a search with a `zipcodes`
+     filter silently returns 0 results even in a populated area (verified: the exact
+     same query with no geo filter returns tens of thousands), while `departments`
+     works normally — don't spend time debugging query phrasing when `zipcodes`
+     returns 0, switch to `departments` first. A department is much wider than a
+     20km pickup radius, so geo-filter the results yourself afterward by matching
+     each listing's `location` field against a commune whitelist tiered by real
+     distance (P1 <20km / P2 20-35km / exclude beyond) — give that whitelist to
+     whichever subagent processes the results. Re-test `zipcodes` occasionally in
+     case it gets fixed upstream.
    - Vinted: `mcp__vinted__search_all_items` per category/query (no geo filter beyond
      country — treat it as a national complement, best for compact/shippable goods,
      not bulky local-only items).
@@ -117,15 +131,22 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-ser
      (e.g. a full PC listing that mentions the RAM you're hunting).
    - Apply the geo-tiers you give it (e.g. P1 <20km / P2 20-35km / P3 further-but-doable)
      and report each listing's tier.
-   - Judge deals against **price anchors you supply in the prompt**: the current new/retail
-     price (check it with a live WebSearch for the exact model — don't rely on memory,
-     tech prices especially move fast and a stale mental price makes a bad deal look good)
-     plus a ballpark used-market value per sub-type/condition. Without anchors a subagent's
-     "good deal" verdict is a guess, not an analysis. Treat `analyze_market_price` /
-     `compare_prices` verdicts as a hint, not ground truth — their own comparable panel can
-     be polluted by irrelevant listings (e.g. full PCs/laptops pulled in when hunting a
-     component), silently skewing the "fair"/"good deal" label; sanity-check against the
-     retail-price anchor before trusting it.
+   - Judge deals against **two price anchors, not one**: (a) the current new/retail price
+     (live WebSearch for the exact model — don't rely on memory, tech prices especially
+     move fast) **and** (b) the actual used-market resale price, since that's what
+     actually comes back on resale, not the new price — a big gap to "new" means nothing
+     if the used market already prices the item near what you'd pay for it. Get (b) from
+     `analyze_market_price` / `compare_prices`, but treat their median as a hint, not
+     ground truth: the comparable panel is polluted two opposite ways — bundled/irrelevant
+     listings (e.g. full PCs/laptops pulled in when hunting a component) skew it **high**,
+     and accessories sold under the product's name (phone cases, watch straps, headphone
+     ear pads, screen protectors, spare charging cases at €1-15) skew it **low**. Confirmed
+     in testing: an "AirPods Pro 2" comp panel's `minPrice` was €1 (a spare case), an
+     "Apple Watch Series 8" panel's `minPrice` was €9 (a strap). Check whether `avgPrice`
+     and `medianPrice` roughly agree — close agreement means the panel is probably clean;
+     a sharp divergence means outliers are dragging one of them, so manually skim a sample
+     of titles and exclude non-full-item listings before trusting the number. Without both
+     anchors a subagent's "good deal" verdict is a guess, not an analysis.
    - Flag category-specific risk factors (undisclosed battery health on e-bikes/power
      tools is the single biggest hidden cost — a suspiciously cheap battery-powered item
      is usually a dead-battery trap, not a bargain; missing box/case on collectibles
@@ -137,6 +158,14 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-ser
      margin looks big — each unit needs its own photo, listing, and negotiation. Note
      whether the lot could instead move as one bundled resale (fast, lower total price)
      or only piecemeal (slow, higher total price, more work).
+   - Check listing **freshness**: Leboncoin's `publishedAt` (or equivalent date field)
+     can be years old — sorting by price surfaces long-dead listings just as readily as
+     live ones, and a suspiciously good price is often explained by "this sold in 2022
+     and nobody removed it," not by an actual bargain. Confirmed in testing: a batch
+     sorted by price asc surfaced listings from 2021, 2023, and 2024 mixed in with
+     same-day posts. Flag anything older than ~4-6 weeks as likely stale in the caveat
+     column, and put genuinely recent listings ahead of older ones at a similar price —
+     don't let an old listing's lower price make it look like the better deal.
    - Return a ranked table: title, price, location+tier, estimated resale, estimated
      margin, selling effort/speed, link, one-line caveat.
 
@@ -193,7 +222,7 @@ and the recommended priority order given the yield/speed/storage trade-off.
   fetch the detail endpoint and actually look at the photo before putting something in a final report.
 - Assuming Leboncoin detail calls give a full photo gallery like Vinted does → they only return one
   low-res thumbnail; say so rather than implying a full visual inspection happened.
-- Trusting `analyze_market_price`'s label at face value → its comparable panel can be dominated by
+- Trusting `analyze_market_price`'s label at face value — its comparable panel can be dominated by
   unrelated bundled listings (confirmed in testing: hunting RAM pulled in full PCs, skewing the
   average to 900€+ and mislabeling overpriced RAM kits as "good deal"/"fair"). Always cross-check
   against a live-searched current retail price before accepting the verdict.
@@ -204,6 +233,23 @@ and the recommended priority order given the yield/speed/storage trade-off.
   bestselling game or a common consumer model) sell in huge volume and are often worth
   less per unit than a niche item with genuine collector demand; verify actual comps,
   don't assume fame equals value.
+- Showing *any* comparison/ranking table without the listing link on every row — including
+  an interim status update mid-conversation, not just the final consolidated report. A row
+  the user can't click is a row they can't act on, no matter how "preliminary" it felt when
+  you wrote it. Include the link every time, not just in the last table you produce.
+- Trusting the `zipcodes` filter on the Leboncoin MCP tools — confirmed broken (silently
+  returns 0 as of 2026-08). Use `departments` and filter communes yourself instead.
+- Asking for a free-text value (a pickup city, a budget number) via a tool built for
+  discrete choices, padded with one dummy "Autre" option — most such tools reject a
+  question with fewer than 2 real options. Ask free-text values as a plain question.
+- Anchoring margin on the new/retail price alone — resale happens on the used market,
+  which can price close to what you'd pay for the item (e.g. a Bose QC45 bought and
+  resold nets almost nothing once compared against real used comps, despite looking like
+  a big discount off the new price). Always pull the actual resale-comp price too.
+- Sorting by price and treating the cheapest hits as the best deals without checking the
+  publish date — confirmed in testing: a "cheap" Steam Deck and a "cheap" Switch Lite
+  were listings from 2021-2023, almost certainly long sold. An old stale listing at a low
+  price isn't a bargain, it's noise; check freshness before ranking on price.
 
 ## Quick Reference — Tools
 
