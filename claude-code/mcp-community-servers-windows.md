@@ -9,7 +9,7 @@ description: Gotchas when wiring up third-party (non-official) MCP servers on Wi
 Paste this into a fresh agent session to have it read this page and offer the worked-example community servers as a menu:
 
 ````
-Fetch https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-servers-windows
+Fetch https://kipavy.gitbook.io/it-wiki/ai-coding-agents/mcp-community-servers-windows
 and list every "Worked example" server documented on it (name + one-line description of
 what it's for). Present them as a numbered menu and ask which ones I want — don't
 install anything without my explicit selection. For each one I pick, run its exact

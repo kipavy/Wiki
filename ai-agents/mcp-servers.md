@@ -25,7 +25,7 @@ and give the agent new capabilities, so show me each command before running it. 
 done, tell me to restart the session (or run `/mcp`) to confirm each new server
 connected. This page only covers official/polished servers — if I also want unofficial
 community ones (e.g. Leboncoin, Vinted), separately fetch
-https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-servers-windows
+https://kipavy.gitbook.io/it-wiki/ai-coding-agents/mcp-community-servers-windows
 and offer those the same way.
 ````
 

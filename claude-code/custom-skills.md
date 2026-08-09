@@ -10,7 +10,7 @@ Paste this into a fresh agent session (new machine, new profile, or just want to
 up newer skills) to have it read this page and offer them to you as a menu:
 
 ````
-Fetch https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/custom-skills and
+Fetch https://kipavy.gitbook.io/it-wiki/ai-coding-agents/custom-skills and
 list every skill documented on it (name + one-line description). Present them to me as
 a numbered menu and ask which ones I want — don't install anything without my explicit
 selection, and don't assume I want all of them. For each skill I pick: create
@@ -93,7 +93,7 @@ own `-p`/`--print` flag); npm's `.cmd` shim can't be spawned directly, so point 
 at the real entry file instead (both commands above already do this); scope follows
 the current directory unless you pass `-s user`; a server added mid-session only loads
 after restarting Claude Code. Full reference:
-https://kipavy.gitbook.io/it-wiki/ai-coding-agents/claude-code/mcp-community-servers-windows#worked-example-leboncoin--vinted-mcp
+https://kipavy.gitbook.io/it-wiki/ai-coding-agents/mcp-community-servers-windows#worked-example-leboncoin--vinted-mcp
 
 ## Workflow
 
