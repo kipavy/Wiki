@@ -103,7 +103,7 @@ Use the official `github/github-mcp-server` above. The old `@modelcontextprotoco
 **Lets the agent drive a real browser.** Microsoft's server works from structured accessibility snapshots (not screenshots), so the agent can open a page, click, type, submit forms, and read results deterministically. The reliable way to have Claude _actually check that the thing it built works_.
 
 ```bash
-claude mcp add playwright -- npx @playwright/mcp@latest
+claude mcp add playwright -- npx -y @playwright/mcp@latest
 ```
 
 **Use it for:** verifying a UI flow end-to-end, reproducing a bug in the browser, scraping a page that needs interaction. **Why it's worth it:** turns "looks right to me" into "I clicked through it and it works."
@@ -115,7 +115,7 @@ claude mcp add playwright -- npx @playwright/mcp@latest
 **Inspect and debug a live running page.** Google's server hooks the agent into a real Chrome instance — read the console, inspect network requests, capture performance traces. Where Playwright _does_ things in the browser, this one _looks inside_ it.
 
 ```bash
-claude mcp add chrome-devtools -- npx chrome-devtools-mcp@latest
+claude mcp add chrome-devtools -- npx -y chrome-devtools-mcp@latest
 ```
 
 **Use it for:** "why is this page slow," "what's throwing in the console," "which request is 500-ing." **Why it's worth it:** the agent debugs your web app with the same signals you'd open DevTools for.

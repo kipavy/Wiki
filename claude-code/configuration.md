@@ -59,7 +59,7 @@ Common events: `PreToolUse` / `PostToolUse` (before/after a tool runs), `UserPro
       {
         "matcher": "Edit|Write",
         "hooks": [
-          { "type": "command", "command": "npx prettier --write $CLAUDE_FILE_PATHS" }
+          { "type": "command", "command": "npx -y prettier --write $CLAUDE_FILE_PATHS" }
         ]
       }
     ]
@@ -74,7 +74,7 @@ Typical uses: auto-format after every edit, run tests when a file changes, block
 **MCP** (Model Context Protocol) lets Claude talk to external systems — databases, GitHub, a browser, your own APIs — through standardized tool servers. Add one with:
 
 ```bash
-claude mcp add playwright -- npx @playwright/mcp@latest
+claude mcp add playwright -- npx -y @playwright/mcp@latest
 claude mcp list        # see what's connected
 ```
 

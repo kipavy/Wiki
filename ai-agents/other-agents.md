@@ -64,7 +64,7 @@ Google's open-source terminal agent — and the **strongest free-out-of-the-box 
 
 ```bash
 npm install -g @google/gemini-cli
-# or run without installing: npx @google/gemini-cli
+# or run without installing: npx -y @google/gemini-cli
 ```
 
 **Standout features:** free Gemini 2.5 Pro, built-in Google Search grounding, MCP support. **Watch:** it's tied to Google/Gemini models, and free-tier numbers shift over time — check the current quota if it matters.

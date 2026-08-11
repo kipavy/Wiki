@@ -144,7 +144,7 @@ Despite the name, it manages `pre-push` and other stages too.
 {% tab title="Husky + lint-staged (JS/TS)" %}
 ```bash
 npm install --save-dev husky lint-staged
-npx husky init
+npx -y husky init
 ```
 
 `package.json`:
@@ -160,7 +160,7 @@ npx husky init
 `.husky/pre-commit`:
 
 ```sh
-npx lint-staged
+npx -y lint-staged
 ```
 
 `lint-staged` runs the tools only against the files you actually staged.

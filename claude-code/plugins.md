@@ -116,7 +116,7 @@ The original repo (`gsd-build/get-shit-done`) was **archived in mid-2026**; acti
 **Install:**
 
 ```bash
-npx skills add JuliusBrussee/caveman
+npx -y skills add JuliusBrussee/caveman
 ```
 
 **Standout features:**
