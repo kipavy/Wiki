@@ -23,7 +23,7 @@ install anything beyond what I selected. Once done, tell me to restart the sessi
 run `/mcp`) to confirm each server connected.
 ````
 
-The [MCP Servers Worth It](../ai-agents/mcp-servers.md) list covers the polished, official servers. Sometimes what you need is a random community package instead — there's no official Leboncoin or Vinted MCP server, for instance, but people have built and published unofficial ones. These work fine, but expect more friction than `claude mcp add playwright -- npx @playwright/mcp@latest`. Four gotchas showed up wiring up two of them on Windows; all four are generic enough to bite with any community server.
+The [MCP Servers Worth It](../ai-agents/mcp-servers.md) list covers the polished, official servers. Sometimes what you need is a random community package instead — there's no official Leboncoin or Vinted MCP server, for instance, but people have built and published unofficial ones. These work fine, but expect more friction than `claude mcp add playwright -- npx -y @playwright/mcp@latest`. Four gotchas showed up wiring up two of them on Windows; all four are generic enough to bite with any community server.
 
 {% hint style="warning" %}
 Community MCP servers scrape/automate sites that don't want to be scraped (anti-bot protection, ToS). Use for personal, defensive purposes — don't build harassment or scraping-at-scale tooling on top of them.
