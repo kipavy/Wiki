@@ -142,6 +142,10 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/mcp-community-servers-windows
      distance (P1 <20km / P2 20-35km / exclude beyond) — give that whitelist to
      whichever subagent processes the results. Re-test `zipcodes` occasionally in
      case it gets fixed upstream.
+     **Filter out sold/reserved listings as the very first pass over any result
+     set** — drop every ad whose `attributes.transaction_status` exists (`"Vendu"`,
+     `"Achat en cours"`); see step 5. Doing it before ranking keeps dead listings
+     out of both the shortlist and the price comparison.
    - Vinted: `mcp__vinted__search_all_items` per category/query (no geo filter beyond
      country — treat it as a national complement, best for compact/shippable goods,
      not bulky local-only items).
@@ -155,6 +159,15 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/mcp-community-servers-windows
    - Exclude noise: want-to-buy posts ("recherche"/"achète"), pro/shop listings at
      retail price, bundles where the sought item is just a mentioned component
      (e.g. a full PC listing that mentions the RAM you're hunting).
+   - **Drop anything already sold or reserved**: Leboncoin listings carry
+     `attributes.transaction_status`, present in *search* results (no detail fetch
+     needed). Observed values: **`"Vendu"`** (already sold) and **`"Achat en cours"`**
+     (a purchase is in progress — effectively gone). The field is **absent** on
+     available listings, so the filter is "drop any listing where
+     `transaction_status` exists". Confirmed in testing (2026-08): a 120-result
+     Arctic P12 batch contained 4 `Vendu` + 3 `Achat en cours` — and they clustered
+     at the **cheapest** end, so `sortBy: "price"` surfaces them first, exactly like
+     stale listings do. Never show one in a table, even as a price data point.
    - Apply the geo-tiers you give it (e.g. P1 <20km / P2 20-35km / P3 further-but-doable)
      and report each listing's tier.
    - Judge deals against **two price anchors, not one**: (a) the current new/retail price
@@ -205,6 +218,15 @@ https://kipavy.gitbook.io/it-wiki/ai-coding-agents/mcp-community-servers-windows
      pickup transactions (either side) carry no meaningful fee (€0-0,99) — this is
      another reason to prefer local Leboncoin listings over shipped ones when the
      margin is thin.
+     **But don't turn that into a blanket "shipped is never worth it" rule.** The fee
+     structure is *fixed cost + percentage*, so it is the **per-unit landed cost**
+     that decides, not the fact of shipping. Two cases where a shipped listing beats
+     a local one outright: (a) a **multi-unit lot**, where one shipping charge and one
+     fixed fee are amortized across every unit — 5 items in one parcel carry roughly
+     the same €0,70 + shipping as a single item, so the per-unit penalty collapses;
+     and (b) a **genuinely slashed price**, where the discount is simply bigger than
+     the total fee load. Compute landed cost per unit for both options and compare
+     numbers — never dismiss a shipped listing on principle before doing the division.
    - Flag category-specific risk factors (undisclosed battery health on e-bikes/power
      tools is the single biggest hidden cost — a suspiciously cheap battery-powered item
      is usually a dead-battery trap, not a bargain; missing box/case on collectibles
@@ -318,6 +340,15 @@ and the recommended priority order given the yield/speed/storage trade-off.
   publish date — confirmed in testing: a "cheap" Steam Deck and a "cheap" Switch Lite
   were listings from 2021-2023, almost certainly long sold. An old stale listing at a low
   price isn't a bargain, it's noise; check freshness before ranking on price.
+- Presenting listings that are already sold or reserved — Leboncoin marks these in
+  `attributes.transaction_status` (`"Vendu"` / `"Achat en cours"`) **right in the search
+  results**, so there is no excuse for missing it. Confirmed in testing (2026-08): a
+  120-result Arctic P12 search contained 7 such listings, concentrated at the cheapest
+  end, and a recent (freshness-passing) `"Achat en cours"` lot was recommended to the
+  user before the field was noticed. Note that `publishedAt` freshness does **not** catch
+  this: a listing posted 4 days ago can already be sold. They are two independent checks —
+  run both. Filter on the field's mere presence (it's absent when the item is available)
+  rather than matching exact strings, so a new status value can't slip through.
 - Anchoring the used-market comp on professional refurbisher reprise/reconditioned prices
   instead of genuine peer-to-peer listings — confirmed in testing: a Samsung Galaxy S22's
   real Vinted P2P median (190€) sat well below the "reconditionné" price used as an
@@ -328,6 +359,12 @@ and the recommended priority order given the yield/speed/storage trade-off.
   flagship" pricing — an outgoing generation (e.g. Apple Watch Ultra 2 once Ultra 3
   launched) depreciates faster than it looks on paper; a quick check of the current
   lineup before pricing prevents overstating what the older generation still fetches.
+- Over-correcting the fee point into "only in-person pickup is worth it" — the fee is
+  *fixed + percentage*, so what matters is landed cost **per unit**. A multi-unit lot
+  amortizes one shipping charge and one €0,70 fee across every unit, and a genuinely
+  slashed price can outweigh the whole fee load. Do the division before ruling a shipped
+  listing out; recommending a local pickup over a cheaper shipped lot without comparing
+  per-unit landed costs is the same analytical failure as ignoring the fees entirely.
 - Computing margin from the listed price alone on a shipped purchase, ignoring buyer-side
   platform fees — confirmed in testing: a €100 Vinted item landed at ~€111 once the
   0,70€+5% Buyer Protection fee and real shipping were added, shrinking the margin by
