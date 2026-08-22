@@ -187,6 +187,12 @@ fi
 exec /usr/bin/proxmox-backup-client backup \
     etc.pxar:/etc \
     pve.pxar:/etc/pve \
+    usrlocal.pxar:/usr/local \
+    opt.pxar:/opt \
+    root.pxar:/root \
+    --exclude pve-old \
+    --exclude etc-old \
+    --exclude .cache \
     --backup-id "$(hostname)" \
     --repository "$REPO"
 ```
@@ -211,13 +217,28 @@ EOF
 ```
 {% endcode %}
 
+{% hint style="success" %}
+**Back up more than `/etc`.** The three extra archives above are what turn a rebuild into a restore instead of a scavenger hunt:
+
+| Archive | Path | What it saves you |
+| ------- | ---- | ----------------- |
+| `usrlocal.pxar` | `/usr/local` | your host scripts — this backup script, the vzdump hook |
+| `opt.pxar` | `/opt` | third-party host agents, e.g. the Scrutiny collector binary |
+| `root.pxar` | `/root` | `.pbs-host-token`, `.ssh/authorized_keys`, service runner scripts |
+
+Costs ~13 MB on the first run and effectively nothing after — PBS dedups it. The `--exclude`s drop restore staging dirs (`pve-old`, `etc-old`) and caches; without them every night re-archives a copy of your last restore.
+
+Confirm a new archive really holds what you think by restoring it to a temp dir, rather than trusting the byte count:
+
+```shellscript
+proxmox-backup-client restore host/<name>/<DATE> root.pxar /tmp/vfy --repository "$REPO"
+```
+{% endhint %}
+
 {% hint style="danger" %}
-**This backup covers `/etc` and `/etc/pve` — and nothing else.** Two things routinely live outside `/etc` and are silently lost in a bare-metal restore:
+**Still not covered: root's crontab.** It lives in `/var/spool/cron/crontabs/root`, not in `/etc` — which is exactly why the schedule above goes in `/etc/cron.d/` instead. Same timing, but it actually gets backed up. Mind the extra `root` column; `/etc/cron.d` entries take a user field, plain crontabs don't.
 
-* **root's crontab**, which lives in `/var/spool/cron/crontabs/root`, *not* in `/etc`. That's exactly why the entry above goes in `/etc/cron.d/` instead: same schedule, but it actually gets backed up. Mind the extra `root` column — `/etc/cron.d` entries take a user field, plain crontabs don't.
-* **`/root/.pbs-host-token`** — the token secret this very script reads. Unrecoverable; you'll have to reissue it (see step 7 of the restore method).
-
-`/usr/local/bin` isn't backed up either, so keep a copy of your scripts on the ZFS pool (e.g. in `/tank/backup/`). It costs nothing and saves rewriting them from memory.
+Mirroring your host scripts to the ZFS pool (`/tank/backup/`) on top of this is still worth doing — that's the copy you can reach *before* any PBS is running during a bare-metal restore.
 {% endhint %}
 
 {% hint style="info" %}
@@ -446,7 +467,7 @@ pvesm add pbs pbs-backup --datastore backup --server 192.168.1.105 \
 
 The LXC's certificate lives inside its own filesystem, so it came back with the container — **the fingerprint in your old `storage.cfg` is still valid**. Confirm with `pct exec 105 -- proxmox-backup-manager cert info | grep -i fingerprint`.
 
-The one secret you genuinely cannot recover is `/root/.pbs-host-token`, because `/root` isn't backed up. Reissue it under the **same token name**, so the auth-id string is unchanged and the `host/<name>` group ownership still matches:
+If your host backup includes `root.pxar`, restore it and you already have `/root/.pbs-host-token` — nothing to reissue, and the identity is unchanged. **If it doesn't, that secret is gone.** Reissue under the **same token name** so the auth-id string stays identical and the `host/<name>` group ownership still matches:
 
 {% code overflow="wrap" %}
 ```shellscript
@@ -485,15 +506,36 @@ rm -rf /root/pve-old /root/etc-old
 The `/etc` backup restores **systemd units, but not the things they point at.** After a reinstall you can have `scrutiny.timer` reporting `enabled`, a clean `systemctl status`, and a dashboard that loads fine — while the script the service actually executes doesn't exist. Nothing anywhere reports an error; you discover it days later when the data is stale. Walk this list explicitly instead of trusting a green `systemctl`.
 {% endhint %}
 
+If your host backup includes the `usrlocal` / `opt` / `root` archives, most of this becomes a restore rather than a rebuild:
+
+```shellscript
+proxmox-backup-client restore host/pve/<DATE> usrlocal.pxar /root/usrlocal-old --repository "$REPO"
+proxmox-backup-client restore host/pve/<DATE> opt.pxar      /root/opt-old      --repository "$REPO"
+proxmox-backup-client restore host/pve/<DATE> root.pxar     /root/root-old     --repository "$REPO"
+```
+
 | What | Where | How to get it back |
 | ---- | ----- | ------------------ |
-| Host backup script | `/usr/local/bin/pve-etc-backup.sh` | copy from `/tank/backup/` |
-| vzdump PBS start hook | `/usr/local/bin/pbs-lxc-start-hook.sh` | copy from `/tank/backup/` |
-| PBS host token | `/root/.pbs-host-token` | **unrecoverable** — reissue, see step 7 |
-| Scrutiny collector + runner | `/opt/scrutiny/bin/`, `/root/scrutiny/scrutiny.sh` | [hdd-monitoring-proxmox.md](hdd-monitoring-proxmox.md "mention") |
-| Extra packages | `smartmontools`, `lm-sensors` | `apt install` |
-| Sensor modules | `/etc/modules` — `coretemp`, `nct6683` | cherry-pick from `/root/etc-old/modules` |
-| Root SSH keys | `/root/.ssh/authorized_keys` | `/root/pve-old/priv/authorized_keys` |
+| Host backup script | `/usr/local/bin/pve-etc-backup.sh` | `usrlocal.pxar`, or `/tank/backup/` |
+| vzdump PBS start hook | `/usr/local/bin/pbs-lxc-start-hook.sh` | `usrlocal.pxar`, or `/tank/backup/` |
+| PBS host token | `/root/.pbs-host-token` | `root.pxar` — else reissue, step 7 |
+| Scrutiny collector + runner | `/opt/scrutiny/bin/`, `/root/scrutiny/scrutiny.sh` | `opt.pxar` + `root.pxar` — setup in [hdd-monitoring-proxmox.md](hdd-monitoring-proxmox.md "mention") |
+| Extra packages | `smartmontools`, `lm-sensors` | `apt install` — archives carry files, not packages |
+| Sensor modules | `/etc/modules` — `coretemp`, `nct6683` | `etc.pxar` |
+| Root SSH keys | `/root/.ssh/authorized_keys` | `root.pxar`, or `priv/authorized_keys` |
+
+{% hint style="danger" %}
+**Do not restore `/usr/local` wholesale onto different hardware.** It contains `/usr/local/lib/systemd/network/50-pmx-nic0.link`, which pins the interface name to a specific **MAC address**:
+
+```
+[Match]
+MACAddress=d8:bb:c1:3b:1b:d9
+[Link]
+Name=nic0
+```
+
+The PVE installer regenerates this file per machine — which is *why* `nic0` and `/etc/network/interfaces` come out identical across a rebuild, and why that similarity is misleading. Copy the old one onto a new board and it matches nothing: the NIC keeps its default kernel name, `bridge-ports nic0` has no member, and the host boots with no network. Restore `/usr/local/bin` and leave the `.link` file where the installer put it.
+{% endhint %}
 
 {% hint style="warning" %}
 **Scrutiny is the classic miss.** Web + InfluxDB live inside the LXC, so they return with the guest restore and the dashboard loads normally — but the **collector runs on the PVE host** and is gone. The dashboard then keeps showing the *old* disks and never the new ones, silently. Full procedure: [hdd-monitoring-proxmox.md](hdd-monitoring-proxmox.md "mention").
