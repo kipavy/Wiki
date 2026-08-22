@@ -114,6 +114,8 @@ You'll now have access to Scrutiny Dashboard on [http://192.168.1.xx:8087](http:
 
 ### After a host reinstall (restore)
 
+Part of the wider rebuild checklist in [proxmox-backup.md](proxmox-backup.md "mention") (step 9) — the collector is the item people most often forget, because everything else looks healthy without it.
+
 {% hint style="warning" %}
 Web + InfluxDB live **in the LXC**, so they come back with your PBS restore — but the **collector lives on the PVE host** and is wiped when you reinstall PVE. Until you re-set it up, Scrutiny keeps showing the **old disks** (historical InfluxDB data) and **never shows the new ones** (nothing is collecting). That's the symptom, not a data-association bug.
 {% endhint %}

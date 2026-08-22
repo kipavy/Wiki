@@ -469,7 +469,7 @@ cp /root/pve-old/user.cfg        /etc/pve/user.cfg          # users, API token I
 cp /root/pve-old/priv/token.cfg  /etc/pve/priv/token.cfg    # the token secrets themselves
 ```
 
-Guest configs come back automatically with the guest restores in step 6, and `datacenter.cfg` is usually already correct. **Leave `/etc/network/interfaces` alone** unless you've diffed it first (see step 9).
+Guest configs come back automatically with the guest restores in step 6, and `datacenter.cfg` is usually already correct. **Leave `/etc/network/interfaces` alone** unless you've diffed it first (see step 10).
 
 Don't forget what lives _outside_ `/etc` and so isn't in the archive at all: your scripts (`/usr/local/bin/*.sh`), the cron entry, and `/root/.ssh/authorized_keys`. Old root SSH keys are recoverable from `/root/pve-old/priv/authorized_keys` — inspect with `ssh-keygen -lf` and merge rather than overwrite.
 
@@ -479,7 +479,44 @@ Finally delete the staging dirs, which contain secrets:
 rm -rf /root/pve-old /root/etc-old
 ```
 
-### 9. After a hardware change (new board / CPU / RAM)
+### 9. Rebuild what lives outside /etc
+
+{% hint style="danger" %}
+The `/etc` backup restores **systemd units, but not the things they point at.** After a reinstall you can have `scrutiny.timer` reporting `enabled`, a clean `systemctl status`, and a dashboard that loads fine — while the script the service actually executes doesn't exist. Nothing anywhere reports an error; you discover it days later when the data is stale. Walk this list explicitly instead of trusting a green `systemctl`.
+{% endhint %}
+
+| What | Where | How to get it back |
+| ---- | ----- | ------------------ |
+| Host backup script | `/usr/local/bin/pve-etc-backup.sh` | copy from `/tank/backup/` |
+| vzdump PBS start hook | `/usr/local/bin/pbs-lxc-start-hook.sh` | copy from `/tank/backup/` |
+| PBS host token | `/root/.pbs-host-token` | **unrecoverable** — reissue, see step 7 |
+| Scrutiny collector + runner | `/opt/scrutiny/bin/`, `/root/scrutiny/scrutiny.sh` | [hdd-monitoring-proxmox.md](hdd-monitoring-proxmox.md "mention") |
+| Extra packages | `smartmontools`, `lm-sensors` | `apt install` |
+| Sensor modules | `/etc/modules` — `coretemp`, `nct6683` | cherry-pick from `/root/etc-old/modules` |
+| Root SSH keys | `/root/.ssh/authorized_keys` | `/root/pve-old/priv/authorized_keys` |
+
+{% hint style="warning" %}
+**Scrutiny is the classic miss.** Web + InfluxDB live inside the LXC, so they return with the guest restore and the dashboard loads normally — but the **collector runs on the PVE host** and is gone. The dashboard then keeps showing the *old* disks and never the new ones, silently. Full procedure: [hdd-monitoring-proxmox.md](hdd-monitoring-proxmox.md "mention").
+{% endhint %}
+
+You can catch this whole class of failure in one command — it lists any restored unit whose `ExecStart` target is missing:
+
+{% code overflow="wrap" %}
+```shellscript
+for f in /etc/systemd/system/*.service; do
+  [ -e "$f" ] || continue
+  u=$(basename "$f")
+  b=$(systemctl show "$u" -p ExecStart --value 2>/dev/null | grep -oE "path=[^ ;]+" | head -1 | cut -d= -f2)
+  case "$b" in /*) [ -e "$b" ] || echo "MISSING TARGET: $u -> $b";; esac
+done
+```
+{% endcode %}
+
+Empty output means every restored unit has its executable present. It deliberately checks **absolute paths only** — bare command names resolve through `PATH` and would otherwise throw false positives on stock units like `postfix` and `grub-common`. It also scans `.service` files directly rather than the enabled-unit list, because a service triggered by a timer is not itself "enabled" and would be skipped — which is exactly the Scrutiny case.
+
+Mirroring every host-side script and binary to the pool (`/tank/backup/`) reduces this step to a handful of `cp` commands, for a few MB.
+
+### 10. After a hardware change (new board / CPU / RAM)
 
 Restored configs describe the _old_ machine. Extra traps when the rebuild also crosses a hardware change:
 
