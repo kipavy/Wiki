@@ -46,11 +46,21 @@ chmod +x /opt/scrutiny/bin/scrutiny-collector-metrics-linux-amd64
 
 You can just change API\_ENDPOINT in the script to match your Scrutiny Web IP + Port and paste the script in proxmox shell.
 
+{% hint style="warning" %}
+Use the **published** port, not the container's internal one. The Dokploy template maps `8087 -> 8080`, so the Web UI *and* the collector's `--api-endpoint` are both `http://<web-ip>:8087`. Port `8080` only exists inside the container — pointing the collector at it just times out from the host, with no disks ever appearing and no obvious error saying why.
+
+Check yours and use the left-hand side of the `->`:
+
+```bash
+pct exec <docker-ct-id> -- docker ps --format '{{.Names}}\t{{.Ports}}' | grep -i scrutiny
+```
+{% endhint %}
+
 ```bash
 #!/bin/bash
 
 # CHANGE ME
-API_ENDPOINT="http://192.168.1.xx:8080"
+API_ENDPOINT="http://192.168.1.xx:8087"   # published port, NOT the container-internal 8080
 
 
 ############# Scrutiny Collector ###################
@@ -100,7 +110,7 @@ systemctl enable --now scrutiny.timer
 systemctl status scrutiny.timer
 ```
 
-You'll now have access to Scrutiny Dashboard on [http://192.168.1.xx:8080](http://192.168.1.xx:8080/)
+You'll now have access to Scrutiny Dashboard on [http://192.168.1.xx:8087](http://192.168.1.xx:8087/)
 
 ### After a host reinstall (restore)
 
@@ -115,6 +125,25 @@ Web + InfluxDB live **in the LXC**, so they come back with your PBS restore — 
 ```bash
 curl -X DELETE http://192.168.1.xx:8087/api/device/0x50XXXXXXXXXXXXXX
 ```
+
+{% hint style="danger" %}
+**Delete by WWN, and only for drives that are physically gone.** After a restore your *surviving* drives will also show the wrong `/dev/sdX` — letters shift whenever a disk is added or removed, and Scrutiny shows the name captured at the **last successful collection**, which is stale until the collector runs again.
+
+Those are **not** ghosts. Scrutiny keys devices by **WWN**, so real drives re-associate correctly on their own and their names fix themselves after one collection. Deleting one because its `sdX` looks wrong destroys that drive's whole SMART history — power-on hours, temperature trend, error counts — and it does not come back.
+
+Tell them apart by **serial**, never by device name:
+
+{% code overflow="wrap" %}
+```bash
+# what Scrutiny thinks it has
+curl -s http://192.168.1.xx:8087/api/summary | grep -oE '"wwn":"[^"]*","device_name":"[^"]*","device_uuid":"[^"]*","device_serial_id":"[^"]*"'
+# what is actually plugged in
+for d in /dev/sd?; do echo "$d $(smartctl -i $d | grep -iE '^Serial Number|^Device Model' | tr -s ' ' | tr '\n' ' ')"; done
+```
+{% endcode %}
+
+A WWN in the first list with no counterpart in the second is a genuine ghost — delete that one. Everything else just needs the collector to run once. Dump `…/api/summary` to a file before deleting anything, so a mistake is at least reconstructible.
+{% endhint %}
 
 {% hint style="info" %}
 Put the collector cron/timer in a host-backed-up location if you can. A systemd unit under `/etc/systemd/system` (like the script above) **is** captured by the `/etc` backup — but the **binary** in `/opt/scrutiny` is not, so you'll still re-fetch it after a bare-metal restore.
