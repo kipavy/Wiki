@@ -201,13 +201,24 @@ chmod 700 /usr/local/bin/pve-etc-backup.sh
 /usr/local/bin/pve-etc-backup.sh   # run once to test + accept fingerprint
 ```
 
-Then add it to the PVE crontab (`crontab -e`), a couple of minutes **before** your guest backup job so PBS is already running:
+Then schedule it a couple of minutes **before** your guest backup job so PBS is already running. Put it in `/etc/cron.d/` rather than root's crontab — see the warning below for why:
 
 {% code overflow="wrap" %}
 ```shellscript
-58 20 * * * /usr/local/bin/pve-etc-backup.sh >> /var/log/pve-etc-backup.log 2>&1
+cat > /etc/cron.d/pve-etc-backup <<'EOF'
+58 20 * * * root /usr/local/bin/pve-etc-backup.sh >> /var/log/pve-etc-backup.log 2>&1
+EOF
 ```
 {% endcode %}
+
+{% hint style="danger" %}
+**This backup covers `/etc` and `/etc/pve` — and nothing else.** Two things routinely live outside `/etc` and are silently lost in a bare-metal restore:
+
+* **root's crontab**, which lives in `/var/spool/cron/crontabs/root`, *not* in `/etc`. That's exactly why the entry above goes in `/etc/cron.d/` instead: same schedule, but it actually gets backed up. Mind the extra `root` column — `/etc/cron.d` entries take a user field, plain crontabs don't.
+* **`/root/.pbs-host-token`** — the token secret this very script reads. Unrecoverable; you'll have to reissue it (see step 7 of the restore method).
+
+`/usr/local/bin` isn't backed up either, so keep a copy of your scripts on the ZFS pool (e.g. in `/tank/backup/`). It costs nothing and saves rewriting them from memory.
+{% endhint %}
 
 {% hint style="info" %}
 The backup group is owned by whoever first created it. If you get `backup owner check failed`, the group belongs to a different user/token — either keep using that same identity, or reassign ownership (see [#fixing-backup-owner-check-failed](proxmox-backup.md#fixing-backup-owner-check-failed "mention")). Avoid `proxmox-backup-client snapshot forget` unless you're OK losing that group's snapshot history — it only works around the mismatch by discarding the old group so the new identity can recreate it from scratch.
@@ -259,7 +270,14 @@ Reconnect the pool disks (powered off), boot, then:
 
 ```shellscript
 zpool import -f tank
+zpool status tank      # expect ONLINE / "No known data errors" — confirm before going further
 ```
+
+The `-f` is required because the pool was last touched by "another system" (your old install — or literally another motherboard). That message is expected and is **not** a sign of damage.
+
+{% hint style="info" %}
+PVE 9 ships a newer ZFS than your old install, so `zpool status` may add _"Some supported and requested features are not enabled"_. Ignore it. `zpool upgrade` is **one-way**, buys you nothing during a restore, and makes the pool unreadable by older ZFS — don't run it here.
+{% endhint %}
 
 ### 3. Run a temporary PBS on the host
 
@@ -275,26 +293,99 @@ proxmox-backup-manager datastore create backup /tank/backup --reuse-datastore tr
 ```
 {% endcode %}
 
-### 4. Add it as PVE storage and restore the guests
+A successful adopt prints `Access time update check successful.` followed by `TASK OK`. If it instead starts initialising a fresh chunk store, stop — you passed the wrong path or dropped `--reuse-datastore`.
+
+### 4. Recover the old host config _first_
+
+Before restoring a single guest, pull the old `/etc/pve` out of the backup. It's tiny (tens of KiB) and it tells you exactly what you're rebuilding — which storages existed, which guests existed, and the original secrets — instead of guessing.
+
+You need credentials to talk to the temporary PBS. An API token beats putting the root password on a command line, but note that a freshly created token has **no permissions at all** until you grant them — even one belonging to `root@pam`:
+
+```shellscript
+proxmox-backup-manager user generate-token root@pam pve-restore     # prints the secret ONCE
+proxmox-backup-manager acl update /datastore/backup DatastoreAdmin --auth-id 'root@pam!pve-restore'
+```
+
+{% hint style="warning" %}
+`user generate-token` does **not** accept `--output-format` (it errors with _"schema does not allow additional properties"_). It prints a plain table, and the secret is shown exactly once — if you lose it, delete the token and reissue.
+{% endhint %}
+
+Then restore both config archives to a staging dir:
+
+{% code overflow="wrap" %}
+```shellscript
+export PBS_PASSWORD='<token-secret>'
+export PBS_FINGERPRINT="$(proxmox-backup-manager cert info | grep -oiE '([0-9a-f]{2}:){31}[0-9a-f]{2}')"
+REPO='root@pam!pve-restore@127.0.0.1:backup'
+
+proxmox-backup-client list --repository "$REPO"                                  # find host/<name>/<DATE>
+proxmox-backup-client restore host/pve/<DATE> pve.pxar /root/pve-old --repository "$REPO"
+proxmox-backup-client restore host/pve/<DATE> etc.pxar /root/etc-old --repository "$REPO"
+
+cat /root/pve-old/storage.cfg          # the storages you must recreate (step 5)
+ls  /root/pve-old/nodes/*/lxc/         # the guests you must restore (step 6)
+```
+{% endcode %}
+
+{% hint style="success" %}
+**`/etc/pve/priv` IS included in `pve.pxar`** — an earlier version of this page claimed it was lost, which is wrong and leads to unnecessary re-tokenising. What you get back:
+
+* `priv/storage/<storeid>.pw` — the **original PBS storage token secret**
+* `priv/token.cfg` — your PVE API token secrets
+* `priv/authorized_keys` — the SSH keys that used to let you into the host
+
+Reusing that original token in step 7 means the datastore's existing groups are already owned by the identity you authenticate as — so the "backup owner check failed" problem below **never occurs in the first place**. Recovering the secret is strictly better than reassigning ownership afterwards.
+{% endhint %}
+
+### 5. Recreate your storages
+
+A fresh install has only `local` and `local-lvm`. Any guest whose rootfs lived elsewhere **cannot be restored until that storage exists again**. Copy the definitions out of `/root/pve-old/storage.cfg`, e.g.:
+
+```shellscript
+pvesm add zfspool tank --pool tank --content images,rootdir --mountpoint /tank
+pvesm status                            # every storage should read "active"
+```
+
+{% hint style="danger" %}
+**If a guest's disk still exists on the pool, `pct restore` replaces it.** A container whose rootfs lived on ZFS (`rootfs: tank:subvol-104-disk-0`) still has that subvol sitting on the pool, holding data _newer_ than your last backup.
+
+A ZFS snapshot is **not** protection here — the snapshot lives inside the dataset and is destroyed along with it. Rename the dataset aside instead; it's instant and copies nothing:
+
+```shellscript
+zfs rename tank/subvol-104-disk-0 tank/subvol-104-preupgrade
+```
+
+Restore the guest, verify it, and only then `zfs destroy` the renamed copy.
+{% endhint %}
+
+### 6. Restore the guests
 
 ```shellscript
 FP=$(proxmox-backup-manager cert info | grep -i fingerprint | grep -oiE '([0-9a-f]{2}:){31}[0-9a-f]{2}')
 pvesm add pbs pbs-local --datastore backup --server 127.0.0.1 \
-    --username root@pam --password '<your-root-pw>' --fingerprint "$FP" --content backup
+    --username 'root@pam!pve-restore' --password '<token-secret>' --fingerprint "$FP" --content backup
 
 pvesm list pbs-local                                   # find the snapshot dates
 pct restore 105 pbs-local:backup/ct/105/<DATE> --storage local-lvm
-# repeat for every CT/VM (use qmrestore for VMs)
+# repeat for every CT/VM (use qmrestore for VMs) — restore each onto the storage it came from
 ```
+
+The restored config keeps everything: MAC addresses, static IPs, tags, `features`, bind mounts and raw `lxc.*` lines. Note that `pvesm list` reports the _uncompressed_ archive size, so a 38 GiB entry may be only ~20 GiB on disk. Large guests take a while — launch them with `nohup … &` and tail the log rather than holding an SSH session open.
 
 {% hint style="warning" %}
 If your new system disk is **smaller** than the old one, `local-lvm` may be too small for big guests — restore those onto the ZFS pool instead: `pct restore 104 pbs-local:backup/ct/104/<DATE> --storage tank`. Data on **bind-mounts** (e.g. `/tank/immich`) is _not_ in the backups; it stays on the pool and is just re-linked when the guest starts.
 {% endhint %}
 
+Leave the guests **stopped** for now — the PBS LXC has to take over the datastore first (step 7).
+
 ### Fixing "backup owner check failed"
 
+{% hint style="success" %}
+If you recovered the original token secret from `priv/storage/<storeid>.pw` in step 4 and reuse it in step 7, you can skip this section entirely — ownership already matches. It's kept for the case where that secret is genuinely gone.
+{% endhint %}
+
 {% hint style="danger" %}
-Once you re-add PBS as PVE storage (step 4 above, or step 5 below) using a **freshly generated token**, your first scheduled backup after the restore will fail for every guest with `Error: backup owner check failed (your-new-token != proxmox@pbs)`. The pre-existing backup groups on the datastore are still owned by whatever identity created them originally (often the bare user `proxmox@pbs`, if the old storage used password auth instead of a token) — a brand new token/user is a *different* identity as far as PBS ownership is concerned, even though it's the same physical datastore and the same PVE storage name. **This silently breaks every nightly backup until fixed** — check for it explicitly after any restore, don't assume backups are running just because the job is scheduled and PBS is reachable.
+Once you re-add PBS as PVE storage using a **freshly generated token**, your first scheduled backup after the restore will fail for every guest with `Error: backup owner check failed (your-new-token != proxmox@pbs)`. The pre-existing backup groups on the datastore are still owned by whatever identity created them originally (often the bare user `proxmox@pbs`, if the old storage used password auth instead of a token) — a brand new token/user is a _different_ identity as far as PBS ownership is concerned, even though it's the same physical datastore and the same PVE storage name. **This silently breaks every nightly backup until fixed** — check for it explicitly after any restore, don't assume backups are running just because the job is scheduled and PBS is reachable.
 {% endhint %}
 
 Reassign ownership of the existing groups to your new token instead of discarding their history. There's no CLI command for this (the web UI's "Change Owner" button on Datastore > Content calls it under the hood) — the same call also works from any host that can reach PBS, e.g. from the PVE host itself:
@@ -320,45 +411,100 @@ Notes:
 * Method is **POST**, not PUT.
 * The calling identity needs `Datastore.Modify` on the group (`DatastoreAdmin` role covers it).
 * Verify with `GET /api2/json/admin/datastore/backup/groups` (same auth header) — check the `owner` field per group.
+* The owner is also readable straight off the disk: `cat /tank/backup/ct/<id>/owner`.
 * This preserves every existing snapshot for that group; nothing is deleted.
 
-### 5. Hand over to the real PBS LXC, remove the temporary one
+### 7. Hand over to the real PBS LXC, remove the temporary one
 
 {% hint style="danger" %}
 Two PBS must **never** serve the same datastore at once. Stop the host PBS **before** starting the PBS LXC.
 {% endhint %}
 
+{% hint style="danger" %}
+`apt autoremove --purge` will happily take **`proxmox-backup-client`** with it, because it arrived as a dependency of the server package. That's the binary your host backup script calls — so `/etc` backups break, and you won't notice until a run fails. Pin it first.
+{% endhint %}
+
 ```shellscript
+apt-mark manual proxmox-backup-client
 systemctl disable --now proxmox-backup-proxy proxmox-backup
 pvesm remove pbs-local
 apt purge -y proxmox-backup-server && apt autoremove --purge -y
-pct start 105        # the restored PBS LXC takes over
+which proxmox-backup-client          # must still be there
+pct start 105                        # the restored PBS LXC takes over
 ```
 
-Re-add PBS as PVE storage, this time pointing at the LXC (`192.168.1.105`) with an API token — see [#lxcs-vms-backup](proxmox-backup.md#lxcs-vms-backup "mention"). The original `proxmox@pbs` password lived in `/etc/pve/priv` (lost), so just generate a fresh token in the LXC.
-
-### 6. Restore /etc
-
-With PBS back, restore the host config to a **staging dir** and cherry-pick — never blindly overwrite a running `/etc/pve`:
+Re-add PBS as PVE storage, this time pointing at the LXC (`192.168.1.105`) — reusing the **original** identity and secret recovered in step 4:
 
 {% code overflow="wrap" %}
 ```shellscript
-proxmox-backup-client restore host/pve/<DATE> pve.pxar /root/pve-old --repository 'proxmox@pbs!host-backup@192.168.1.105:backup'
-proxmox-backup-client restore host/pve/<DATE> etc.pxar /root/etc-old --repository 'proxmox@pbs!host-backup@192.168.1.105:backup'
+pvesm add pbs pbs-backup --datastore backup --server 192.168.1.105 \
+    --username 'proxmox@pbs!pve-restore' \
+    --password "$(cat /root/pve-old/priv/storage/pbs-backup.pw)" \
+    --fingerprint '<pbs-fingerprint>' --content backup
 ```
 {% endcode %}
 
-Guest configs come back automatically with the guest restores in step 4, so from `/etc` you usually only need bits like `user.cfg`, firewall rules, or custom files under `/etc` proper.
+The LXC's certificate lives inside its own filesystem, so it came back with the container — **the fingerprint in your old `storage.cfg` is still valid**. Confirm with `pct exec 105 -- proxmox-backup-manager cert info | grep -i fingerprint`.
 
+The one secret you genuinely cannot recover is `/root/.pbs-host-token`, because `/root` isn't backed up. Reissue it under the **same token name**, so the auth-id string is unchanged and the `host/<name>` group ownership still matches:
 
+{% code overflow="wrap" %}
+```shellscript
+pct exec 105 -- proxmox-backup-manager user delete-token proxmox@pbs host-backup
+pct exec 105 -- proxmox-backup-manager user generate-token proxmox@pbs host-backup
+pct exec 105 -- proxmox-backup-manager acl update /datastore/backup DatastoreAdmin --auth-id 'proxmox@pbs!host-backup'
+# then write the new secret to /root/.pbs-host-token (chmod 600)
+```
+{% endcode %}
 
+Deleting a token also drops its ACL entries — that's why the third line is needed.
 
+### 8. Cherry-pick the rest of /etc
 
+Never blindly overwrite a running `/etc/pve`. From the staging dirs restored in step 4, copy back only what you need:
 
+```shellscript
+cp /root/pve-old/jobs.cfg        /etc/pve/jobs.cfg          # your backup job
+cp /root/pve-old/user.cfg        /etc/pve/user.cfg          # users, API token IDs, ACLs
+cp /root/pve-old/priv/token.cfg  /etc/pve/priv/token.cfg    # the token secrets themselves
+```
 
+Guest configs come back automatically with the guest restores in step 6, and `datacenter.cfg` is usually already correct. **Leave `/etc/network/interfaces` alone** unless you've diffed it first (see step 9).
 
+Don't forget what lives _outside_ `/etc` and so isn't in the archive at all: your scripts (`/usr/local/bin/*.sh`), the cron entry, and `/root/.ssh/authorized_keys`. Old root SSH keys are recoverable from `/root/pve-old/priv/authorized_keys` — inspect with `ssh-keygen -lf` and merge rather than overwrite.
 
+Finally delete the staging dirs, which contain secrets:
 
+```shellscript
+rm -rf /root/pve-old /root/etc-old
+```
 
+### 9. After a hardware change (new board / CPU / RAM)
 
+Restored configs describe the _old_ machine. Extra traps when the rebuild also crosses a hardware change:
 
+* **`cores:` can silently exceed the host.** A guest set to `cores: 16` on an 8-thread CPU still starts — LXC just caps it at what exists — so nothing errors and the wrong value sits there indefinitely. Compare against `nproc` and fix with `pct set <id> --cores 8`.
+* **Network interface names.** `/etc/network/interfaces` names a specific NIC (`nic0`, `enp0s31f6`, …). If the new board's interface is named differently, restoring the old file drops the host off the network at next boot. Diff the two first — with PVE 9's interface pinning the name is often _identical_, in which case there's nothing to do.
+* **PCIe passthrough.** `hostpciX` entries reference bus addresses that have almost certainly changed. Re-check against `lspci` before starting those guests.
+* **Anything keyed to the host's MAC.** Guest MACs live in their own configs and survive; the host NIC's MAC is new, so a DHCP reservation or MAC-based filtering for the host needs updating.
+
+Guest IPs are stored in the guest configs and come back unchanged, so from the LAN's point of view everything reappears where it was.
+
+### Verify — don't assume
+
+A restored system that _looks_ healthy can still have a broken backup chain, and you won't find out until a nightly job fails days later. Force one real run of each:
+
+```shellscript
+/usr/local/bin/pve-etc-backup.sh                        # expect "skipping mount point: pve", then both pxar archives
+vzdump <smallest-ct-id> --storage pbs-backup --mode snapshot
+```
+
+The guest backup is the one that matters. If ownership is correct it completes and reports something like:
+
+```
+INFO: root.pxar: backup was done incrementally, reused 85.072 MiB (74.3%)
+```
+
+That reuse percentage is the proof you want: it means you're writing into the **existing** group with its dedup history intact, not silently starting a fresh one beside it.
+
+Worth checking too: guests reachable on their old IPs, bind mounts remounted with real data (`pct exec <id> -- df -h /mnt/...`), and the services inside them healthy — several containers report `unhealthy` for a minute or two during startup before settling, so give them time before diagnosing.
