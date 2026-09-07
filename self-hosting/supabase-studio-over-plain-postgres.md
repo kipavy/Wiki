@@ -286,7 +286,9 @@ Either way it's still **snapshots off-host, not PITR** — but a dead disk no lo
 
 The dump sidecar gives you _last night_. [**WAL-G**](https://github.com/wal-g/wal-g) gives you _any second_: Postgres continuously ships write-ahead-log segments to R2, so you can restore to "3:46:59 PM, just before the bad `DELETE`". This turns your **RPO from \~24 h into \~60 s** and is the closest a single box gets to what Neon's PITR offered. Keep the dump sidecar too — it's a dead-simple independent fallback.
 
-It's the advanced tier: a custom image, a few settings, a base-backup sidecar, and — non-negotiable — a **tested restore**. At R2 free-tier this costs \~$0 for a small DB (WAL + base backups stay well under the 10 GB / 1M-ops free limits).
+It's the advanced tier: a custom image, a few settings, a base-backup sidecar, and — non-negotiable — a **tested restore**.
+
+> **Budget warning, learned the hard way.** WAL-G never deletes anything on its own. Left as-is, this recipe grows without bound: on a **44 MB** database, seven weeks of 6-hourly base backups produced **196 full copies and 8.29 GB in R2** — about to blow through the 10 GB free tier on a database you could email. Retention is not optional, and it is included in the sidecar below. Don't copy this section without it.
 
 ### 1. Custom Postgres image with WAL-G baked in
 
@@ -349,7 +351,8 @@ services:
       PGUSER: postgres
       PGPASSWORD: ${POSTGRES_PASSWORD}
       PGDATABASE: ${POSTGRES_DB}
-      BASEBACKUP_INTERVAL: ${BASEBACKUP_INTERVAL:-21600}   # every 6h
+      BASEBACKUP_INTERVAL: ${BASEBACKUP_INTERVAL:-86400}   # daily
+      BASEBACKUP_RETAIN: ${BASEBACKUP_RETAIN:-14}          # keep 14 full backups
     entrypoint:
       - /bin/bash
       - -c
@@ -358,19 +361,39 @@ services:
         while true; do
           echo "[base-backup] $(date -u) pushing...";
           wal-g backup-push /var/lib/postgresql/data && echo ok || echo "FAILED (WAL still protects you)";
+          echo "[base-backup] pruning to last $${BASEBACKUP_RETAIN} full backups...";
+          wal-g delete retain FULL "$${BASEBACKUP_RETAIN}" --confirm && echo "prune ok" || echo "PRUNE FAILED";
           sleep "$${BASEBACKUP_INTERVAL}";
         done
 ```
+
+**The prune line is the important one.** `wal-g delete retain FULL N --confirm` deletes old base backups _and_ garbage-collects every WAL segment below the oldest one it keeps — which is most of the reclaimed space. Without it the bucket grows forever.
+
+Pick the pair together, since `INTERVAL × RETAIN` is your recovery window: daily × 14 gives 14 days of PITR for roughly `14 × <db size>` plus 14 days of WAL. **6-hourly is almost always overkill** — WAL archiving already gives you \~60 s RPO between base backups, so more frequent bases buy you faster restores, not less data loss.
+
+Don't reach for an **R2 lifecycle rule** as the safety net instead. A blind delete-after-N-days rule doesn't understand backup dependencies and will happily delete a WAL segment that a base backup you're still keeping needs to replay. Let WAL-G do it.
 
 `.env` additions (reuses the same `R2_*` creds as the mirror):
 
 ```bash
 WALG_S3_PREFIX=s3://<bucket>/walg
-BASEBACKUP_INTERVAL=21600
+BASEBACKUP_INTERVAL=86400
+BASEBACKUP_RETAIN=14
 AWS_REGION=auto
 ```
 
 Verify archiving is live: `psql -c "select archived_count, failed_count from pg_stat_archiver;"` — you want `failed_count = 0` and `archived_count` climbing.
+
+Verify retention is working: `wal-g backup-list` should never show more than `BASEBACKUP_RETAIN` entries, and `rclone size r2backup:<bucket>` should flatten out after `INTERVAL × RETAIN` has elapsed. If either keeps climbing, your prune isn't running — check the sidecar logs for `PRUNE FAILED`.
+
+**Retrofitting an already-bloated bucket?** The same command cleans up history in one shot. Dry-run first (omit `--confirm` and it only prints what it _would_ delete), then commit:
+
+```bash
+docker exec <base-backup-container> wal-g delete retain FULL 14            # dry run
+docker exec <base-backup-container> wal-g delete retain FULL 14 --confirm  # do it
+```
+
+This is irreversible, so confirm your dump sidecar's history is intact first — that's your independent fallback while the WAL-G history is being cut down.
 
 ### 3. Restore to a point in time (test this before you trust it!)
 
@@ -393,15 +416,27 @@ Tips: `SELECT pg_create_restore_point('label')` before risky operations gives yo
 
 > **Verified end to end:** created a row, marked a restore point, dropped the table, then restored — Postgres stopped exactly at the restore point and the table + row came back. RPO in the test was seconds.
 
-### The one caveat that matters
+### The two caveats that matter
 
-**If R2 is unreachable, `archive_command` keeps failing and Postgres retains WAL in `pg_wal` until it succeeds — which can fill the disk.** Monitor it:
+Neither is about RAM or CPU. WAL archiving is cheap to run and expensive to ignore.
+
+**1. If R2 is unreachable, `archive_command` keeps failing and Postgres retains WAL in `pg_wal` until it succeeds — which can fill the disk.** Monitor it:
 
 ```sql
 SELECT failed_count, last_failed_wal, last_failed_time FROM pg_stat_archiver;
 ```
 
-Alert if `failed_count` climbs or `pg_wal` size grows. This — not RAM/CPU — is the real operational cost of WAL archiving.
+Alert if `failed_count` climbs or `pg_wal` size grows.
+
+**2. If retention isn't configured, the bucket grows without bound — silently, because nothing fails.** This is the nastier of the two: archiving keeps reporting success while your bill builds. Measured on a real 44 MB database running the un-pruned version of this recipe for seven weeks:
+
+| | before retention | after `retain FULL 14` |
+| --- | --- | --- |
+| base backups | 196 (4.86 GB) | 14 (524 MB) |
+| WAL segments | 10 337 (2.80 GB) | 767 (194 MB) |
+| **bucket total** | **8.29 GB / 11 537 objects** | **1.33 GB / 875 objects** |
+
+A 6× reduction, and the recovery window got _wider_ in wall-clock terms — 196 backups at 6 h apart only span 48 days, and nobody restores to a Tuesday in July. Check `rclone size` on your backup bucket right now if you built this before adding the prune step.
 
 ## Migrating off Neon.tech (full walkthrough)
 
