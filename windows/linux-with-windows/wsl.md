@@ -54,6 +54,27 @@ wsl --unregister <distro-name>
 wsl --install -d <distro-name>
 ```
 
+### Install a distro in a specific location
+
+By default distros live in `%LOCALAPPDATA%`, on `C:`. To put it elsewhere:
+
+```powershell
+wsl --install -d <distro-name> --location D:\WSL\<distro-name>
+```
+
+### Move an existing distro
+
+```powershell
+wsl --shutdown
+wsl --manage <distro-name> --move D:\WSL\<distro-name>
+```
+
+### Find where a distro (and its ext4.vhdx) is stored
+
+```powershell
+Get-ChildItem HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss | Get-ItemProperty | Select-Object DistributionName, BasePath
+```
+
 ***
 
 ### WSL takes too much space ?
@@ -62,9 +83,15 @@ wsl --install -d <distro-name>
 If you notice your WSL2 is taking too much space even after some clean, here's how you can compact your WSL2 virtual disk on windows (If you're having trouble with automatic, just doit manually)
 {% endhint %}
 
-When this [issue](https://github.com/microsoft/WSL/issues/4699) will be fixed this part will be useless.
+The vhdx still never shrinks on its own ([issue](https://github.com/microsoft/WSL/issues/4699) still open), but since WSL 3.0.1 there is a built-in compact command (`wsl --update` first):
 
-Use [wslcompact](https://github.com/okibcn/wslcompact?tab=readme-ov-file#option-1-as-a-powershell-module). If wslcompact did nothing, you can try the following script to compact vdisk:
+```powershell
+wsl -d <distro-name> -u root fstrim -av
+wsl --shutdown
+wsl --manage <distro-name> --compact
+```
+
+On older WSL versions, use [wslcompact](https://github.com/okibcn/wslcompact?tab=readme-ov-file#option-1-as-a-powershell-module). If wslcompact did nothing, you can try the following script to compact vdisk:
 
 {% tabs %}
 {% tab title="Automatic" %}
