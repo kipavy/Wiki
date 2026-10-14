@@ -61,6 +61,22 @@ smbcontrol smbd reload-config
 net conf list                                        # check
 ```
 
+### Windows "Previous Versions" (ZFS snapshots)
+
+With [sanoid snapshots](zfs-proxmox-config.md#automatic-snapshots-sanoid) on the dataset, Samba can show them in Windows (right click a file or folder > Properties > **Previous Versions**), so anyone can restore their own files. The bind mount already exposes `/nfs/.zfs/snapshot` in the LXC:
+
+```shellscript
+net conf setparm samba "vfs objects" "shadow_copy2 streams_xattr"
+net conf setparm samba "shadow:snapdir" ".zfs/snapshot"
+net conf setparm samba "shadow:snapprefix" "^autosnap"
+net conf setparm samba "shadow:delimiter" "_"
+net conf setparm samba "shadow:format" "_%Y-%m-%d_%H:%M:%S"
+net conf setparm samba "shadow:sort" "desc"
+net conf setparm samba "shadow:localtime" "no"     # sanoid names snapshots in UTC
+smbcontrol smbd reload-config
+smbclient //localhost/samba -U kipavy -c 'allinfo "some file"'   # lists @GMT-... versions
+```
+
 ### NFS export (only if a Linux client needs it)
 
 Squash to the same owner and restrict the clients (here: Tailscale devices + the LAN):
