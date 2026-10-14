@@ -42,6 +42,21 @@ bash /usr/local/sbin/pve-dns-sync --install   # systemd timer, every 2 minutes
 pve-dns-sync --dry-run                        # what is published
 ```
 
+{% hint style="warning" %}
+The wildcard also catches subdomains that are **not** behind this reverse proxy (e.g. `vw.kipavy.fr`, served by a Cloudflare tunnel on another server): on the LAN they hit NPMplus, get its default certificate and fail. Exempt them in AdGuard (`/opt/AdGuardHome/AdGuardHome.yaml`, under `rewrites:`, AdGuard stopped) with the special answers `A` / `AAAA`, which mean "keep the upstream answer":
+
+```yaml
+    - domain: vw.kipavy.fr
+      answer: A
+      enabled: true
+    - domain: vw.kipavy.fr
+      answer: AAAA
+      enabled: true
+```
+
+`pve-dns-sync` only edits the rewrites listed in `REWRITES`, so these stay.
+{% endhint %}
+
 ## Who resolves through AdGuard
 
 | Client | How |
