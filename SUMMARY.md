@@ -110,6 +110,7 @@
   * [📁 File Sharing](self-hosting/storage/file-sharing.md)
   * [💾 Proxmox Backup](self-hosting/storage/proxmox-backup.md)
   * [🚚 Moving Proxmox to Another Network](self-hosting/storage/proxmox-move-network.md)
+  * [🏷️ Local Names Instead of IPs](self-hosting/storage/proxmox-local-dns.md)
 * [Supabase Studio over plain Postgres](self-hosting/supabase-studio-over-plain-postgres.md)
 * [Tips](self-hosting/tips.md)
 

@@ -88,7 +88,7 @@ Plug the server into the box **with an Ethernet cable** and power it on. Allow ~
 The subnet router shows up in Tailscale again. In the admin console, **approve the new route** (*Machines → … → Edit route settings*) unless autoApprovers did it. Then, from anywhere:
 
 ```shellscript
-ssh root@192.168.0.75        # the host, with its new subnet
+ssh root@pve.lan             # names follow the move (see Local Names Instead of IPs)
 pve-renumber --status
 cat /root/pve-renumber-report.txt
 ```
@@ -99,16 +99,15 @@ Log of what happened: `/var/log/pve-renumber.log`.
 {% step %}
 ### Fix the leftovers
 
-Go through the report: update each listed file (and the reverse proxy / DNS UIs), then restart the app. Example from this homelab:
+With every app using [`.lan` names](proxmox-local-dns.md) instead of IPs, the report should be empty. If it lists something, that file still has an IP: replace it with a name rather than with the new IP, so the next move needs nothing either. Run `pve-renumber --scan` to check again.
 
-```
-  CT 101:  /opt/npmplus/nginx/proxy_host/*.conf     -> fix proxy hosts in the NPM UI
-  CT 102:  /opt/AdGuardHome/AdGuardHome.yaml          -> DNS rewrites
-  CT 104:  /etc/exports, Glance .env + widgets        -> edit, then redeploy
-  host:    /usr/local/bin/pve-etc-backup.sh           -> PBS address
+**Docker Swarm (Dokploy)**: a swarm stays bound to the IP it was initialised with. If Dokploy does not come back after a move, re-anchor it in its container without losing services or data:
+
+```shellscript
+docker swarm init --force-new-cluster --advertise-addr "$(ip -4 -o addr show eth0 | awk '{split($4,a,"/"); print a[1]}')"
 ```
 
-Run `pve-renumber --scan` again until it lists nothing you care about.
+Single-node swarms in an LXC: use `--endpoint-mode dnsrr` on services that others reach by name (IPVS virtual IPs refuse connections in unprivileged containers).
 {% endstep %}
 
 {% step %}
