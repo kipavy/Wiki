@@ -1,6 +1,0 @@
----
-icon: python
----
-
-# Python
-
