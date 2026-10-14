@@ -75,6 +75,50 @@ groupadd -g 10000 nas_shares
 usermod -aG nas_shares $USER  # or whatever user needs to access data
 ```
 
+### Automatic snapshots (sanoid)
+
+A mirror is **redundancy, not a backup**: it survives a dead disk, but a deletion, an overwrite or a ransomware run is written to both disks instantly. Snapshots cover that. They are free when taken and only grow with the data **deleted or modified** since, so a few GB for photos and documents.
+
+On the Proxmox host:
+
+```shellscript
+apt install sanoid
+cat > /etc/sanoid/sanoid.conf <<'EOF'
+# Not snapshotted: tank/backup (PBS has its own retention), subvol-* (CT rootfs, backed up by PBS)
+[tank/nfs_data]
+  use_template = files
+  recursive = yes
+[tank/immich]
+  use_template = files
+[tank/anytype]
+  use_template = files
+
+[template_files]
+  frequently = 0
+  hourly = 24
+  daily = 14
+  weekly = 4
+  monthly = 0
+  yearly = 0
+  autosnap = yes
+  autoprune = yes
+EOF
+systemctl enable --now sanoid.timer           # runs every 15 min, takes/prunes as due
+zfs list -t snapshot -o name,used -r tank     # snapshot names are in UTC
+```
+
+{% hint style="warning" %}
+Write the config with spaces, not tabs, when pasting into a terminal: tabs trigger shell completion and end up in the file.
+{% endhint %}
+
+Restore a file: every snapshot is browsable read-only under `<dataset mountpoint>/.zfs/snapshot/<name>/`, or from Windows via **Previous Versions** (see [File Sharing](file-sharing.md)). Roll a whole dataset back: `zfs rollback -r tank/nfs_data@<snapshot>` (destroys everything newer).
+
+Space: `zfs list -o name,used,usedbysnapshots -r tank`. Forgotten manual snapshots (e.g. `@migration`) keep deleted data forever. Remove them with `zfs destroy tank/<ds>@<name>`.
+
+{% hint style="info" %}
+A mirror's capacity is its **smallest** disk (a 3 TB + 4 TB mirror gives ~2.5 TiB usable). Replace the small one with a bigger disk and set `zpool set autoexpand=on tank` to get the space.
+{% endhint %}
+
 ### Add disk to an existing pool
 
 {% hint style="success" %}
