@@ -1,0 +1,12 @@
+dhcpcd-10.1.0 starting
+vmbr0: offered 192.168.0.39 from 192.168.0.254
+interface='vmbr0'
+reason='TEST'
+new_broadcast_address='192.168.0.255'
+new_domain_name_servers='192.168.0.254'
+new_ip_address='192.168.0.39'
+new_network_number='192.168.0.0'
+new_routers='192.168.0.254'
+new_subnet_cidr='24'
+new_subnet_mask='255.255.255.0'
+dhcpcd exited
