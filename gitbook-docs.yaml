@@ -1,0 +1,11 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: IT Wiki
+  structure:
+    - type: space
+      key: space-1
+      title: IT Wiki
+      path: it-wiki
+      default: true
+      content:
+        directory: ./it-wiki
