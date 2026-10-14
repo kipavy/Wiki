@@ -21,14 +21,15 @@ At every boot, **before the guests start**:
 4. It backs everything up, then reboots once.
 5. After the reboot, once guests are up, it moves the Tailscale subnet route (`192.168.1.0/24` → `192.168.0.0/24`) and writes a report of the app configs that still point at the old network.
 
-```
-boot ── gateway answers? ──yes──▶ normal boot
-             │no
-             ▼
-     DHCP offer = same network? ──yes──▶ normal boot (box just slow / no ping)
-             │no (or no offer at all → leave everything alone)
-             ▼
-     rewrite host + LXC/VM configs ─▶ backup ─▶ reboot ─▶ Tailscale route + report
+```mermaid
+flowchart TD
+    boot([Boot]) --> gw{Gateway answers?}
+    gw -- yes --> normal([Normal boot])
+    gw -- no --> offer{DHCP offer?}
+    offer -- "no offer" --> leave([Leave everything alone])
+    offer -- "same network<br/>(box slow / no ping)" --> normal
+    offer -- "different network" --> rewrite[Rewrite host + LXC/VM configs]
+    rewrite --> backup[Backup] --> reboot[Reboot] --> post([Tailscale route + report])
 ```
 
 | Rewritten automatically | Only reported (you fix them) |
