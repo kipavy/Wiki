@@ -8,4 +8,6 @@ site:
       path: it-wiki
       default: true
       content:
-        directory: ./it-wiki
+        # The wiki lives at the repository root (SUMMARY.md + README.md drive
+        # the navigation). Not ./it-wiki: that was a one-off GitBook export.
+        directory: ./
