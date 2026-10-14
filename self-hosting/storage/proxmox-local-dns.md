@@ -8,11 +8,12 @@ description: >-
 
 Hard-coded LAN addresses (`192.168.1.149:2283` in a reverse proxy, a dashboard, a script…) are what breaks when the server moves to another network. Here every guest gets a name **generated from `/etc/pve`**, and every app uses that name:
 
-```
-/etc/pve (hostnames + IPs)  ──pve-dns-sync──▶  AdGuard Home  ──▶  docker.lan, pbs.lan, pve.lan, box.lan…
-        ▲                                         ▲
-  pve-renumber keeps it right             reached via Tailscale split DNS
-  after a move                            (stable 100.x address)
+```mermaid
+flowchart LR
+    renumber["pve-renumber<br/>(after a move)"] -- keeps it right --> pve["/etc/pve<br/>hostnames + IPs"]
+    pve -- "pve-dns-sync<br/>(every 2 min)" --> adguard["AdGuard Home"]
+    adguard --> names["docker.lan, pbs.lan,<br/>pve.lan, box.lan…"]
+    devices["Your devices"] -- "Tailscale split DNS<br/>(stable 100.x address)" --> adguard
 ```
 
 After a move, [`pve-renumber`](proxmox-move-network.md) rewrites `/etc/pve`, `pve-dns-sync` republishes the names within 2 minutes, and **nothing else needs editing**.
