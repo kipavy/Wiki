@@ -1,0 +1,127 @@
+# Table of contents
+
+* [👋 Welcome](README.md)
+
+## Web Development
+
+* [🏭 Architecture & Planning](web-development/architecture-and-planning/README.md)
+  * [Architectural Patterns](web-development/architecture-and-planning/architectural-patterns/README.md)
+    * [SPA vs. MPA](web-development/architecture-and-planning/architectural-patterns/spa-vs.-mpa.md)
+    * [Rendering Strategies](web-development/architecture-and-planning/architectural-patterns/rendering-strategies.md)
+    * [Monolith vs. Microservices](web-development/architecture-and-planning/architectural-patterns/monolith-vs.-microservices.md)
+    * [Communication](web-development/architecture-and-planning/architectural-patterns/communication.md)
+    * [MVC](web-development/architecture-and-planning/architectural-patterns/mvc.md)
+  * [Choosing the Stack](web-development/architecture-and-planning/choosing-the-stack.md)
+  * [Project Lifecycle](web-development/architecture-and-planning/project-lifecycle.md)
+* [🎨 Frontend](web-development/frontend.md)
+* [🧱 Backend](web-development/backend/README.md)
+  * [API Design](web-development/backend/api-design.md)
+  * [Code Architecture](web-development/backend/code-architecture.md)
+* [⚙️ Environment & Setup](web-development/environment-and-setup/README.md)
+  * [Git Workflows](web-development/environment-and-setup/git-workflows.md)
+  * [📦 Package Managers](web-development/environment-and-setup/package-managers.md)
+  * [🚀 Quickstart](web-development/environment-and-setup/quickstart.md)
+* [🚀 Deployment & DevOps](web-development/deployment-and-devops.md)
+
+## 🐧 Linux
+
+* [Basics](linux/basics.md)
+* [Useful Commands](linux/useful-commands.md)
+* [SSH](linux/ssh.md)
+* [Customize Terminal](linux/customize-terminal/README.md)
+  * [Best Shell](linux/customize-terminal/best-shell.md)
+  * [Change Bash Colors](linux/customize-terminal/change-bash-colors.md)
+* [Add flatpak for Kubuntu 24.04](linux/add-flatpak-for-kubuntu-24.04.md)
+* [Troubleshooting](linux/troubleshooting.md)
+* [🐳 Docker](linux/docker/README.md)
+  * [Introduction](linux/docker/introduction.md)
+  * [Tips & Tricks](linux/docker/useful-tips.md)
+  * [Easy Monitoring](linux/docker/easy-monitoring.md)
+  * [Examples of use](linux/docker/examples-of-use.md)
+* [Kubernetes](linux/kubernetes.md)
+
+## Windows
+
+* [Useful tools](windows/useful-tools.md)
+* [Linux with Windows](windows/linux-with-windows/README.md)
+  * [WSL](windows/linux-with-windows/wsl.md)
+  * [Linux on Portable SSD](windows/linux-with-windows/linux-on-portable-ssd.md)
+
+## 🤖 AI Coding Agents
+
+* [Claude Code](ai-coding-agents/claude-code/README.md)
+  * [Using It Well](ai-coding-agents/claude-code/using-it-well.md)
+  * [CLAUDE.md](ai-coding-agents/claude-code/claude-md.md)
+  * [Configuration](ai-coding-agents/claude-code/configuration.md)
+  * [Plugins Worth It](ai-coding-agents/claude-code/plugins.md)
+* [Custom Skills](ai-coding-agents/custom-skills.md)
+* [MCP Servers Worth It](ai-coding-agents/mcp-servers.md)
+* [Community MCP Servers on Windows](ai-coding-agents/mcp-community-servers-windows.md)
+* [Other Agents](ai-coding-agents/other-agents.md)
+
+***
+
+* [VS Code](vs-code/README.md)
+  * [Alpine Vscode Server Tunnel](vs-code/alpine-vscode-server-tunnel.md)
+  * [Codespace as SSH Proxy](vs-code/codespace-as-ssh-proxy.md)
+  * [GUI on Codespace](vs-code/gui-on-codespace.md)
+  * [Nice Extensions](vs-code/nice-extensions.md)
+* [Git](git/README.md)
+  * [Git Basics](git/git-basics.md)
+  * [Git Workflows](web-development/environment-and-setup/git-workflows.md)
+  * [SSH Keys & PAT](git/github-ssh-access-for-private-repo.md)
+  * [Updating a fork](git/updating-fork.md)
+  * [Creating a mirror of a repo](git/creating-a-mirror-of-a-repo.md)
+  * [Managing Branches](git/managing-branches.md)
+  * [Rename/Edit/Squash commit(s)](git/renaming-a-pushed-commit.md)
+  * [Reset and Switch](git/reset-and-switch.md)
+  * [CI/CD](git/github-actions.md)
+  * [Tips & Tricks](git/tips-and-tricks.md)
+* [Python](python/README.md)
+  * [Virtual Environments](python/virtual-environments.md)
+  * [UV](python/uv.md)
+  * [Tips & Tricks](python/tips-and-tricks.md)
+
+## 🌐 Networking
+
+* [Networking](networking/networking/README.md)
+  * [Virtual Networking with KVM/QEMU & VDE2](networking/networking/kvm-qemu-vde2.md)
+  * [Building a Linux Router](networking/networking/linux-router.md)
+  * [Packet Capture with tshark](networking/networking/packet-capture-tshark.md)
+  * [Network Troubleshooting](networking/networking/troubleshooting.md)
+  * [DVB & SDR — Broadcast TV Analysis](networking/networking/dvb-sdr.md)
+  * [Asterisk VoIP](networking/networking/asterisk-voip.md)
+
+## 🖥️ Self-hosting
+
+* [Remote Access](self-hosting/remote-access/README.md)
+  * [Cloudflare Tunnels](self-hosting/remote-access/cloudflare-tunnels.md)
+  * [Tailscale](self-hosting/remote-access/tailscale/README.md)
+    * [Split DNS](self-hosting/remote-access/tailscale/split-dns.md)
+    * [Tailscale Subnet routers](self-hosting/remote-access/tailscale/tailscale-subnet-routers.md)
+    * [Tailscale Funnel](self-hosting/remote-access/tailscale/tailscale-funnel.md)
+    * [SSH Web Tailscale](self-hosting/remote-access/tailscale/ssh-web-tailscale.md)
+  * [Reverse Proxy](self-hosting/remote-access/reverse-proxy.md)
+  * [Forward Port on Oracle Free Tier](self-hosting/remote-access/forward-port-on-oracle-free-tier.md)
+* [Storage](self-hosting/storage/README.md)
+  * [⚙️ Proxmox Post-Install](self-hosting/storage/proxmox-post-install.md)
+  * [HDD Monitoring Proxmox](self-hosting/storage/hdd-monitoring-proxmox.md)
+  * [ZFS Proxmox Config](self-hosting/storage/zfs-proxmox-config.md)
+  * [📁 File Sharing](self-hosting/storage/file-sharing.md)
+  * [💾 Proxmox Backup](self-hosting/storage/proxmox-backup.md)
+* [Supabase Studio over plain Postgres](self-hosting/supabase-studio-over-plain-postgres.md)
+* [Tips](self-hosting/tips.md)
+
+## 🎬 PlexMediaServer
+
+* [Installation](plexmediaserver/installation.md)
+
+## 💻 Awesome Tools
+
+* [Everything](awesome-tools/everything.md)
+* [Medicat](awesome-tools/medicat.md)
+
+## ✍️ TODO
+
+* [Page 1](todo/page-1.md)
+* [Parsec when it's blocked](todo/parsec-when-its-blocked.md)
