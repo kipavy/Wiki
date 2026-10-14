@@ -1,143 +1,123 @@
 ---
-description: This is a tutorial to setup and use an NFS file share on a Proxmox server.
+description: Share a ZFS dataset from Proxmox over SMB (Windows/Android) and optionally NFS (Linux), with permissions that just work.
 ---
 
 # 📁 File Sharing
 
-This tutorial only covers NFS but there are other file sharing methods like SSHFS, SMB, FTP.
+**Pick the protocol by client, not by benchmark:**
 
-Personnaly I chose NFS because it was the most performant option (see benchmarks below). Moreover, I use Tailscale for external access, so using SSHFS would have resulted in double encryption. Though SSHFS could be a good choice because it needs no server config, if you're interested in using SSHFS, the server can be any machine that has SSH server (and for windows clients, check out [#sshfs-win-mount-ssh-host-as-network-drive](../../windows/useful-tools.md#sshfs-win-mount-ssh-host-as-network-drive "mention")).
+| Client | Protocol | Why |
+| --- | --- | --- |
+| Windows | **SMB** | Native SMB3 saturates gigabit. The Windows NFS client is NFSv3-only, maps every user to an anonymous UID, and is not faster: copies fail on permissions and leave `file:Zone.Identifier` stub files behind |
+| Android | **SMB** | The only thing file managers speak |
+| Linux | NFS (optional) | Native and a bit lighter than SMB. Only worth it if a Linux machine actually mounts the share |
 
-{% embed url="https://blog.ja-ke.tech/2019/08/27/nas-performance-sshfs-nfs-smb.html" %}
+NFS benchmarks well against SMB [between Linux machines](https://blog.ja-ke.tech/2019/08/27/nas-performance-sshfs-nfs-smb.html), but behind a mirrored HDD pool (~150 MB/s) or a remote Tailscale link, the disks or the upload are the bottleneck, not the protocol.
+
+{% hint style="danger" %}
+Never leave a share as **guest** (no password). Anyone on the LAN (or on the network of whoever hosts your server) can read and write it.
+{% endhint %}
 
 ***
 
-## NFS Server
+## Server (Cockpit LXC)
 
-1. Create <mark style="color:yellow;">**Privileged**</mark> Cockpit LXC (during setup, say yes to 45drives plugin): [https://community-scripts.github.io/ProxmoxVE/scripts?id=cockpit](https://community-scripts.github.io/ProxmoxVE/scripts?id=cockpit)
-2. Once you're logged it into Cockpit dashboard ([https://192.168.1.90:9090/file-sharing](https://192.168.1.90:9090/file-sharing)), Create an NFS Share (don't create in on '/') (make sure the permissions are ok).
+1. Create a <mark style="color:yellow;">**Privileged**</mark> Cockpit LXC (say yes to the 45drives plugins): [https://community-scripts.github.io/ProxmoxVE/scripts?id=cockpit](https://community-scripts.github.io/ProxmoxVE/scripts?id=cockpit)
+2. Bind-mount the dataset into it (on the Proxmox host):
 
-## NFS Client
-
-### Windows NFS Client
-
-1. Enable NFS Client on your Windows PC:
-
-{% tabs %}
-{% tab title="EASY WAY (Recommended)" %}
-Open an **Admin** Powershell and paste this in:
-
-```powershell
-Write-Host "Enabling NFS client features..."
-Enable-WindowsOptionalFeature -Online -FeatureName ServicesForNFS-ClientOnly, ClientForNFS-Infrastructure -NoRestart
-
-$regPath = 'HKLM:\SOFTWARE\Microsoft\ClientForNFS\CurrentVersion\Default'
-
-nfsadmin client stop
-Set-ItemProperty -Path $regPath -Name 'AnonymousUID' -Type DWord -Value 0
-Set-ItemProperty -Path $regPath -Name 'AnonymousGID' -Type DWord -Value 0
-nfsadmin client start
-nfsadmin client localhost config fileaccess=755 SecFlavors=+sys -krb5 -krb5i
-
-Write-Host "`nVerifying registry values..."
-Get-ItemProperty -Path $regPath | Select-Object AnonymousUid, AnonymousGid
-
-Write-Host "`nNFS client status:"
-Get-Service -Name NfsClnt
-Write-Host "`n✅ NFS client successfully enabled and configured."
-
-```
-{% endtab %}
-
-{% tab title="EASY WAY 2" %}
-1. Open Powershell and paste this in:
-
-```powershell
-iwr christitus.com/win | iex
+```shellscript
+pct set 103 -mp0 /tank/nfs_data,mp=/nfs
 ```
 
-2. Config > check NFS > Install Features
-3. Wait for install to finish, you can see in the CMD when its done
-{% endtab %}
+3. In the container, create **one owner** for every file, whatever protocol writes it:
 
-{% tab title="WORST WAY" %}
-{% hint style="danger" %}
-DON'T DO IT, I included it just for reference but I tried it, it was laggy, slow (2x slower than method 1/2)&#x20;
+```shellscript
+groupadd -g 1000 kipavy
+useradd -u 1000 -g 1000 -M -d /nonexistent -s /usr/sbin/nologin kipavy
+smbpasswd -a kipavy                       # the SMB password
+chown -R kipavy:kipavy /nfs
+find /nfs -type d -exec chmod 2775 {} +   # setgid: new files keep the group
+find /nfs -type f -exec chmod 0664 {} +
+```
+
+{% hint style="warning" %}
+The share root must belong to that user too. A root-owned `755` share root lets nobody create files at the top level, the classic "I can read but not write" symptom.
 {% endhint %}
 
-choco install nfs-win
+### SMB share
 
-```powershell
-choco install nfs-win
+Create it in Cockpit > File Sharing, or directly (Cockpit stores shares in the Samba registry):
+
+```shellscript
+net conf addshare samba /nfs writeable=y guest_ok=n
+net conf setparm samba "valid users" kipavy
+net conf setparm samba "force user" kipavy
+net conf setparm samba "force group" kipavy
+net conf setparm samba "create mask" 0664
+net conf setparm samba "directory mask" 2775
+net conf setparm samba "vfs objects" streams_xattr   # Windows metadata (Zone.Identifier...) as xattrs
+net conf setparm global "map to guest" never
+smbcontrol smbd reload-config
+net conf list                                        # check
 ```
 
-Note that after this, you won't have `mount` command, so you'll use:
+### NFS export (only if a Linux client needs it)
 
-```powershell
-net use V: \\nfs\192.168.1.90\srv\nfs_share /PERSISTENT:YES
-```
-{% endtab %}
-{% endtabs %}
+Squash to the same owner and restrict the clients (here: Tailscale devices + the LAN):
 
-2. Mount the network drive automatically, press `Win+R` then `shell:startup`
-3. Create a `.bat` file with
-
-```powershell
-@echo off
-mount -o anon \\192.168.1.90\YOUR\PATH V:
+```shellscript
+echo '/nfs 100.64.0.0/10(rw,sync,no_subtree_check,all_squash,anonuid=1000,anongid=1000) 192.168.1.0/24(rw,sync,no_subtree_check,all_squash,anonuid=1000,anongid=1000)' \
+  > /etc/exports.d/cockpit-file-sharing.exports
+exportfs -ra
 ```
 
-4. You can now either reboot or double click the .bat file to mount the NFS Network Drive.
+No Linux client? `systemctl disable --now nfs-server` and empty that file.
 
-### Linux NFS Client
+***
 
-1. Install NFS package
+## Clients
+
+### Windows (SMB)
+
+Save the password, then map the drive (persists across reboots, no startup script needed):
+
+```powershell
+cmdkey /add:cockpit.lan /user:kipavy /pass:YOUR_PASSWORD
+net use N: \\cockpit.lan\samba /persistent:yes
+```
+
+`cockpit.lan` is served by AdGuard ([local DNS](proxmox-local-dns.md)), so the drive survives a network move.
+
+If the Windows NFS client was installed before, remove it (admin PowerShell, then reboot):
+
+```powershell
+Disable-WindowsOptionalFeature -Online -FeatureName ServicesForNFS-ClientOnly,ClientForNFS-Infrastructure -NoRestart
+```
+
+### Android (SMB)
+
+Any file manager with SMB (Material Files, Solid Explorer, CX File Explorer): host `cockpit.lan` (or the IP), share `samba`, user `kipavy` + password.
+
+### Linux
 
 {% tabs %}
-{% tab title="Debian/Ubuntu" %}
+{% tab title="SMB" %}
 ```shellscript
-sudo apt update
-sudo apt install nfs-common
+sudo apt install cifs-utils
+printf 'username=kipavy\npassword=YOUR_PASSWORD\n' | sudo tee /root/.smb-nas >/dev/null && sudo chmod 600 /root/.smb-nas
+sudo mkdir -p /mnt/nas
+echo '//cockpit.lan/samba /mnt/nas cifs credentials=/root/.smb-nas,uid=1000,gid=1000,x-systemd.automount,_netdev 0 0' | sudo tee -a /etc/fstab
+sudo systemctl daemon-reload && sudo mount -a
 ```
 {% endtab %}
 
-{% tab title="Arch Linux/Manjaro" %}
-```bash
-sudo pacman -S nfs-utils
-sudo systemctl enable --now nfs-client.target
-```
-{% endtab %}
+{% tab title="NFS" %}
+Install the client (`nfs-common` on Debian/Ubuntu, `nfs-utils` on Arch/Fedora), then:
 
-{% tab title="Fedora/CentOS/RHEL" %}
-```bash
-sudo dnf install nfs-utils
+```shellscript
+sudo mkdir -p /mnt/nas
+echo 'cockpit.lan:/nfs /mnt/nas nfs defaults,noatime,x-systemd.automount,x-systemd.device-timeout=10 0 0' | sudo tee -a /etc/fstab
+sudo systemctl daemon-reload && sudo mount -a
 ```
 {% endtab %}
 {% endtabs %}
-
-2. Créez votre point de montage
-
-```shellscript
-sudo mkdir -p /mnt/nfs_share
-```
-
-3. Ouvrez le fichier `/etc/fstab`
-
-```shellscript
-sudo nano /etc/fstab
-```
-
-4. Ajoutez la ligne suivante à la fin du fichier, en remplaçant l'adresse IP et les chemins :
-
-{% code overflow="wrap" %}
-```shellscript
-192.168.1.90:/srv/nfs_share /mnt/nfs_share nfs defaults,noatime,x-systemd.automount,x-systemd.device-timeout=10 0 0
-```
-{% endcode %}
-
-5. Testez le montage sans redémarrer :
-
-```shellscript
-sudo systemctl daemon-reload
-sudo mount -a
-```
