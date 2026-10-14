@@ -1,0 +1,5 @@
+# Shell scripts and their test fixtures must stay LF. With core.autocrlf=true
+# (the Git for Windows default) they would be checked out as CRLF and bash then
+# fails with "set: pipefail: invalid option name" / "syntax error near $'\r'".
+*.sh text eol=lf
+scripts/** text eol=lf
