@@ -62,12 +62,34 @@ The wildcard also catches subdomains that are **not** behind this reverse proxy 
 | Client | How |
 | --- | --- |
 | Containers | Proxmox `nameserver` option: `pct set <id> --nameserver "192.168.1.95 1.1.1.1"` (in `/etc/pve`, so `pve-renumber` moves it) |
-| Host | `/etc/resolv.conf`: AdGuard first, `1.1.1.1` second, `options timeout:2` |
+| Host | `/etc/resolv.conf`: AdGuard first, `1.1.1.1` second, `options timeout:2`, `search lan` ([why](#search-domain-lan-never-the-wildcard-domain)) |
 | Reverse proxy (NPMplus, CT101) | **AdGuard only**: nginx round-robins its resolvers, with `1.1.1.1` listed half the `.lan` lookups fail. `tailscale set --accept-dns=false` in that CT so MagicDNS doesn't take over |
 | DHCP containers | Give them a static IP instead (above the box's DHCP range). The `dhcpcd` started by ifupdown keeps rewriting `resolv.conf` with the box's DNS, and does not reload `nohook resolv.conf` from its config |
 | Your devices, anywhere | Tailscale split DNS: `kipavy.fr` and `lan` → AdGuard's **Tailscale IP** |
 
 AdGuard runs its own Tailscale client (`tailscale up --accept-dns=false --hostname=adguard`) only to get a `100.x` address that never changes. The split DNS in the Tailscale admin console therefore never needs editing after a move.
+
+## Search domain: `lan`, never the wildcard domain
+
+The search domain is appended to every short name (`docker`, `immich-database`…). If it is `kipavy.fr`, the wildcard answers **every** short name with the reverse proxy's IP, including names that should never leave Docker:
+
+* Symptom: a Compose stack whose containers are all `healthy` but whose app fails, with `ECONNREFUSED 192.168.1.110:5432` (or `:6379`…) in its logs: the app reaches NPMplus instead of its database.
+* Cause: containers inherit the CT's `search kipavy.fr`, so `immich-database` resolves as `immich-database.kipavy.fr` → wildcard → NPMplus, before Docker's own DNS answers.
+* Check:
+
+  ```shellscript
+  docker exec <container> getent hosts <service>   # must be a 172.x Docker IP, not the proxy
+  ```
+
+* Fix, on the host (containers without their own `searchdomain` inherit it at their next start):
+
+  ```shellscript
+  pvesh set /nodes/pve/dns -search lan -dns1 192.168.1.95 -dns2 1.1.1.1   # pass dns1/dns2 again
+  # running CTs: same edit inside the "BEGIN PVE" block of their /etc/resolv.conf
+  docker compose up -d --force-recreate   # in each stack: Docker copies resolv.conf at creation only
+  ```
+
+With `search lan`, short names now resolve to the right guest (`docker` → `docker.lan`), and unknown ones fail instead of silently reaching the proxy. The host's own FQDN (`pve.kipavy.fr` in `/etc/hosts`) can stay.
 
 ## AdGuard must not fall over
 
