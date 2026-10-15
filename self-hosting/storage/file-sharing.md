@@ -26,7 +26,7 @@ Never leave a share as **guest** (no password). Anyone on the LAN (or on the net
 2. Bind-mount the dataset into it (on the Proxmox host):
 
 ```shellscript
-pct set 103 -mp0 /tank/nfs_data,mp=/nfs
+pct set 103 -mp0 /tank/smb_data,mp=/smb
 ```
 
 3. In the container, create **one owner** for every file, whatever protocol writes it:
@@ -35,9 +35,9 @@ pct set 103 -mp0 /tank/nfs_data,mp=/nfs
 groupadd -g 1000 kipavy
 useradd -u 1000 -g 1000 -M -d /nonexistent -s /usr/sbin/nologin kipavy
 smbpasswd -a kipavy                       # the SMB password
-chown -R kipavy:kipavy /nfs
-find /nfs -type d -exec chmod 2775 {} +   # setgid: new files keep the group
-find /nfs -type f -exec chmod 0664 {} +
+chown -R kipavy:kipavy /smb
+find /smb -type d -exec chmod 2775 {} +   # setgid: new files keep the group
+find /smb -type f -exec chmod 0664 {} +
 ```
 
 {% hint style="warning" %}
@@ -49,7 +49,7 @@ The share root must belong to that user too. A root-owned `755` share root lets 
 Create it in Cockpit > File Sharing, or directly (Cockpit stores shares in the Samba registry):
 
 ```shellscript
-net conf addshare samba /nfs writeable=y guest_ok=n
+net conf addshare samba /smb writeable=y guest_ok=n
 net conf setparm samba "valid users" kipavy
 net conf setparm samba "force user" kipavy
 net conf setparm samba "force group" kipavy
@@ -63,7 +63,7 @@ net conf list                                        # check
 
 ### Windows "Previous Versions" (ZFS snapshots)
 
-With [sanoid snapshots](zfs-proxmox-config.md#automatic-snapshots-sanoid) on the dataset, Samba can show them in Windows (right click a file or folder > Properties > **Previous Versions**), so anyone can restore their own files. The bind mount already exposes `/nfs/.zfs/snapshot` in the LXC:
+With [sanoid snapshots](zfs-proxmox-config.md#automatic-snapshots-sanoid) on the dataset, Samba can show them in Windows (right click a file or folder > Properties > **Previous Versions**), so anyone can restore their own files. The bind mount already exposes `/smb/.zfs/snapshot` in the LXC:
 
 ```shellscript
 net conf setparm samba "vfs objects" "shadow_copy2 streams_xattr"
@@ -77,12 +77,16 @@ smbcontrol smbd reload-config
 smbclient //localhost/samba -U kipavy -c 'allinfo "some file"'   # lists @GMT-... versions
 ```
 
+{% hint style="warning" %}
+Files added, removed or rolled back **directly on the dataset** (from the Proxmox host or a script, not through Samba) are not announced to SMB clients. A Windows client that already opened the folder keeps an oplock lease on it and shows the old listing, even after F5. Check what the server sees with `ls /smb` in the LXC, then drop the stale session: `smbstatus -S` to get the PID, then `smbcontrol <pid> close-share samba`. Explorer reconnects by itself.
+{% endhint %}
+
 ### NFS export (only if a Linux client needs it)
 
 Squash to the same owner and restrict the clients (here: Tailscale devices + the LAN):
 
 ```shellscript
-echo '/nfs 100.64.0.0/10(rw,sync,no_subtree_check,all_squash,anonuid=1000,anongid=1000) 192.168.1.0/24(rw,sync,no_subtree_check,all_squash,anonuid=1000,anongid=1000)' \
+echo '/smb 100.64.0.0/10(rw,sync,no_subtree_check,all_squash,anonuid=1000,anongid=1000) 192.168.1.0/24(rw,sync,no_subtree_check,all_squash,anonuid=1000,anongid=1000)' \
   > /etc/exports.d/cockpit-file-sharing.exports
 exportfs -ra
 ```
@@ -132,7 +136,7 @@ Install the client (`nfs-common` on Debian/Ubuntu, `nfs-utils` on Arch/Fedora), 
 
 ```shellscript
 sudo mkdir -p /mnt/nas
-echo 'cockpit.lan:/nfs /mnt/nas nfs defaults,noatime,x-systemd.automount,x-systemd.device-timeout=10 0 0' | sudo tee -a /etc/fstab
+echo 'cockpit.lan:/smb /mnt/nas nfs defaults,noatime,x-systemd.automount,x-systemd.device-timeout=10 0 0' | sudo tee -a /etc/fstab
 sudo systemctl daemon-reload && sudo mount -a
 ```
 {% endtab %}
