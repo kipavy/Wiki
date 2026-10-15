@@ -85,7 +85,7 @@ On the Proxmox host:
 apt install sanoid
 cat > /etc/sanoid/sanoid.conf <<'EOF'
 # Not snapshotted: tank/backup (PBS has its own retention), subvol-* (CT rootfs, backed up by PBS)
-[tank/nfs_data]
+[tank/smb_data]
   use_template = files
   recursive = yes
 [tank/immich]
@@ -111,7 +111,7 @@ zfs list -t snapshot -o name,used -r tank     # snapshot names are in UTC
 Write the config with spaces, not tabs, when pasting into a terminal: tabs trigger shell completion and end up in the file.
 {% endhint %}
 
-Restore a file: every snapshot is browsable read-only under `<dataset mountpoint>/.zfs/snapshot/<name>/`, or from Windows via **Previous Versions** (see [File Sharing](file-sharing.md)). Roll a whole dataset back: `zfs rollback -r tank/nfs_data@<snapshot>` (destroys everything newer).
+Restore a file: every snapshot is browsable read-only under `<dataset mountpoint>/.zfs/snapshot/<name>/`, or from Windows via **Previous Versions** (see [File Sharing](file-sharing.md)). Roll a whole dataset back: `zfs rollback -r tank/smb_data@<snapshot>` (destroys everything newer).
 
 Space: `zfs list -o name,used,usedbysnapshots -r tank`. Forgotten manual snapshots (e.g. `@migration`) keep deleted data forever. Remove them with `zfs destroy tank/<ds>@<name>`.
 
