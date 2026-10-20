@@ -106,7 +106,6 @@ Save the password, then map the drive (persists across reboots, no startup scrip
 ```powershell
 cmdkey /add:cockpit.lan /user:kipavy /pass:YOUR_PASSWORD
 net use N: \\cockpit.lan\samba /persistent:yes
-label N: NAS
 ```
 
 `cockpit.lan` is served by AdGuard ([local DNS](proxmox-local-dns.md)), so the drive survives a network move.
