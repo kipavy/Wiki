@@ -1,18 +1,20 @@
 ---
-description: Share a ZFS dataset from Proxmox over SMB (Windows/Android) and optionally NFS (Linux), with permissions that just work.
+description: >-
+  Share a ZFS dataset from Proxmox over SMB (Windows/Android) and optionally NFS
+  (Linux), with permissions that just work.
 ---
 
 # 📁 File Sharing
 
 **Pick the protocol by client, not by benchmark:**
 
-| Client | Protocol | Why |
-| --- | --- | --- |
-| Windows | **SMB** | Native SMB3 saturates gigabit. The Windows NFS client is NFSv3-only, maps every user to an anonymous UID, and is not faster: copies fail on permissions and leave `file:Zone.Identifier` stub files behind |
-| Android | **SMB** | The only thing file managers speak |
-| Linux | NFS (optional) | Native and a bit lighter than SMB. Only worth it if a Linux machine actually mounts the share |
+| Client  | Protocol       | Why                                                                                                                                                                                                        |
+| ------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Windows | **SMB**        | Native SMB3 saturates gigabit. The Windows NFS client is NFSv3-only, maps every user to an anonymous UID, and is not faster: copies fail on permissions and leave `file:Zone.Identifier` stub files behind |
+| Android | **SMB**        | The only thing file managers speak                                                                                                                                                                         |
+| Linux   | NFS (optional) | Native and a bit lighter than SMB. Only worth it if a Linux machine actually mounts the share                                                                                                              |
 
-NFS benchmarks well against SMB [between Linux machines](https://blog.ja-ke.tech/2019/08/27/nas-performance-sshfs-nfs-smb.html), but behind a mirrored HDD pool (~150 MB/s) or a remote Tailscale link, the disks or the upload are the bottleneck, not the protocol.
+NFS benchmarks well against SMB [between Linux machines](https://blog.ja-ke.tech/2019/08/27/nas-performance-sshfs-nfs-smb.html), but behind a mirrored HDD pool (\~150 MB/s) or a remote Tailscale link, the disks or the upload are the bottleneck, not the protocol.
 
 {% hint style="danger" %}
 Never leave a share as **guest** (no password). Anyone on the LAN (or on the network of whoever hosts your server) can read and write it.
@@ -104,6 +106,7 @@ Save the password, then map the drive (persists across reboots, no startup scrip
 ```powershell
 cmdkey /add:cockpit.lan /user:kipavy /pass:YOUR_PASSWORD
 net use N: \\cockpit.lan\samba /persistent:yes
+label N: NAS
 ```
 
 `cockpit.lan` is served by AdGuard ([local DNS](proxmox-local-dns.md)), so the drive survives a network move.
