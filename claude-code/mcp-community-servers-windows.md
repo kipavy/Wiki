@@ -13,7 +13,7 @@ Fetch https://kipavy.gitbook.io/it-wiki/ai-coding-agents/mcp-community-servers-w
 and list every "Worked example" server documented on it (name + one-line description of
 what it's for). Present them as a numbered menu and ask which ones I want — don't
 install anything without my explicit selection. For each one I pick, run its exact
-install commands from the page (`npm install -g` / `git clone` + build, then
+install commands from the page (`npm install -g` / `git clone` + `uv` venv, then
 `claude mcp add`), applying the four gotchas listed at the top of the page as needed
 (skip `npx -p`, point `node` at the real entry file rather than the `.cmd` shim, add
 `-s user` unless I say I want it project-scoped only, and tell me it won't be usable
@@ -78,21 +78,27 @@ Want to sanity-check a server without restarting? Talk to it directly over stdio
 
 ### Worked example: Leboncoin + Vinted MCP
 
-Two unofficial servers, both npm/Node-based, both hit gotchas #1–#3 above:
+Two unofficial servers — Vinted is npm/Node, Leboncoin is Python (managed with [uv](https://docs.astral.sh/uv/), no system Python needed). Commands are for **Git Bash**:
 
 ```bash
 # Vinted — global install, point node at the real entry point (gotcha #2)
-npm install -g @googlarz/vinted-client
+npm install -g @googlarz/vinted-client@latest
 claude mcp add vinted -s user -- node "$(npm root -g)/@googlarz/vinted-client/dist/mcp.js"
 
-# Leboncoin — clone + build, same node-direct approach
-git clone https://github.com/NarenkuII/Leboncoin_mcp.git
-cd Leboncoin_mcp && npm install && npm run build
-claude mcp add leboncoin -s user -- node "$(pwd)/dist/index.js"
+# Leboncoin — wydii/leboncoin-mcp (FastMCP wrapper around the `lbc` client)
+git clone https://github.com/wydii/leboncoin-mcp.git
+cd leboncoin-mcp && uv venv && uv pip install -r requirements.txt
+claude mcp add leboncoin -s user -- "$(pwd -W)/.venv/Scripts/python.exe" "$(pwd -W)/server.py"
 ```
 
-Both worked with zero extra config — no API keys, no proxy needed for occasional personal use. The Leboncoin server falls back through direct SSR parsing → Jina rendering → browser automation when DataDome blocks a plain request, which covered every search made during testing.
+`pwd -W` matters: plain `$(pwd)` gives a `/c/Users/...` path that only Git Bash understands, and the server is spawned without a shell. Pointing at the venv's `python.exe` directly avoids needing to activate the venv (same idea as gotcha #2).
+
+Both work with zero extra config — no API keys, no proxy, no cookie for occasional personal use. Leboncoin tools: `search_ads`, `get_ad`, `get_user`, `list_categories` / `list_regions` / `list_departments`. The [`lbc`](https://github.com/etienne-hd/lbc) library underneath gets past Leboncoin's DataDome anti-bot and returns real ad IDs and URLs.
+
+{% hint style="info" %}
+**History (2026-11):** this page originally used `NarenkuII/Leboncoin_mcp` (Node). DataDome started answering its plain requests with 403, and its Jina fallback only scraped the search page — wrong-category results, fake IDs, every URL pointing at the search page. It was replaced by `wydii/leboncoin-mcp`. At the same time, `@googlarz/vinted-client` 1.1.x began returning 404 on every search (Vinted changed its API); **1.6.3** fixed it. So when a marketplace server suddenly breaks, first check `npm view <pkg> version` / `git fetch` for an update, and test the new version on the side (e.g. `node .../dist/cli.js search nike`) before upgrading.
+{% endhint %}
 
 {% hint style="warning" %}
-**Marketplace listings go stale fast.** A `search_listings`/`search_items` result is a snapshot — items get sold, reserved, or turn out defective (description says "HS"/"ne fonctionne pas" even though the title looks fine) between the search and when you'd act on it. Before presenting or acting on a result, fetch each candidate's **detail** endpoint (`get_listing_details` / `get_item`) and check for a sold/reserved status field and red-flag words in the full description — not just the title. Cheap insurance against recommending a dead or broken listing.
+**Marketplace listings go stale fast.** A `search_ads`/`search_items` result is a snapshot — items get sold, reserved, or turn out defective (description says "HS"/"ne fonctionne pas" even though the title looks fine) between the search and when you'd act on it. Before presenting or acting on a result, fetch each candidate's **detail** endpoint (`get_ad` / `get_item`) and check for a sold/reserved status field and red-flag words in the full description — not just the title. Cheap insurance against recommending a dead or broken listing.
 {% endhint %}
